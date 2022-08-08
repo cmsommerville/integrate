@@ -36,6 +36,10 @@ class Model_RefComparisonOperator(Model_RefMaster):
         'polymorphic_identity': 'comparison_operator'
     }
 
+class Model_RefCensusStrategy(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'census_strategy'
+    }
 
 class Model_RefComponentTypes(Model_RefMaster):
     ref_attr_enum = db.Column(db.String(30))
@@ -44,30 +48,35 @@ class Model_RefComponentTypes(Model_RefMaster):
         'polymorphic_identity': 'component_type'
     }
 
-
 class Model_RefInputTypes(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'text_field_type'
     }
 
+class Model_RefProductVariation(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'product_variation'
+    }
+
+class Model_RefProvision(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'provision'
+    }
 
 class Model_RefUnitCode(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'unit_code'
     }
 
-
 class Model_RefOptionality(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'optionality'
     }
 
-
 class Model_RefPremiumFrequency(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'premium_frequency'
     }
-
 
 class Model_RefFactorType(Model_RefMaster):
     __mapper_args__ = {
@@ -78,7 +87,6 @@ class Model_RefRatingStrategy(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'rating_strategy'
     }
-
 
 class Model_RefAttrMapperType(Model_RefMaster):
     __mapper_args__ = {

@@ -1,0 +1,1 @@
+from .Config_AttributeMapperDetail import Observer_ConfigAttributeMapperDetail_010

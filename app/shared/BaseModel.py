@@ -55,7 +55,15 @@ class BaseModel(db.Model):
         return qry.get(id)
 
     @classmethod
-    def find_by_attr(cls, attrs: dict, as_of_ts=None, *args, **kwargs) -> List[BaseModel]:
+    def find_one_by_attr(cls, attrs: dict, as_of_ts=None, *args, **kwargs) -> List[BaseModel]:
+        SUPPORT_TEMPORAL_TABLES = current_app.config.get("SUPPORT_TEMPORAL_TABLES", False)
+        qry = cls.query.filter(*[getattr(cls, k) == v for k, v in attrs.items()])
+        if as_of_ts and SUPPORT_TEMPORAL_TABLES: 
+            qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
+        return qry.first()
+
+    @classmethod
+    def find_all_by_attr(cls, attrs: dict, as_of_ts=None, *args, **kwargs) -> List[BaseModel]:
         SUPPORT_TEMPORAL_TABLES = current_app.config.get("SUPPORT_TEMPORAL_TABLES", False)
         qry = cls.query.filter(*[getattr(cls, k) == v for k, v in attrs.items()])
         if as_of_ts and SUPPORT_TEMPORAL_TABLES: 

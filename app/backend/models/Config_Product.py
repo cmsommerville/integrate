@@ -60,5 +60,4 @@ class Model_ConfigProduct(BaseModel):
     #     "Model_ConfigBenefit", back_populates="product")
     # provisions = db.relationship(
     #     "Model_ConfigProvision", back_populates="product")
-    # states = db.relationship(
-    #     "Model_ConfigProductStateAvailability", back_populates="product")
+    states = db.relationship("Model_ConfigProductState")

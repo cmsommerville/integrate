@@ -12,6 +12,9 @@ class Model_ConfigAttributeSet(BaseModel):
     config_attr_type_code = db.Column(db.String(30), nullable=False)
     config_attr_set_label = db.Column(db.String(100))
 
+    attributes = db.relationship("Model_ConfigAttributeDetail", 
+        primaryjoin="Model_ConfigAttributeSet.config_attr_set_id == Model_ConfigAttributeDetail.config_attr_set_id")
+
     __mapper_args__ = {
         'polymorphic_on': config_attr_type_code,
         'polymorphic_identity': 'attr_set'
@@ -24,24 +27,13 @@ class Model_ConfigAttributeSet_Gender(Model_ConfigAttributeSet):
         'polymorphic_identity': 'gender'
     }
 
-    genders = db.relationship("Model_ConfigAttributeDetail", 
-        primaryjoin="Model_ConfigAttributeSet_Gender.config_attr_set_id == Model_ConfigAttributeDetail.config_attr_set_id")
-
-
 class Model_ConfigAttributeSet_SmokerStatus(Model_ConfigAttributeSet):
     __mapper_args__ = {
         'polymorphic_identity': 'smoker_status'
     }
-
-    smoker_statuses = db.relationship("Model_ConfigAttributeDetail", 
-        primaryjoin="Model_ConfigAttributeSet_Gender.config_attr_set_id == Model_ConfigAttributeDetail.config_attr_set_id")
 
 
 class Model_ConfigAttributeSet_Relationship(Model_ConfigAttributeSet):
     __mapper_args__ = {
         'polymorphic_identity': 'relationship'
     }
-
-    relationships = db.relationship("Model_ConfigAttributeDetail", 
-        primaryjoin="Model_ConfigAttributeSet_Relationship.config_attr_set_id == Model_ConfigAttributeDetail.config_attr_set_id")
-

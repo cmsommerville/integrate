@@ -3,7 +3,7 @@ from app.shared import BaseSchema
 
 from ..models import Model_RefComparisonOperator, Model_RefComponentTypes, \
     Model_RefOptionality, Model_RefInputTypes, Model_RefUnitCode, Model_RefPremiumFrequency, \
-    Model_RefBenefit
+    Model_RefBenefit, Model_RefProvision
 
 
 class Schema_RefBenefit(BaseSchema):
@@ -16,6 +16,18 @@ class Schema_RefBenefit(BaseSchema):
     ref_attr_code = ma.String(data_key="ref_benefit_code")
     ref_attr_label = ma.String(data_key="ref_benefit_label")
     ref_attr_description = ma.String(data_key="ref_benefit_description")
+    
+
+class Schema_RefProvision(BaseSchema):
+    class Meta:
+        model = Model_RefProvision
+        load_instance = True
+
+    ref_entity_code = ma.Constant('provision')
+    ref_id = ma.Integer()
+    ref_attr_code = ma.String()
+    ref_attr_label = ma.String()
+    ref_attr_description = ma.String()
     
 
 class Schema_RefPremiumFrequency(BaseSchema):

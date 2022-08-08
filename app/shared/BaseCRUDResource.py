@@ -2,11 +2,12 @@ from flask import request
 from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
-
+from .BaseObservable import BaseObservable
 
 class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
+    observable: BaseObservable = None
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -16,6 +17,8 @@ class BaseCRUDResource(Resource):
         schema_instance = cls.schema()
         try: 
             obj = cls.model.find_one(id)
+            if cls.observable:
+                cls.observable.notify("GET", obj)
             if obj: 
                 return schema_instance.dump(obj), 200
             raise Exception(f"No data found for id {id}")
@@ -37,6 +40,12 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "message": str(e)}, 400
         
         try: 
+            if cls.observable:
+                cls.observable.notify("POST", obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
             return schema_instance.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
@@ -48,6 +57,16 @@ class BaseCRUDResource(Resource):
             req = request.get_json()
             obj = schema_instance.load(req)
             obj.save_to_db()
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+        
+        try: 
+            if cls.observable:
+                cls.observable.notify("PUT", obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+        
+        try: 
             return schema_instance.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
@@ -65,6 +84,16 @@ class BaseCRUDResource(Resource):
             obj = schema_instance.load({**data, **req})
             # save object to database 
             obj.save_to_db()
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try:
+            if cls.observable:
+                cls.observable.notify("PATCH", obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+        
+        try:
             return schema_instance.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
@@ -73,6 +102,16 @@ class BaseCRUDResource(Resource):
     def delete(cls, id): 
         try: 
             obj = cls.model.find_one(id)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try:
+            if cls.observable:
+                cls.observable.notify("DELETE", obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+        
+        try: 
             obj.delete()
             return {"status": "Deleted"}, 204
         except Exception as e:
@@ -90,6 +129,16 @@ class BaseCRUDResourceList(Resource):
     def get(cls, **kwargs):
         try: 
             objs = cls.model.find_all(**kwargs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
+            if cls.observable:
+                cls.observable.notify("GET", objs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
             if objs: 
                 return cls.schema(many=True).dump(objs), 200
             raise Exception("No data found")
@@ -103,6 +152,16 @@ class BaseCRUDResourceList(Resource):
             req = request.get_json()
             objs = schema_list_instance.load(req)
             cls.model.save_all_to_db(objs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
+            if cls.observable:
+                cls.observable.notify("POST", objs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try:
             return schema_list_instance.dump(objs), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400

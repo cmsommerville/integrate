@@ -7,6 +7,7 @@ TBL_NAMES = {
     "CONFIG_ATTRIBUTE_DETAIL": "config_attr_detail", 
     "CONFIG_ATTRIBUTE_DISTRIBUTION": "config_attr_distribution", 
     "CONFIG_ATTRIBUTE_DISTRIBUTION_SET": "config_attr_distribution_set", 
+    "CONFIG_ATTRIBUTE_MAPPER_DETAIL": "config_attr_mappre_detail",
     "CONFIG_ATTRIBUTE_SET": "config_attr_set",  
     "CONFIG_BENEFIT": "config_benefit",
     "CONFIG_BENEFIT_DURATION_DETAIL": "config_benefit_duration_detail",
