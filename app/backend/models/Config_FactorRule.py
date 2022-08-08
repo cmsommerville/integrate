@@ -25,4 +25,4 @@ class Model_ConfigFactorRule(BaseModel):
     comparison_column_value = db.Column(db.String(100), nullable=False)
     comparison_column_data_type_id = db.Column(db.ForeignKey(
         f"{REF_MASTER}.ref_id"
-    ), nullable=False, comment="Pythonic data types, such as str, float, etc.")
+    ), nullable=False, comment="Javascript data types, such as string, number, and boolean")
