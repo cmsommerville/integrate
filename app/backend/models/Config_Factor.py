@@ -16,3 +16,5 @@ class Model_ConfigFactor(BaseModel):
     ))
     factor_priority = db.Column(db.Integer, nullable=False)
     factor_value = db.Column(db.Numeric(8,5), nullable=False)
+
+    factor_rules = db.relationship("Model_ConfigFactorRule")

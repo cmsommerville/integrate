@@ -48,6 +48,12 @@ class Model_RefComponentTypes(Model_RefMaster):
         'polymorphic_identity': 'component_type'
     }
 
+class Model_RefDataTypes(Model_RefMaster):
+
+    __mapper_args__ = {
+        'polymorphic_identity': 'data_type'
+    }
+
 class Model_RefInputTypes(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'text_field_type'
