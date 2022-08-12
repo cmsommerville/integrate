@@ -1,9 +1,10 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_RefBenefit, \
     Model_ConfigCoverage, Model_ConfigRateGroup, Model_RefUnitCode
 
-DATA_BENEFIT = [
+def DATA_BENEFIT():
+    return [
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
@@ -25,7 +26,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -48,7 +49,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -71,7 +72,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -94,7 +95,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -117,7 +118,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -140,7 +141,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -163,7 +164,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -186,7 +187,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "dollars"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -209,7 +210,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "dollars"
         }).ref_id, 
         'is_durational': True,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -232,7 +233,7 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -255,14 +256,13 @@ DATA_BENEFIT = [
             "ref_attr_code": "percent"
         }).ref_id, 
         'is_durational': False,
-        'config_product_description': "" 
+        'config_benefit_description': "" 
     }, 
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigBenefit_List'), DATA_BENEFIT)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/benefit-list')
+    res = requests.post(url, json=DATA_BENEFIT())
+    if not res.ok: 
+        raise Exception(res.text)

@@ -1,23 +1,27 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from ..models import Model_ConfigProduct, Model_RefAttrMapperType, Model_ConfigAttributeDetail
 
-_PRODUCT_ID = Model_ConfigProduct.find_one_by_attr({
-      "product_code": "CI"
-  })
+def _PRODUCT_ID():
+    return Model_ConfigProduct.find_one_by_attr({
+        "config_product_code": "CI21000"
+    })
 
-_COMPOSITE = Model_RefAttrMapperType.find_one_by_attr({
-      "ref_attr_code": "composite"
-  })
-_DISTINCT = Model_RefAttrMapperType.find_one_by_attr({
-      "ref_attr_code": "composite"
-  })
+def _COMPOSITE(): 
+    return Model_RefAttrMapperType.find_one_by_attr({
+        "ref_attr_code": "composite"
+    })
+def _DISTINCT(): 
+    return Model_RefAttrMapperType.find_one_by_attr({
+        "ref_attr_code": "distinct"
+    })
 
-DATA_PRODUCT_MAPPER__GENDER = [
+def DATA_PRODUCT_MAPPER__GENDER(): 
+    return [
     { 
-        'config_product_id': _PRODUCT_ID.config_product_id,
+        'config_product_id': _PRODUCT_ID().config_product_id,
         'config_attr_type_code': 'gender', 
-        'config_attr_mapper_type_id': _COMPOSITE.ref_id, 
+        'config_attr_mapper_type_id': _COMPOSITE().ref_id, 
         'is_default': True, 
         'mappers': [
             {
@@ -39,9 +43,9 @@ DATA_PRODUCT_MAPPER__GENDER = [
         ]
     }, 
     { 
-        'config_product_id': _PRODUCT_ID.config_product_id,
+        'config_product_id': _PRODUCT_ID().config_product_id,
         'config_attr_type_code': 'gender', 
-        'config_attr_mapper_type_id': _DISTINCT.ref_id, 
+        'config_attr_mapper_type_id': _DISTINCT().ref_id, 
         'is_default': False, 
         'mappers': [
             {
@@ -66,14 +70,12 @@ DATA_PRODUCT_MAPPER__GENDER = [
 
 
 
-
-
-
-DATA_PRODUCT_MAPPER__SMOKER_STATUS = [
+def DATA_PRODUCT_MAPPER__SMOKER_STATUS(): 
+    return [
     { 
-        'config_product_id': _PRODUCT_ID.config_product_id,
+        'config_product_id': _PRODUCT_ID().config_product_id,
         'config_attr_type_code': 'smoker_status', 
-        'config_attr_mapper_type_id': _COMPOSITE.ref_id, 
+        'config_attr_mapper_type_id': _COMPOSITE().ref_id, 
         'is_default': False, 
         'mappers': [
             {
@@ -95,9 +97,9 @@ DATA_PRODUCT_MAPPER__SMOKER_STATUS = [
         ]
     }, 
     { 
-        'config_product_id': _PRODUCT_ID.config_product_id,
+        'config_product_id': _PRODUCT_ID().config_product_id,
         'config_attr_type_code': 'smoker_status', 
-        'config_attr_mapper_type_id': _DISTINCT.ref_id, 
+        'config_attr_mapper_type_id': _DISTINCT().ref_id, 
         'is_default': True, 
         'mappers': [
             {
@@ -122,10 +124,13 @@ DATA_PRODUCT_MAPPER__SMOKER_STATUS = [
 
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigProductMapperSet_Gender_List'), DATA_PRODUCT_MAPPER__GENDER)
-    requests.post(fields.Url('CRUD_ConfigProductMapperSet_SmokerStatus_List'), DATA_PRODUCT_MAPPER__SMOKER_STATUS)
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/product-mapper-set-gender-list')
+    res = requests.post(url, json=DATA_PRODUCT_MAPPER__GENDER())
+    if not res.ok: 
+        raise Exception(res.text)
 
-
-if __name__ == '__main__':
-    load()
+    url = urljoin(hostname, 'api/crud/config/product-mapper-set-smoker-status-list')
+    res = requests.post(url, json=DATA_PRODUCT_MAPPER__SMOKER_STATUS())
+    if not res.ok: 
+        raise Exception(res.text)

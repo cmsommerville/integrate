@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 REF_STATES = [
   {'state_code': 'AL',
@@ -158,9 +158,9 @@ REF_STATES = [
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefStates_List'), REF_STATES)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/state-list')
+    res = requests.post(url, json=REF_STATES)
+    if not res.ok: 
+        raise Exception(res.text)

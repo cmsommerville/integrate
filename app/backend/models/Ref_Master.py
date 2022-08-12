@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseLabeledColumn
+from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
@@ -12,7 +12,7 @@ class Model_RefMaster(BaseModel):
     )
 
     ref_id = db.Column(db.Integer, primary_key=True)
-    ref_entity_code = BaseLabeledColumn(label="Reference Entity Code", type_=db.String(30), nullable=False)
+    ref_entity_code = db.Column(db.String(30), nullable=False)
     ref_attr_code = db.Column(db.String(30), nullable=False)
     ref_attr_label = db.Column(db.String(100), nullable=False)
     ref_attr_description = db.Column(db.String(1000))
@@ -25,15 +25,14 @@ class Model_RefMaster(BaseModel):
     }
 
 
+class Model_RefAttrMapperType(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'attr_type_code'
+    }
 
 class Model_RefBenefit(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'benefit'
-    }
-
-class Model_RefComparisonOperator(Model_RefMaster):
-    __mapper_args__ = {
-        'polymorphic_identity': 'comparison_operator'
     }
 
 class Model_RefCensusStrategy(Model_RefMaster):
@@ -41,8 +40,12 @@ class Model_RefCensusStrategy(Model_RefMaster):
         'polymorphic_identity': 'census_strategy'
     }
 
+class Model_RefComparisonOperator(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'comparison_operator'
+    }
+
 class Model_RefComponentTypes(Model_RefMaster):
-    ref_attr_enum = db.Column(db.String(30))
 
     __mapper_args__ = {
         'polymorphic_identity': 'component_type'
@@ -54,9 +57,19 @@ class Model_RefDataTypes(Model_RefMaster):
         'polymorphic_identity': 'data_type'
     }
 
+class Model_RefFactorType(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'factor_type'
+    }
+
 class Model_RefInputTypes(Model_RefMaster):
     __mapper_args__ = {
-        'polymorphic_identity': 'text_field_type'
+        'polymorphic_identity': 'input_type'
+    }
+
+class Model_RefPremiumFrequency(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'premium_frequency'
     }
 
 class Model_RefProductVariation(Model_RefMaster):
@@ -69,32 +82,13 @@ class Model_RefProvision(Model_RefMaster):
         'polymorphic_identity': 'provision'
     }
 
-class Model_RefUnitCode(Model_RefMaster):
-    __mapper_args__ = {
-        'polymorphic_identity': 'unit_code'
-    }
-
-class Model_RefOptionality(Model_RefMaster):
-    __mapper_args__ = {
-        'polymorphic_identity': 'optionality'
-    }
-
-class Model_RefPremiumFrequency(Model_RefMaster):
-    __mapper_args__ = {
-        'polymorphic_identity': 'premium_frequency'
-    }
-
-class Model_RefFactorType(Model_RefMaster):
-    __mapper_args__ = {
-        'polymorphic_identity': 'factor_type'
-    }
-
 class Model_RefRatingStrategy(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'rating_strategy'
     }
 
-class Model_RefAttrMapperType(Model_RefMaster):
+class Model_RefUnitCode(Model_RefMaster):
     __mapper_args__ = {
-        'polymorphic_identity': 'attr_mapper_type'
+        'polymorphic_identity': 'unit_code'
     }
+

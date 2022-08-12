@@ -2,27 +2,10 @@ from __future__ import annotations
 from flask import current_app
 from typing import List
 from sqlalchemy import text
-from sqlalchemy.orm import RelationshipProperty
-from sqlalchemy.util.langhelpers import public_factory
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
 from app.extensions import db
 
-
-class BaseLabeledColumn(db.Column):
-
-    def __init__(self, label: str, **kwargs):
-        self.label = label
-        super().__init__(**kwargs)
-
-class BaseLabeledRelationship(RelationshipProperty): 
-
-    def __init__(self, relationship_code: str, label: str, **kwargs):
-        self.relationship_code = relationship_code
-        self.label = label
-        super().__init__(**kwargs)
-
-labeled_relationship = public_factory(BaseLabeledRelationship, ".orm.relationship")
 
 class BaseModel(db.Model):
     __abstract__ = True

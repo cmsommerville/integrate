@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_AGE_DISTRIBUTION = [
     {
@@ -71,10 +71,8 @@ DATA_AGE_DISTRIBUTION = [
     }, 
 ]
 
-
-def load() -> None:
-    requests.post(fields.Url('Config_AgeDistributionSet_List'), DATA_AGE_DISTRIBUTION)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/age-distribution-set-list')
+    res = requests.post(url, json=DATA_AGE_DISTRIBUTION)
+    if not res.ok: 
+        raise Exception(res.text)

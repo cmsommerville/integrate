@@ -1,11 +1,11 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_GENDER = [
     {
         'config_attr_type_code': 'gender', 
         'config_attr_set_label': 'Standard M/F/X', 
-        'genders': [
+        'attributes': [
             {
                 'config_attr_detail_code': 'M',
                 'config_attr_detail_label': 'Male',
@@ -30,7 +30,7 @@ DATA_SMOKER_STATUS = [
     {
         'config_attr_type_code': 'smoker_status', 
         'config_attr_set_label': 'Standard N/T/U', 
-        'smoker_statuses': [
+        'attributes': [
             {
                 'config_attr_detail_code': 'N',
                 'config_attr_detail_label': 'Non-Tobacco',
@@ -56,7 +56,7 @@ DATA_RELATIONSHIP = [
     {
         'config_attr_type_code': 'relationship', 
         'config_attr_set_label': 'Standard EE/SP/CH', 
-        'relationships': [
+        'attributes': [
             {
                 'config_attr_detail_code': 'EE',
                 'config_attr_detail_label': 'Employee',
@@ -78,11 +78,16 @@ DATA_RELATIONSHIP = [
 
 
 
-def load() -> None:
-    requests.post(fields.Url('Config_AttributeSet_Gender_List'), DATA_GENDER)
-    requests.post(fields.Url('Config_AttributeSet_SmokerStatus_List'), DATA_SMOKER_STATUS)
-    requests.post(fields.Url('Config_AttributeSet_Relationship_List'), DATA_RELATIONSHIP)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/attribute-set-gender-list')
+    res = requests.post(url, json=DATA_GENDER)
+    if not res.ok: 
+        raise Exception(res.text)
+    url = urljoin(hostname, 'api/crud/config/attribute-set-smoker-status-list')
+    res = requests.post(url, json=DATA_SMOKER_STATUS)
+    if not res.ok: 
+        raise Exception(res.text)
+    url = urljoin(hostname, 'api/crud/config/attribute-set-relationship-list')
+    res = requests.post(url, json=DATA_RELATIONSHIP)
+    if not res.ok: 
+        raise Exception(res.text)

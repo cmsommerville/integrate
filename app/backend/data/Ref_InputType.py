@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_INPUT_TYPES = [
     {
@@ -39,9 +39,9 @@ DATA_INPUT_TYPES = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefInputTypes_List'), DATA_INPUT_TYPES)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/input-type-list')
+    res = requests.post(url, json=DATA_INPUT_TYPES)
+    if not res.ok: 
+        raise Exception(res.text)

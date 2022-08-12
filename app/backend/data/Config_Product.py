@@ -1,11 +1,12 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from  ..models import Model_ConfigAttributeDistributionSet_SmokerStatus, \
     Model_ConfigAttributeSet_SmokerStatus, Model_RefRatingStrategy, \
     Model_ConfigAttributeSet_Gender, Model_ConfigAttributeDistributionSet_Gender, \
     Model_RefCensusStrategy, Model_ConfigAgeDistributionSet
 
-DATA_PRODUCT = [
+def DATA_PRODUCT():
+    return [
     {
         'config_product_code': 'CI21000', 
         'config_product_label': 'Critical Illness Series 21000', 
@@ -39,7 +40,7 @@ DATA_PRODUCT = [
 
         "age_distribution_set_id": Model_ConfigAgeDistributionSet.find_one_by_attr({
             "config_age_distribution_set_label": "Normal(45,15) Age Distribution"
-        }), 
+        }).config_age_distribution_set_id, 
         "age_rating_strategy_id": Model_RefRatingStrategy.find_one_by_attr({
             "ref_attr_code": "rating"
         }).ref_id,
@@ -47,17 +48,17 @@ DATA_PRODUCT = [
         "allow_employer_paid": True,  
         "voluntary_census_strategy_id": Model_RefCensusStrategy.find_one_by_attr({
             "ref_attr_code": "optional"
-        }), 
+        }).ref_id, 
         "employer_paid_census_strategy_id": Model_RefCensusStrategy.find_one_by_attr({
             "ref_attr_code": "required"
-        }), 
+        }).ref_id, 
     }, 
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigProduct_List'), DATA_PRODUCT)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/product-list')
+    res = requests.post(url, json=DATA_PRODUCT())
+    if not res.ok: 
+        raise Exception(res.text)

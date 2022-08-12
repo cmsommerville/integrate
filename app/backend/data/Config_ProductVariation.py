@@ -1,8 +1,9 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_RefProductVariation
 
-DATA_PRODUCT_VARIATION = [
+def DATA_PRODUCT_VARIATION():
+    return [
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
@@ -22,9 +23,8 @@ DATA_PRODUCT_VARIATION = [
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigProductVariation_List'), DATA_PRODUCT_VARIATION)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/product-variation-list')
+    res = requests.post(url, json=DATA_PRODUCT_VARIATION())
+    if not res.ok: 
+        raise Exception(res.text)

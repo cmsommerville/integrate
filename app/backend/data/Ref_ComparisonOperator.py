@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_COMPARISON_OPERATOR = [
     {
@@ -40,9 +40,9 @@ DATA_COMPARISON_OPERATOR = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefComparisonOperator_List'), DATA_COMPARISON_OPERATOR)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/comparison-operator-list')
+    res = requests.post(url, json=DATA_COMPARISON_OPERATOR)
+    if not res.ok: 
+        raise Exception(res.text)

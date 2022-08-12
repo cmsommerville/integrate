@@ -10,6 +10,8 @@ class Schema_ConfigProductMapperSet_Gender(BaseSchema):
         include_relationships=True
         include_fk=True
 
+    config_attr_type_code = ma.Constant('gender')
+
 
 class Schema_ConfigProductMapperSet_SmokerStatus(BaseSchema):
     class Meta:
@@ -17,3 +19,5 @@ class Schema_ConfigProductMapperSet_SmokerStatus(BaseSchema):
         load_instance = True
         include_relationships=True
         include_fk=True
+
+    config_attr_type_code = ma.Constant('smoker_status')

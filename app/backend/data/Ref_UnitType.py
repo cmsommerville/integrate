@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_UNIT_TYPE = [
     {
@@ -16,9 +16,8 @@ DATA_UNIT_TYPE = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefUnitType_List'), DATA_UNIT_TYPE)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/unit-code-list')
+    res = requests.post(url, json=DATA_UNIT_TYPE)
+    if not res.ok: 
+        raise Exception(res.text)

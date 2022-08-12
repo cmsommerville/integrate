@@ -13,12 +13,15 @@ class Schema_ConfigProvisionUI_SelectItem(BaseSchema):
         include_fk=True
 
 
+
 class Schema_ConfigProvisionUI_Input(BaseSchema):
     class Meta:
         model = Model_ConfigProvisionUI_Input
         load_instance = True
         include_relationships=True
         include_fk=True
+
+    component_type_code = ma.Constant('INPUT')
 
 
 class Schema_ConfigProvisionUI_Checkbox(BaseSchema):
@@ -28,6 +31,8 @@ class Schema_ConfigProvisionUI_Checkbox(BaseSchema):
         include_relationships=True
         include_fk=True
 
+    component_type_code = ma.Constant('CHECKBOX')
+
 
 class Schema_ConfigProvisionUI_Select(BaseSchema):
     class Meta:
@@ -36,6 +41,7 @@ class Schema_ConfigProvisionUI_Select(BaseSchema):
         include_relationships=True
         include_fk=True
 
+    component_type_code = ma.Constant('SELECT')
     items = ma.List(ma.Nested(Schema_ConfigProvisionUI_SelectItem))
 
 

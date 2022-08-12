@@ -1,5 +1,6 @@
 import requests
-from flask_restx import fields
+import json
+from requests.compat import urljoin
 
 DATA_CENSUS_STRATEGY = [
     {
@@ -19,9 +20,9 @@ DATA_CENSUS_STRATEGY = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefCensusStrategy_List'), DATA_CENSUS_STRATEGY)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/census-strategy-list')
+    res = requests.post(url, json=DATA_CENSUS_STRATEGY)
+    if not res.ok: 
+        raise Exception(res.text)

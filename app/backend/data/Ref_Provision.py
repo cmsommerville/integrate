@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_PROVISION = [
     {
@@ -14,9 +14,9 @@ DATA_PROVISION = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefProvision_List'), DATA_PROVISION)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/provision-list')
+    res = requests.post(url, json=DATA_PROVISION)
+    if not res.ok: 
+        raise Exception(res.text)

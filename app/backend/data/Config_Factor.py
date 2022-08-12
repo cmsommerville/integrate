@@ -1,9 +1,10 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from  ..models import Model_RefProvision, Model_ConfigProvision, Model_RefComparisonOperator, \
     Model_RefDataTypes
 
-DATA_FACTOR = [
+def DATA_FACTOR(): 
+    return [
     {
         'config_provision_id': Model_ConfigProvision.find_one_by_attr({
             "ref_provision_id": Model_RefProvision.find_one_by_attr({
@@ -20,7 +21,9 @@ DATA_FACTOR = [
                     "ref_attr_symbol": "<"
                 }).ref_id,
                 'comparison_column_value': '1000',
-                'comparison_column_data_type_id': 'number',
+                'comparison_column_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                    'ref_attr_code': 'number'
+                }).ref_id,
             },
         ]
     }, 
@@ -40,7 +43,9 @@ DATA_FACTOR = [
                     "ref_attr_symbol": "<"
                 }).ref_id,
                 'comparison_column_value': '5000',
-                'comparison_column_data_type_id': 'number',
+                'comparison_column_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                    'ref_attr_code': 'number'
+                }).ref_id,
             },
         ]
     }, 
@@ -60,7 +65,9 @@ DATA_FACTOR = [
                     "ref_attr_symbol": ">="
                 }).ref_id,
                 'comparison_column_value': '5000',
-                'comparison_column_data_type_id': 'number',
+                'comparison_column_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                    'ref_attr_code': 'number'
+                }).ref_id,
             },
         ]
     }, 
@@ -82,7 +89,9 @@ DATA_FACTOR = [
                     "ref_attr_symbol": "<"
                 }).ref_id,
                 'comparison_column_value': '5000',
-                'comparison_column_data_type_id': 'string',
+                'comparison_column_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                    'ref_attr_code': 'string'
+                }).ref_id,
             },
         ]
     }, 
@@ -102,16 +111,17 @@ DATA_FACTOR = [
                     "ref_attr_symbol": ">="
                 }).ref_id,
                 'comparison_column_value': '5000',
-                'comparison_column_data_type_id': 'string',
+                'comparison_column_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                    'ref_attr_code': 'string'
+                }).ref_id,
             },
         ]
     }, 
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigProvision_Product_List'), DATA_FACTOR)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/factor-list')
+    res = requests.post(url, json=DATA_FACTOR())
+    if not res.ok: 
+        raise Exception(res.text)

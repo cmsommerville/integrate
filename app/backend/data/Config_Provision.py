@@ -1,8 +1,9 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_RefProvision
 
-DATA_PROVISION_PRODUCT = [
+def DATA_PROVISION_PRODUCT():
+    return [
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
@@ -24,9 +25,8 @@ DATA_PROVISION_PRODUCT = [
 ]
 
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_ConfigProvision_Product_List'), DATA_PROVISION_PRODUCT)
-
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/config/provision-product-list')
+    res = requests.post(url, json=DATA_PROVISION_PRODUCT())
+    if not res.ok: 
+        raise Exception(res.text)

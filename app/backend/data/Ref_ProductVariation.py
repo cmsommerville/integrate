@@ -1,5 +1,5 @@
 import requests
-from flask_restx import fields
+from requests.compat import urljoin
 
 DATA_PRODUCT_VARIATION = [
     {
@@ -14,9 +14,10 @@ DATA_PRODUCT_VARIATION = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefProductVariation_List'), DATA_PRODUCT_VARIATION)
 
 
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/product-variation-list')
+    res = requests.post(url, json=DATA_PRODUCT_VARIATION)
+    if not res.ok: 
+        raise Exception(res.text)

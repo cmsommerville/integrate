@@ -1,5 +1,6 @@
 import requests
-from flask_restx import fields
+import json
+from requests.compat import urljoin
 
 DATA_BENEFIT = [
     {
@@ -64,9 +65,9 @@ DATA_BENEFIT = [
     },
 ]
 
-def load() -> None:
-    requests.post(fields.Url('CRUD_RefBenefit_List'), DATA_BENEFIT)
 
-
-if __name__ == '__main__':
-    load()
+def load(hostname: str) -> None:
+    url = urljoin(hostname, 'api/crud/ref/benefit-list')
+    res = requests.post(url, json=DATA_BENEFIT)
+    if not res.ok: 
+        raise Exception(res.text)
