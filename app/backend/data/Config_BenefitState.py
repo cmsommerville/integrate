@@ -35,6 +35,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "cancer"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "cancer"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -49,6 +52,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "heart_attack"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "heart_attack"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -63,6 +69,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "stroke"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "stroke"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -77,6 +86,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "renal_failure"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "renal_failure"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -91,6 +103,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "transplant"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "transplant"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -105,6 +120,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "cis"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "cis"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -119,6 +137,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "cabg"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "cabg"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -133,6 +154,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "ms"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "ms"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -147,6 +171,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "als"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "als"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -161,6 +188,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "hsb"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "hsb"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 
@@ -175,6 +205,9 @@ def DATA_BENEFIT_STATES():
                 "ref_attr_code": "skin_cancer"
             }).ref_id
         }).config_benefit_id, 
+        "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
+            "ref_attr_code": "skin_cancer"
+        }).ref_id,
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
             "config_product_code": "CI21000"
         }).config_product_id, 

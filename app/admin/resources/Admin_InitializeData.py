@@ -27,6 +27,6 @@ class Resource_AdminInitConfig(Resource):
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
         load_config(hostname)
-        return {"status": "success", "message": "Reference tables successfully loaded"}
+        return {"status": "success", "message": "Config tables successfully loaded"}
 
 
