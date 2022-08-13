@@ -10,7 +10,8 @@ def DATA_PRODUCT_VARIATION():
         }).config_product_id, 
         'ref_product_variation_id': Model_RefProductVariation.find_one_by_attr({
             "ref_attr_code": 'issue_age',
-        }).ref_id
+        }).ref_id, 
+        'config_product_variation_version_code': 'std_issue_age', 
     }, 
     {
         'config_product_id': Model_ConfigProduct.find_one_by_attr({
@@ -18,7 +19,8 @@ def DATA_PRODUCT_VARIATION():
         }).config_product_id, 
         'ref_product_variation_id': Model_RefProductVariation.find_one_by_attr({
             "ref_attr_code": 'attained_age',
-        }).ref_id
+        }).ref_id, 
+        'config_product_variation_version_code': 'std_attained_age', 
     }, 
 ]
 

@@ -11,6 +11,7 @@ def DATA_PROVISION_PRODUCT():
         'ref_provision_id': Model_RefProvision.find_one_by_attr({
             "ref_attr_code": "group_size"
         }).ref_id, 
+        'config_provision_version_code': 'std_group_size',
         'config_provision_description': "This is the standard provision for CI21000 Group Size."
     }, 
     {
@@ -20,6 +21,7 @@ def DATA_PROVISION_PRODUCT():
         'ref_provision_id': Model_RefProvision.find_one_by_attr({
             "ref_attr_code": "sic_code"
         }).ref_id, 
+        'config_provision_version_code': 'std_sic_code',
         'config_provision_description': "This is the standard provision for CI21000 SIC code."
     }, 
 ]

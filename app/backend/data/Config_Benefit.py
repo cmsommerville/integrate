@@ -18,6 +18,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_cancer', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -41,6 +42,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_heart_attack', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -64,6 +66,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_stroke', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -87,6 +90,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_renal_failure', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -110,6 +114,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_transplant', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -133,6 +138,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_cis', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 6.25, 
@@ -156,6 +162,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_cabg', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 6.25, 
@@ -179,6 +186,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_hsb', 
         'min_value': 0, 
         'max_value': 150, 
         'step_value': 5, 
@@ -202,6 +210,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_skin_cancer', 
         'min_value': 0, 
         'max_value': 1000, 
         'step_value': 50, 
@@ -225,6 +234,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_ms', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 
@@ -248,6 +258,7 @@ def DATA_BENEFIT():
         'config_rate_group_id': Model_ConfigRateGroup.find_one_by_attr({
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
+        'config_benefit_version_code': 'std_als', 
         'min_value': 0, 
         'max_value': 100, 
         'step_value': 12.5, 

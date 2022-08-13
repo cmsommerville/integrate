@@ -10,12 +10,16 @@ REF_MASTER = TBL_NAMES['REF_MASTER']
 
 class Model_ConfigProvision(BaseModel):
     __tablename__ = CONFIG_PROVISION
+    __table_args__ = (
+        db.UniqueConstraint('config_provision_version_code'),
+    )
 
     config_provision_id = db.Column(db.Integer, primary_key=True)
     config_product_id = db.Column(db.ForeignKey(
         f"{CONFIG_PRODUCT}.config_product_id"), nullable=False)
     ref_provision_id = db.Column(db.ForeignKey(
         f"{REF_MASTER}.ref_id"), nullable=False)
+    config_provision_version_code  = db.Column(db.String(30), nullable=False)
     config_provision_type_code = db.Column(db.String(30), nullable=False)
     config_provision_description = db.Column(db.String(1000))
 

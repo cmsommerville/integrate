@@ -12,10 +12,14 @@ REF_MASTER = TBL_NAMES['REF_MASTER']
 
 class Model_ConfigProductVariation(BaseModel):
     __tablename__ = CONFIG_PRODUCT_VARIATION
+    __table_args__ = (
+        db.UniqueConstraint('config_product_variation_version_code'),
+    )
     
     config_product_variation_id = db.Column(db.Integer, primary_key=True)
     config_product_id = db.Column(db.ForeignKey(f"{CONFIG_PRODUCT}.config_product_id"), index=True)
     ref_product_variation_id = db.Column(db.ForeignKey(f"{REF_MASTER}.ref_id"))
+    config_product_variation_version_code = db.Column(db.String(30), nullable=False)
 
     ref_product_variation = db.relationship("Model_RefProductVariation",  
         primaryjoin="Model_ConfigProductVariation.ref_product_variation_id == Model_RefProductVariation.ref_id")
