@@ -12,6 +12,8 @@ TBL_NAMES = {
     "CONFIG_BENEFIT": "config_benefit",
     "CONFIG_BENEFIT_DURATION_DETAIL": "config_benefit_duration_detail",
     "CONFIG_BENEFIT_DURATION_SET": "config_benefit_duration_set",
+    "CONFIG_BENEFIT_PRODUCT_VARIATION": "config_benefit_product_variation",
+    "CONFIG_BENEFIT_PROVISION": "config_benefit_provision",
     "CONFIG_BENEFIT_STATE": "config_benefit_state",
     "CONFIG_COVERAGE": "config_coverage",
     "CONFIG_FACTOR": "config_factor",

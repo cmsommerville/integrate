@@ -13,6 +13,8 @@ from .Config_AttributeSet import CRUD_ConfigAttributeSet_Gender, CRUD_ConfigAttr
 from .Config_Benefit import CRUD_ConfigBenefit, CRUD_ConfigBenefit_List
 from .Config_BenefitDurationDetail import CRUD_ConfigBenefitDurationDetail, CRUD_ConfigBenefitDurationDetail_List
 from .Config_BenefitDurationSet import CRUD_ConfigBenefitDurationSet, CRUD_ConfigBenefitDurationSet_List
+from .Config_BenefitProductVariation import CRUD_ConfigBenefitProductVariation, CRUD_ConfigBenefitProductVariation_List
+from .Config_BenefitProvision import CRUD_ConfigBenefitProvision, CRUD_ConfigBenefitProvision_List
 from .Config_BenefitState import CRUD_ConfigBenefitState, CRUD_ConfigBenefitState_List
 from .Config_Coverage import CRUD_ConfigCoverage, CRUD_ConfigCoverage_List 
 from .Config_Factor import CRUD_ConfigFactor, CRUD_ConfigFactor_List
@@ -27,6 +29,7 @@ from .Config_Provision import CRUD_ConfigProvision_Product, CRUD_ConfigProvision
 from .Config_ProvisionState import CRUD_ConfigProvisionState, CRUD_ConfigProvisionState_List
 from .Config_ProvisionUI import CRUD_ConfigProvisionUI, CRUD_ConfigProvisionUI_List
 from .Config_RateGroup import CRUD_ConfigRateGroup, CRUD_ConfigRateGroup_List
+from .Config_RateTable import CRUD_ConfigRateTable, CRUD_ConfigRateTable_List
 from .Config_RelationshipMapperDetail import CRUD_ConfigRelationshipMapperDetail, CRUD_ConfigRelationshipMapperDetail_List
 from .Config_RelationshipMapperSet import CRUD_ConfigRelationshipMapperSet, CRUD_ConfigRelationshipMapperSet_List
 from .Ref_Master import *
@@ -64,6 +67,10 @@ ns_crud.add_resource(CRUD_ConfigBenefitDurationDetail, '/crud/config/benefit-dur
 ns_crud.add_resource(CRUD_ConfigBenefitDurationDetail_List, '/crud/config/benefit-duration-detail-list')
 ns_crud.add_resource(CRUD_ConfigBenefitDurationSet, '/crud/config/benefit-duration-set/<int:id>', '/crud/config/benefit-duration-set')
 ns_crud.add_resource(CRUD_ConfigBenefitDurationSet_List, '/crud/config/benefit-duration-set-list')
+ns_crud.add_resource(CRUD_ConfigBenefitProductVariation, '/crud/config/benefit-product-variation/<int:id>', '/crud/config/benefit-product-variation')
+ns_crud.add_resource(CRUD_ConfigBenefitProductVariation_List, '/crud/config/benefit-product-variation-list')
+ns_crud.add_resource(CRUD_ConfigBenefitProvision, '/crud/config/benefit-provision/<int:id>', '/crud/config/benefit-provision')
+ns_crud.add_resource(CRUD_ConfigBenefitProvision_List, '/crud/config/benefit-provision-list')
 ns_crud.add_resource(CRUD_ConfigBenefitState, '/crud/config/benefit-state/<int:id>', '/crud/config/benefit-state')
 ns_crud.add_resource(CRUD_ConfigBenefitState_List, '/crud/config/benefit-state-list')
 ns_crud.add_resource(CRUD_ConfigCoverage, '/crud/config/coverage/<int:id>', '/crud/config/coverage')
@@ -96,6 +103,8 @@ ns_crud.add_resource(CRUD_ConfigProvisionUI, '/crud/config/provision-ui/<int:id>
 ns_crud.add_resource(CRUD_ConfigProvisionUI_List, '/crud/config/provision-ui-list')
 ns_crud.add_resource(CRUD_ConfigRateGroup, '/crud/config/rate-group/<int:id>', '/crud/config/rate-group')
 ns_crud.add_resource(CRUD_ConfigRateGroup_List, '/crud/config/rate-group-list')
+ns_crud.add_resource(CRUD_ConfigRateTable, '/crud/config/rate-table/<int:id>', '/crud/config/rate-table')
+ns_crud.add_resource(CRUD_ConfigRateTable_List, '/crud/config/rate-table-list')
 ns_crud.add_resource(CRUD_ConfigRelationshipMapperDetail, '/crud/config/relationship-mapper-detail/<int:id>', '/crud/config/relationship-mapper-detail')
 ns_crud.add_resource(CRUD_ConfigRelationshipMapperDetail_List, '/crud/config/relationship-mapper-detail-list')
 ns_crud.add_resource(CRUD_ConfigRelationshipMapperSet, '/crud/config/relationship-mapper-set/<int:id>', '/crud/config/relationship-mapper-set')

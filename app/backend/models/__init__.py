@@ -10,6 +10,8 @@ from .Config_AttributeSet import Model_ConfigAttributeSet, Model_ConfigAttribute
 from .Config_Benefit import Model_ConfigBenefit
 from .Config_BenefitDurationDetail import Model_ConfigBenefitDurationDetail
 from .Config_BenefitDurationSet import Model_ConfigBenefitDurationSet 
+from .Config_BenefitProductVariation import Model_ConfigBenefitProductVariation
+from .Config_BenefitProvision import Model_ConfigBenefitProvision
 from .Config_BenefitState import Model_ConfigBenefitState
 from .Config_Coverage import Model_ConfigCoverage 
 from .Config_Factor import Model_ConfigFactor
@@ -24,6 +26,7 @@ from .Config_Provision import Model_ConfigProvision, Model_ConfigProvision_Produ
 from .Config_ProvisionState import Model_ConfigProvisionState
 from .Config_ProvisionUI import Model_ConfigProvisionUI, Model_ConfigProvisionUI_Input, Model_ConfigProvisionUI_SelectItem, Model_ConfigProvisionUI_Select,  Model_ConfigProvisionUI_Checkbox
 from .Config_RateGroup import Model_ConfigRateGroup
+from .Config_RateTable import Model_ConfigRateTable
 from .Config_RelationshipMapperDetail import Model_ConfigRelationshipMapperDetail
 from .Config_RelationshipMapperSet import Model_ConfigRelationshipMapperSet
 from .Ref_Master import *

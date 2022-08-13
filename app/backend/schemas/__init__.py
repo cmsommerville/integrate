@@ -13,6 +13,8 @@ from .Config_AttributeSet import Schema_ConfigAttributeSet_Gender, Schema_Config
 from .Config_Benefit import Schema_ConfigBenefit
 from .Config_BenefitDurationDetail import Schema_ConfigBenefitDurationDetail
 from .Config_BenefitDurationSet import Schema_ConfigBenefitDurationSet 
+from .Config_BenefitProductVariation import Schema_ConfigBenefitProductVariation
+from .Config_BenefitProvision import Schema_ConfigBenefitProvision
 from .Config_BenefitState import Schema_ConfigBenefitState
 from .Config_Coverage import Schema_ConfigCoverage 
 from .Config_Factor import Schema_ConfigFactor
@@ -27,5 +29,6 @@ from .Config_ProvisionUI import Schema_ConfigProvisionUI, Schema_ConfigProvision
 from .Config_Provision import Schema_ConfigProvision_Product, Schema_ConfigProvision_RateTable
 from .Config_ProvisionState import Schema_ConfigProvisionState
 from .Config_RateGroup import Schema_ConfigRateGroup
+from .Config_RateTable import Schema_ConfigRateTable
 from .Config_RelationshipMapperDetail import Schema_ConfigRelationshipMapperDetail
 from .Config_RelationshipMapperSet import Schema_ConfigRelationshipMapperSet
