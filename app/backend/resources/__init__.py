@@ -35,6 +35,14 @@ from .Config_RelationshipMapperSet import CRUD_ConfigRelationshipMapperSet, CRUD
 from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List
 
+from .Selection_AgeBand import CRUD_SelectionAgeBand, CRUD_SelectionAgeBand_List
+from .Selection_Benefit import CRUD_SelectionBenefit, CRUD_SelectionBenefit_List
+from .Selection_BenefitDuration import CRUD_SelectionBenefitDuration, CRUD_SelectionBenefitDuration_List
+from .Selection_CensusDetail import CRUD_SelectionCensusDetail, CRUD_SelectionCensusDetail_List
+from .Selection_CensusSet import CRUD_SelectionCensusSet, CRUD_SelectionCensusSet_List
+from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
+from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
+
 ns_crud = Namespace("crud", "Namespace containing standard CRUD endpoints")
 
 ns_crud.add_resource(CRUD_ConfigAgeBandDetail, '/crud/config/age-band-detail/<int:id>', '/crud/config/age-band-detail')
@@ -110,8 +118,6 @@ ns_crud.add_resource(CRUD_ConfigRelationshipMapperDetail_List, '/crud/config/rel
 ns_crud.add_resource(CRUD_ConfigRelationshipMapperSet, '/crud/config/relationship-mapper-set/<int:id>', '/crud/config/relationship-mapper-set')
 ns_crud.add_resource(CRUD_ConfigRelationshipMapperSet_List, '/crud/config/relationship-mapper-set-list')
 
-
-
 ns_crud.add_resource(CRUD_RefAttrMapperType, '/crud/ref/attr-mapper-type/<int:id>', '/crud/ref/attr-mapper-type')
 ns_crud.add_resource(CRUD_RefAttrMapperType_List, '/crud/ref/attr-mapper-type-list')
 ns_crud.add_resource(CRUD_RefBenefit, '/crud/ref/benefit/<int:id>', '/crud/ref/benefit')
@@ -140,3 +146,19 @@ ns_crud.add_resource(CRUD_RefStates, '/crud/ref/state/<int:id>', '/crud/ref/stat
 ns_crud.add_resource(CRUD_RefStates_List, '/crud/ref/state-list')
 ns_crud.add_resource(CRUD_RefUnitCode, '/crud/ref/unit-code/<int:id>', '/crud/ref/unit-code')
 ns_crud.add_resource(CRUD_RefUnitCode_List, '/crud/ref/unit-code-list')
+
+ns_crud.add_resource(CRUD_SelectionAgeBand, '/crud/selection/age-band/<int:id>', '/crud/selection/age-band')
+ns_crud.add_resource(CRUD_SelectionAgeBand_List, '/crud/selection/age-band-list')
+ns_crud.add_resource(CRUD_SelectionBenefit, '/crud/selection/benefit/<int:id>', '/crud/selection/benefit')
+ns_crud.add_resource(CRUD_SelectionBenefit_List, '/crud/selection/benefit-list')
+ns_crud.add_resource(CRUD_SelectionBenefitDuration, '/crud/selection/benefit-duration/<int:id>', '/crud/selection/benefit-duration')
+ns_crud.add_resource(CRUD_SelectionBenefitDuration_List, '/crud/selection/benefit-duration-list')
+ns_crud.add_resource(CRUD_SelectionCensusDetail, '/crud/selection/census-detail/<int:id>', '/crud/selection/census-detail')
+ns_crud.add_resource(CRUD_SelectionCensusDetail_List, '/crud/selection/census-detail-list')
+ns_crud.add_resource(CRUD_SelectionCensusSet, '/crud/selection/census-set/<int:id>', '/crud/selection/census-set')
+ns_crud.add_resource(CRUD_SelectionCensusSet_List, '/crud/selection/census-set-list')
+ns_crud.add_resource(CRUD_SelectionPlan, '/crud/selection/plan/<int:id>', '/crud/selection/plan')
+ns_crud.add_resource(CRUD_SelectionPlan_List, '/crud/selection/plan-list')
+ns_crud.add_resource(CRUD_SelectionProvision, '/crud/selection/provision/<int:id>', '/crud/selection/provision')
+ns_crud.add_resource(CRUD_SelectionProvision_List, '/crud/selection/provision-list')
+

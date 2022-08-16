@@ -1,6 +1,6 @@
 import requests
 from requests.compat import urljoin
-from  ..models import Model_ConfigProduct, Model_RefProvision
+from  ..models import Model_ConfigProduct, Model_RefProvision, Model_RefDataTypes
 
 def DATA_PROVISION_PRODUCT():
     return [
@@ -12,6 +12,9 @@ def DATA_PROVISION_PRODUCT():
             "ref_attr_code": "group_size"
         }).ref_id, 
         'config_provision_version_code': 'std_group_size',
+        'config_provision_data_type_id': Model_RefDataTypes.find_one_by_attr({
+            "ref_attr_code": "number"
+        }).ref_id, 
         'config_provision_description': "This is the standard provision for CI21000 Group Size."
     }, 
     {
@@ -22,6 +25,9 @@ def DATA_PROVISION_PRODUCT():
             "ref_attr_code": "sic_code"
         }).ref_id, 
         'config_provision_version_code': 'std_sic_code',
+        'config_provision_data_type_id': Model_RefDataTypes.find_one_by_attr({
+            "ref_attr_code": "string"
+        }).ref_id, 
         'config_provision_description': "This is the standard provision for CI21000 SIC code."
     }, 
 ]

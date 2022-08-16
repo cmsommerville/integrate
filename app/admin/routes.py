@@ -10,5 +10,6 @@ ns_admin.add_resource(Resource_AdminDropTables, *['/admin/tables/_drop'])
 ns_admin.add_resource(Resource_AdminInitRefData, *['/admin/tables/_load/refdata'])
 ns_admin.add_resource(Resource_AdminInitConfig, *['/admin/tables/_load/config'])
 ns_admin.add_resource(Resource_AdminHealthCheck, *['/admin/health'])
+ns_admin.add_resource(Resource_AdminSelectionData, *['/admin/tables/_load/selections'])
 
 
