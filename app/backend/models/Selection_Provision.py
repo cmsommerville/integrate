@@ -12,11 +12,10 @@ SELECTION_PLAN = TBL_NAMES['SELECTION_PLAN']
 class Model_SelectionProvision(BaseModel):
     __tablename__ = SELECTION_PROVISION
     __table_args__ = (
-        db.UniqueConstraint('selection_plan_id', 'config_benefit_provision_id', ), 
+        db.UniqueConstraint('selection_plan_id', 'config_provision_id', ), 
     )
 
     selection_provision_id = db.Column(db.Integer, primary_key=True)
     selection_plan_id = db.Column(db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"), nullable=False)
-    config_benefit_provision_id = db.Column(db.ForeignKey(f"{CONFIG_BENEFIT_PROVISION}.config_benefit_provision_id"), nullable=False)
     config_provision_id = db.Column(db.ForeignKey(f"{CONFIG_PROVISION}.config_provision_id"), nullable=False)
     selection_provision_value = db.Column(db.String(255), nullable=False)

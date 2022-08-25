@@ -32,4 +32,8 @@ class Model_SelectionPlan(BaseModel):
     cloned_selection_plan_id = db.Column(db.Integer, db.ForeignKey(f'{SELECTION_PLAN}.selection_plan_id'))
     discretionary_factor = db.Column(db.Numeric(8, 5))
 
+    product = db.relationship("Model_ConfigProduct")
     state = db.relationship("Model_RefStates")
+    benefits = db.relationship("Model_SelectionBenefit")
+    census_set = db.relationship("Model_SelectionCensusSet", foreign_keys=[selection_census_set_id], 
+        primaryjoin="Model_SelectionPlan.selection_census_set_id == Model_SelectionCensusSet.selection_census_set_id")

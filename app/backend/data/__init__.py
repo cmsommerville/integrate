@@ -4,9 +4,10 @@ from . import Config_AgeBand, Config_AgeDistribution, Config_AgeMapper, \
     Config_BenefitState, Config_Coverage, Config_Factor, Config_Product, Config_ProductMapper, \
     Config_ProductState, Config_ProductVariation, Config_ProductVariationState,\
     Config_Provision, Config_ProvisionState, Config_ProvisionUI, Config_RateGroup, \
+    Config_RateTable, Config_RelationshipMapper, \
     Ref_AttrMapperType, Ref_Benefit,Ref_CensusStrategy, Ref_ComparisonOperator, Ref_DataTypes, \
     Ref_InputType, Ref_ProductVariation,Ref_Provision, Ref_RatingStrategy, Ref_States, Ref_UnitType, \
-    Selection_Benefit, Selection_Plan
+    Selection_AgeBand, Selection_Benefit, Selection_Plan, Selection_Provision
 
 
 def load_refdata(hostname: str):
@@ -34,6 +35,7 @@ def load_config(hostname: str):
     Config_RateGroup.load(hostname)
     Config_AgeMapper.load(hostname)
     Config_ProductMapper.load(hostname)
+    Config_RelationshipMapper.load(hostname)
     Config_ProductState.load(hostname)
 
     Config_ProductVariation.load(hostname)
@@ -50,8 +52,14 @@ def load_config(hostname: str):
 
     Config_BenefitProductVariation.load(hostname)
     Config_BenefitProvision.load(hostname)
+
+
+def load_rate_table(hostname: str):  
+    Config_RateTable.load(hostname)
     
 
 def load_selection(hostname: str): 
     Selection_Plan.load(hostname)
     Selection_Benefit.load(hostname)
+    Selection_Provision.load(hostname)
+    Selection_AgeBand.load(hostname)

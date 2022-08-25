@@ -19,3 +19,5 @@ class Model_ConfigRelationshipMapperSet(BaseModel):
     config_relationship_mapper_set_label = db.Column(db.String(100), nullable=False, 
         comment="Specifies the relationship mapper name")
     is_default =  db.Column(db.Boolean, nullable=False)
+
+    mappers = db.relationship("Model_ConfigRelationshipMapperDetail")

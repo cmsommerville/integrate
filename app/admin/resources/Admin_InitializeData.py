@@ -5,7 +5,7 @@ from flask_marshmallow import Schema
 from flask_restx import Resource, fields
 from app.extensions import db
 from app.shared import BaseTemporalTable
-from app.backend.data import load_refdata, load_config
+from app.backend.data import load_rate_table, load_refdata, load_config
 
 
 class Resource_AdminInitRefData(Resource):
@@ -29,4 +29,15 @@ class Resource_AdminInitConfig(Resource):
         load_config(hostname)
         return {"status": "success", "message": "Config tables successfully loaded"}
 
+
+
+class Resource_AdminInitRateTable(Resource):
+
+    @classmethod
+    def post(cls):
+        hostname = os.getenv('HOSTNAME')
+        if not hostname:
+            return {"error": "Could not find HOSTNAME environment variable"}, 400
+        load_rate_table(hostname)
+        return {"status": "success", "message": "Rate tables successfully loaded"}
 

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import pandas as pd
 from flask import current_app
 from typing import List
 from sqlalchemy import text
@@ -16,7 +17,7 @@ class BaseModel(db.Model):
 
     @declared_attr
     def updated_dts(cls):
-        return db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.utc_timestamp())
+        return db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
     @declared_attr
     def updated_by(cls):

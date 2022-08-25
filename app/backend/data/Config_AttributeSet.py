@@ -73,6 +73,32 @@ DATA_RELATIONSHIP = [
                 'is_composite_id': False
             }, 
         ]
+    }, 
+    {
+        'config_attr_type_code': 'relationship', 
+        'config_attr_set_label': 'Standard Four Tier', 
+        'attributes': [
+            {
+                'config_attr_detail_code': 'EE_ONLY',
+                'config_attr_detail_label': 'Employee',
+                'is_composite_id': False
+            }, 
+            {
+                'config_attr_detail_code': 'EE_SP',
+                'config_attr_detail_label': 'Employee + Spouse',
+                'is_composite_id': False
+            }, 
+            {
+                'config_attr_detail_code': 'EE_CH',
+                'config_attr_detail_label': 'Employee + Children',
+                'is_composite_id': False
+            }, 
+            {
+                'config_attr_detail_code': 'FAM',
+                'config_attr_detail_label': 'Family',
+                'is_composite_id': False
+            }, 
+        ]
     }
 ]
 

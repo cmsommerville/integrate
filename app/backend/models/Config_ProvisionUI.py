@@ -71,9 +71,12 @@ class Model_ConfigProvisionUI_Select(Model_ConfigProvisionUI):
     
     config_provision_id = db.Column(db.ForeignKey(f"{CONFIG_PROVISION_UI}.config_provision_id"), primary_key=True)
     is_radio = db.Column(db.Boolean, default=False)
+    default_config_provision_ui_select_item_id = db.Column(db.Integer, nullable=True)
 
-    items = db.relationship(
-        "Model_ConfigProvisionUI_SelectItem")
+    items = db.relationship("Model_ConfigProvisionUI_SelectItem")
+    default_item = db.relationship("Model_ConfigProvisionUI_SelectItem", 
+        foreign_keys=[default_config_provision_ui_select_item_id], 
+        primaryjoin="Model_ConfigProvisionUI_Select.default_config_provision_ui_select_item_id == Model_ConfigProvisionUI_SelectItem.config_provision_ui_select_item_id")
 
     __mapper_args__ = {
         'polymorphic_identity': 'SELECT',
@@ -91,5 +94,4 @@ class Model_ConfigProvisionUI_SelectItem(BaseModel):
     config_provision_id = db.Column(db.ForeignKey(f"{CONFIG_PROVISION_UI}.config_provision_id"))
     item_code = db.Column(db.String(30))
     item_label = db.Column(db.String(100))
-    is_default = db.Column(db.Boolean, default=False)
 

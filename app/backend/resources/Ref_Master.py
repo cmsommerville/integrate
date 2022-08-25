@@ -1,3 +1,4 @@
+import pandas as pd
 from flask_restx import Resource
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
 from .. import models

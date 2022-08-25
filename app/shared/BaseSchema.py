@@ -5,8 +5,6 @@ from marshmallow import post_dump
 class BaseSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         load_instance = True
-
-    created_dts = ma.DateTime(dump_only=True)
     
     @post_dump(pass_many=True)
     def formatDecimal(self, data, many, **kwargs):

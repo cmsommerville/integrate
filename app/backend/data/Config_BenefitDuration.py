@@ -1,4 +1,5 @@
 import requests
+import json
 from requests.compat import urljoin
 from  ..models import Model_ConfigBenefit, Model_RefBenefit
 
@@ -15,27 +16,23 @@ def DATA_BENEFIT_DURATION():
         "duration_items": [
             {
                 "config_benefit_duration_detail_code": "1", 
-                "config_benefit_duration_detail_label": "1 / year", 
+                "config_benefit_duration_detail_label": "1 per year", 
                 "config_benefit_duration_factor": 0.85, 
-                "is_default": False, 
             }, 
             {
                 "config_benefit_duration_detail_code": "2", 
-                "config_benefit_duration_detail_label": "2 / year", 
+                "config_benefit_duration_detail_label": "2 per year", 
                 "config_benefit_duration_factor": 0.95, 
-                "is_default": False, 
             }, 
             {
                 "config_benefit_duration_detail_code": "3", 
-                "config_benefit_duration_detail_label": "3 / year", 
+                "config_benefit_duration_detail_label": "3 per year", 
                 "config_benefit_duration_factor": 1, 
-                "is_default": True, 
             }, 
             {
                 "config_benefit_duration_detail_code": "4", 
-                "config_benefit_duration_detail_label": "1 / year", 
+                "config_benefit_duration_detail_label": "4 per year", 
                 "config_benefit_duration_factor": 1.1, 
-                "is_default": False, 
             }, 
         ]
     }, 
@@ -46,5 +43,14 @@ def DATA_BENEFIT_DURATION():
 def load(hostname: str) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-duration-set-list')
     res = requests.post(url, json=DATA_BENEFIT_DURATION())
+    data = res.json()
     if not res.ok: 
         raise Exception(res.text)
+
+    for item in data:
+        config_benefit_duration_set_id = item['config_benefit_duration_set_id']
+        url = urljoin(hostname, f'api/crud/config/benefit-duration-set/{config_benefit_duration_set_id}')
+        default_id = item.get('duration_items')[-1]
+        res = requests.patch(url, json={'default_config_benefit_duration_detail_id': default_id})
+        if not res.ok: 
+            raise Exception(res.text)
