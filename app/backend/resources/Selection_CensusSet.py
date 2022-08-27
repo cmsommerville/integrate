@@ -1,13 +1,18 @@
+import os
+import requests
+import numpy as np
 import pandas as pd
+from decimal import Decimal
 from dateutil.relativedelta import relativedelta
 from flask import request
 from sqlalchemy import column
 from app.shared import BaseCRUDResource, BaseCRUDResourceList, upload_file, NoFileProvidedException
 from ..models import Model_SelectionCensusSet, Model_SelectionPlan, \
-    Model_ConfigAttributeDetail, Model_ConfigAttributeDistributionSet_Gender, \
-    Model_ConfigAttributeDistributionSet_SmokerStatus
-from ..schemas import Schema_SelectionCensusSet, Schema_ConfigAttributeDetail
+    Model_SelectionCensusDetail, Model_SelectionPlan
+from ..schemas import Schema_SelectionCensusSet, Schema_SelectionCensusDetail
 
+
+HOSTNAME = os.getenv('HOSTNAME')
 
 class Census: 
     def __init__(self, plan_id: int, df_census: pd.DataFrame, *args, **kwargs):
@@ -25,7 +30,7 @@ class Census:
         self.df_gender = pd.DataFrame([
             {
                 'gender_code': row.config_attr_detail_code, 
-                'gender_id': row.config_attr_detail_id, 
+                'config_gender_detail_id': row.config_attr_detail_id, 
             }
             for row in self.gender_list
         ])
@@ -33,7 +38,7 @@ class Census:
         self.df_smoker_status = pd.DataFrame([
             {
                 'smoker_status_code': row.config_attr_detail_code, 
-                'smoker_status_id': row.config_attr_detail_id, 
+                'config_smoker_status_detail_id': row.config_attr_detail_id, 
             }
             for row in self.smoker_status_list
         ])
@@ -45,7 +50,7 @@ class Census:
         return pd.DataFrame([
             {
                 '_dummy': 1, 
-                'smoker_status_id': dist.config_attr_detail_id, 
+                'config_smoker_status_detail_id': dist.config_attr_detail_id, 
                 '_weight_smoker_status': dist.weight, 
             }
             for dist in self.product.smoker_status_distribution_set.smoker_status_distribution
@@ -58,7 +63,7 @@ class Census:
         return pd.DataFrame([
             {
                 '_dummy': 1, 
-                'gender_id': dist.config_attr_detail_id, 
+                'config_gender_detail_id': dist.config_attr_detail_id, 
                 '_weight_gender': dist.weight, 
             }
             for dist in self.product.gender_distribution_set.gender_distribution
@@ -99,22 +104,22 @@ class Census:
 
         # get gender attribute IDs
         self.df_census = self.df_census.merge(self.df_gender, how='left', on='gender_code')
-        if self.df_census['gender_id'].isna().sum() > 0:
+        if self.df_census['config_gender_detail_id'].isna().sum() > 0:
             raise Exception("Gender codes provided in census which are not configured for this product")
         
         # get smoker status attributee IDs
         self.df_census = self.df_census.merge(self.df_smoker_status, how='left', on='smoker_status_code')
-        if self.df_census['smoker_status_id'].isna().sum() > 0:
+        if self.df_census['config_smoker_status_detail_id'].isna().sum() > 0:
             raise Exception("Smoker status codes provided in census which are not configured for this product")
         
         # add weight if not provided
-        if 'weight' not in self.df_census.columns:
-            self.df_census['weight'] = 1
+        if 'selection_census_weight' not in self.df_census.columns:
+            self.df_census['selection_census_weight'] = 1
 
         # aggregate census
         self.df_census = self.df_census.groupby(
-            ['gender_id', 'smoker_status_id', 'age_value']
-        ).agg({'weight': 'sum'})
+            ['config_gender_detail_id', 'config_smoker_status_detail_id', 'age_value']
+        ).agg({'selection_census_weight': 'sum'})
 
         self.df_census['_dummy'] = 1
 
@@ -141,9 +146,9 @@ class Census:
 
         df_census = df_ss_dist.merge(df_g_dist, how='inner', on='_dummy')
         df_census = df_census.merge(df_age_dist, how='inner', on='_dummy')
-        df_census['weight'] = df_census['_weight_age'] * df_census['_weight_ss'] * df_census['_weight_gender']
+        df_census['selection_census_weight'] = df_census['_weight_age'] * df_census['_weight_smoker_status'] * df_census['_weight_gender']
 
-        self.df_census = df_census[['age_value', 'smoker_status_id', 'gender_id', 'weight']]
+        self.df_census = df_census[['age_value', 'config_smoker_status_detail_id', 'config_gender_detail_id', 'selection_census_weight']]
         return self.df_census
 
 
@@ -155,23 +160,23 @@ class Census:
         self.df_census['_dummy'] = 1
         cols = self.df_census.columns
         # if census is missing smoker status, merge default SS distribution
-        smoker_status_id_set = set(self.df_census['smoker_status_id'].tolist())
+        smoker_status_id_set = set(self.df_census['config_smoker_status_detail_id'].tolist())
         if len(smoker_status_id_set) > 1: 
             pass
         if smoker_status_id_set[0] == self.composite_smoker_status.config_attr_detail_id:
             df_ss_dist = self._get_default_smoker_status_distribution()
             self.df_census = self.df_census.merge(df_ss_dist, how='inner', on='_dummy')
-            self.df_census['weight'] = self.df_census['weight'] * self.df_census['_weight_smoker_status']
+            self.df_census['selection_census_weight'] = self.df_census['selection_census_weight'] * self.df_census['_weight_smoker_status']
             self.df_census = self.df_census[cols]
 
         # if census is missing gender, merge default gender distribution
-        gender_id_set = set(self.df_census['gender_id'].tolist())
+        gender_id_set = set(self.df_census['config_gender_detail_id'].tolist())
         if len(gender_id_set) > 1: 
             pass
         if gender_id_set[0] == self.composite_gender.config_attr_detail_id:
             df_g_dist = self._get_default_gender_distribution()
             self.df_census = self.df_census.merge(df_g_dist, how='inner', on='_dummy')
-            self.df_census['weight'] = self.df_census['weight'] * self.df_census['_weight_gender']
+            self.df_census['selection_census_weight'] = self.df_census['selection_census_weight'] * self.df_census['_weight_gender']
             self.df_census = self.df_census[cols]
 
         self.df_census = self.df_census.drop(columns=['_dummy'])
@@ -182,15 +187,18 @@ class Census:
     def process(self):
         if len(self.df_census) == 0: 
             self._handle_no_census()
+        else: 
+            self._process_file()
+            self._handle_census_provided()
 
-        self._process_file()
-        self._handle_census_provided()
+        normalizer = Decimal('10') ** (-int(np.log10(self.df_census['selection_census_weight'].mean())))
+        self.df_census['selection_census_weight'] = self.df_census['selection_census_weight'] * normalizer
 
     def to_census_set_dict(self, *args, **kwargs): 
         return {
             'selection_plan_id': self.plan_id,
             'selection_census_description': kwargs.get('selection_census_description'), 
-            'selection_census_filename': kwargs.get('selection_census_filename'), 
+            'selection_census_filepath': kwargs.get('selection_census_filename'), 
             'census_details': self.df_census.to_dict('records')
         }
 
@@ -203,7 +211,7 @@ class CRUD_SelectionCensusSet(BaseCRUDResource):
     @classmethod
     def post(cls, id: int): 
         try: 
-            df, filename = upload_file(request)
+            df, filename = upload_file(request, '/files')
         except NoFileProvidedException:
             df = pd.DataFrame() 
             filename = None
@@ -214,14 +222,28 @@ class CRUD_SelectionCensusSet(BaseCRUDResource):
         census = Census(id, df)
         census.process()
         dict_census_set = census.to_census_set_dict(selection_census_filename=filename)
-        
+        census_details = dict_census_set.pop('census_details')
+
         # validate census set and load model instance
         _schema_instance = cls.schema()
-        dict_census_set = _schema_instance.dump(dict_census_set)
         model_instance = _schema_instance.load(dict_census_set)
 
-        # save to database
+        # save set to database
         model_instance.save_to_db()
+        set_id = model_instance.selection_census_set_id
+
+        # save details to databasee
+        _detail_schema_instance = Schema_SelectionCensusDetail(many=True)
+        models = _detail_schema_instance.load([{
+            **d, 
+            'selection_census_set_id': set_id,
+        } for d in census_details])
+        Model_SelectionCensusDetail.save_all_to_db(models)
+
+        # set census set id on plan record
+        res = requests.patch(f'{HOSTNAME}/api/crud/selection/plan/{id}', json={
+            'selection_census_set_id': set_id
+        })
 
         return _schema_instance.dump(model_instance), 200
 

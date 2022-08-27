@@ -1,5 +1,4 @@
 import datetime
-from sqlalchemy.sql.functions import current_timestamp
 from app.extensions import db
 from app.shared import BaseModel
 
@@ -14,7 +13,7 @@ class Model_SelectionCensusSet(BaseModel):
 
     selection_census_set_id = db.Column(db.Integer, primary_key=True)
     selection_plan_id = db.Column(db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"), nullable=False)
-    selection_census_description = db.Column(db.String(255), default=f"Census uploaded at {current_timestamp()}")
+    selection_census_description = db.Column(db.String(255), default=f"Census uploaded at {datetime.datetime.now()}")
     selection_census_filepath = db.Column(db.String, nullable=True)
 
     census_details = db.relationship("Model_SelectionCensusDetail", 

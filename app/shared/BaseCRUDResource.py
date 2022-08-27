@@ -62,6 +62,7 @@ class BaseCRUDResource(Resource):
         schema_instance = cls.schema()
         try: 
             req = request.get_json()
+            print(req)
             # get existing data 
             orig_obj = cls.model.find_one(id)
             # dump existing data to json 
