@@ -1,3 +1,4 @@
+from typing import Tuple
 from app.extensions import db
 from app.shared import BaseModel
 
@@ -28,8 +29,8 @@ class Model_ConfigProvision(BaseModel):
     ui_component = db.relationship("Model_ConfigProvisionUI")
     ref_provision = db.relationship("Model_RefProvision",
         primaryjoin="Model_ConfigProvision.ref_provision_id == Model_RefProvision.ref_id")
-    data_type = db.relationship("Model_RefDataTypes",
-        primaryjoin="Model_ConfigProvision.ref_provision_id == Model_RefDataTypes.ref_id")
+    data_type = db.relationship("Model_RefDataTypes", lazy='joined', 
+        primaryjoin="Model_ConfigProvision.config_provision_data_type_id == Model_RefDataTypes.ref_id")
 
     __mapper_args__ = {
         'polymorphic_on': config_provision_type_code,
@@ -42,7 +43,12 @@ class Model_ConfigProvision_Product(Model_ConfigProvision):
         'polymorphic_identity': 'product'
     }
 
+    factors = db.relationship("Model_ConfigFactor")
+
+
 class Model_ConfigProvision_RateTable(Model_ConfigProvision):
     __mapper_args__ = {
         'polymorphic_identity': 'rate_table'
     }
+
+    factors = db.relationship("Model_ConfigFactor")

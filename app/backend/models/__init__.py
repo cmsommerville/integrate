@@ -40,3 +40,4 @@ from .Selection_CensusDetail import Model_SelectionCensusDetail
 from .Selection_CensusSet import Model_SelectionCensusSet
 from .Selection_Plan import Model_SelectionPlan
 from .Selection_Provision import Model_SelectionProvision
+from .Selection_RateTableFactor import Model_SelectionRateTableFactor

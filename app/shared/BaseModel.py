@@ -1,5 +1,6 @@
 from __future__ import annotations
 import pandas as pd
+from functools import reduce
 from flask import current_app
 from typing import List
 from sqlalchemy import text
@@ -44,6 +45,9 @@ class BaseModel(db.Model):
         qry = cls.query.filter(*[getattr(cls, k) == v for k, v in attrs.items()])
         if as_of_ts and SUPPORT_TEMPORAL_TABLES: 
             qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
+
+        if kwargs.get('last'): 
+            return qry.order_by(cls.created_dts.desc()).first()
         return qry.first()
 
     @classmethod
@@ -87,3 +91,16 @@ class BaseModel(db.Model):
             db.session.rollback()
             raise
 
+
+class BaseRuleModel(BaseModel):
+    __abstract__ = True
+
+    def nested_getattr(self, obj, nested_attr):
+        """
+        Returns a deeply nested relationship expressed as a string with dot notation.
+
+        An example, `plan.group.group_label`, will return the group_label attribute from the 
+        group class from the plan class.
+        """
+        _attrs = nested_attr.split('.')
+        return reduce(lambda o, next_attr: getattr(o, next_attr, None), _attrs, obj)

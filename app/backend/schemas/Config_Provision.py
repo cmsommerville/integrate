@@ -1,7 +1,14 @@
 from app.extensions import ma
 from app.shared import BaseSchema
 
-from ..models import Model_ConfigProvision_Product, Model_ConfigProvision_RateTable
+from ..models import Model_ConfigProvision, Model_ConfigProvision_Product, Model_ConfigProvision_RateTable
+
+class Schema_ConfigProvision(BaseSchema):
+    class Meta:
+        model = Model_ConfigProvision
+        load_instance = True
+        include_relationships=True
+        include_fk=True
 
 class Schema_ConfigProvision_Product(BaseSchema):
     class Meta:

@@ -22,14 +22,18 @@ def create_app(config):
 
     from .route_registration import NAMESPACES
     bind_namespaces(api, NAMESPACES, '/api')
+    from .subscription_registration import SUBSCRIPTIONS
+    for subscription in SUBSCRIPTIONS:
+        subscription.subscribe()
 
-    @app.route('/test')
-    def tester(): 
-        from sqlalchemy.inspection import inspect
-        from app.backend.models import Model_ConfigAgeBandSet
 
-        for k, v in inspect(Model_ConfigAgeBandSet).relationships.items():
-            print(f"{v.relationship_code}")
-        return {"hello": "world"}, 200
+    # @app.route('/test')
+    # def tester(): 
+    #     from sqlalchemy.inspection import inspect
+    #     from app.backend.models import Model_ConfigAgeBandSet
+
+    #     for k, v in inspect(Model_ConfigAgeBandSet).relationships.items():
+    #         print(f"{v.relationship_code}")
+    #     return {"hello": "world"}, 200
 
     return app

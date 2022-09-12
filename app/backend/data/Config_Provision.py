@@ -32,9 +32,30 @@ def DATA_PROVISION_PRODUCT():
     }, 
 ]
 
+def DATA_PROVISION_RATE_TABLE():
+    return [
+        {
+            'config_product_id': Model_ConfigProduct.find_one_by_attr({
+                "config_product_code": "CI21000"
+            }).config_product_id, 
+            'ref_provision_id': Model_RefProvision.find_one_by_attr({
+                "ref_attr_code": "reduction_at_70"
+            }).ref_id, 
+            'config_provision_version_code': 'std_reduction_at_70',
+            'config_provision_data_type_id': Model_RefDataTypes.find_one_by_attr({
+                "ref_attr_code": "boolean"
+            }).ref_id, 
+            'config_provision_description': "This is the standard provision for CI21000 Reduction at Age 70."
+        }, 
+    ]
+
 
 def load(hostname: str) -> None:
     url = urljoin(hostname, 'api/crud/config/provision-product-list')
     res = requests.post(url, json=DATA_PROVISION_PRODUCT())
+    if not res.ok: 
+        raise Exception(res.text)
+    url = urljoin(hostname, 'api/crud/config/provision-rate-table-list')
+    res = requests.post(url, json=DATA_PROVISION_RATE_TABLE())
     if not res.ok: 
         raise Exception(res.text)

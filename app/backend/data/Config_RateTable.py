@@ -6,16 +6,18 @@ from  ..models import Model_ConfigBenefitProductVariation, Model_ConfigAttribute
     Model_ConfigAttributeSet_Relationship, Model_ConfigAttributeSet_SmokerStatus
 
 
-def GENDERS():
-    return Model_ConfigAttributeSet_Gender.find_one_by_attr({
+def GENDERS(composite: bool):
+    data = Model_ConfigAttributeSet_Gender.find_one_by_attr({
         'config_attr_set_label': 'Standard M/F/X'
     }).attributes
+    return [x for x in data if x.is_composite_id == composite]
 
-def SMOKER_STATUSES():
-    return Model_ConfigAttributeSet_SmokerStatus.find_one_by_attr({
+def SMOKER_STATUSES(composite: bool):
+    data = Model_ConfigAttributeSet_SmokerStatus.find_one_by_attr({
         'config_attr_set_label': 'Standard N/T/U'
     }).attributes
-
+    return [x for x in data if x.is_composite_id == composite]
+    
 def RELATIONSHIPS():
     return Model_ConfigAttributeSet_Relationship.find_one_by_attr({
         'config_attr_set_label': 'Standard EE/SP/CH'
@@ -29,7 +31,7 @@ def DATA_RATE_TABLE():
     data = []
     betas = [1, 0.1, 0.005, 0.5, 0.5, 0.5]
 
-    for bpv, age, gndr, smkr, rel in product(BENEFIT_VARIATIONS(), range(22, 72, 5), GENDERS(), SMOKER_STATUSES(), RELATIONSHIPS(), ):
+    for bpv, age, gndr, smkr, rel in product(BENEFIT_VARIATIONS(), range(22, 72, 5), GENDERS(True), SMOKER_STATUSES(False), RELATIONSHIPS(), ):
         xs = [
             bpv.config_benefit_product_variation_id % 5,
             age, 

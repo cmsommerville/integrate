@@ -43,4 +43,5 @@ TBL_NAMES = {
     "SELECTION_PLAN": "selection_plan",  
     "SELECTION_PROVISION": "selection_provision", 
     "SELECTION_RATE_GROUP_SUMMARY": "selection_rate_group_summary", 
+    "SELECTION_RATE_TABLE_FACTOR": "selection_rate_table_factor", 
 }

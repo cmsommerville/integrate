@@ -1,5 +1,5 @@
 from app.extensions import ma
-from app.shared import BaseSchema
+from app.shared import BaseSchema, PrimitiveField
 
 from ..models import Model_ConfigFactorRule
 

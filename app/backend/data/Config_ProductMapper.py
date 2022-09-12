@@ -26,20 +26,12 @@ def DATA_PRODUCT_MAPPER__GENDER():
         'mappers': [
             {
                 'from_config_attr_detail_id': Model_ConfigAttributeDetail.find_one_by_attr({
-                        "config_attr_detail_code": 'M'
+                        "config_attr_detail_code": 'X'
                     }).config_attr_detail_id, 
                 'to_config_attr_detail_id': Model_ConfigAttributeDetail.find_one_by_attr({
                         "config_attr_detail_code": 'X'
                     }).config_attr_detail_id
             }, 
-            {
-                'from_config_attr_detail_id': Model_ConfigAttributeDetail.find_one_by_attr({
-                        "config_attr_detail_code": 'F'
-                    }).config_attr_detail_id, 
-                'to_config_attr_detail_id': Model_ConfigAttributeDetail.find_one_by_attr({
-                        "config_attr_detail_code": 'X'
-                    }).config_attr_detail_id
-            }
         ]
     }, 
     { 

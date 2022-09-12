@@ -12,6 +12,11 @@ DATA_PROVISION = [
         "ref_attr_label": "SIC Code", 
         "ref_attr_description": "Standard Industrial Classification Code", 
     },
+    {
+        "ref_attr_code": "reduction_at_70", 
+        "ref_attr_label": "Reduction at Age 70", 
+        "ref_attr_description": "50% Benefit Reduction at Attained Age 70", 
+    },
 ]
 
 

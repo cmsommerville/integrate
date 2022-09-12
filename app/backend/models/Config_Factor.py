@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel
+from app.shared import BaseModel, BaseRuleset
 
 from ..tables import TBL_NAMES
 
@@ -7,7 +7,7 @@ CONFIG_FACTOR = TBL_NAMES['CONFIG_FACTOR']
 CONFIG_PROVISION = TBL_NAMES['CONFIG_PROVISION']
 
 
-class Model_ConfigFactor(BaseModel):
+class Model_ConfigFactor(BaseModel, BaseRuleset):
     __tablename__ = CONFIG_FACTOR
 
     config_factor_id = db.Column(db.Integer, primary_key=True)
@@ -18,3 +18,7 @@ class Model_ConfigFactor(BaseModel):
     factor_value = db.Column(db.Numeric(8,5), nullable=False)
 
     factor_rules = db.relationship("Model_ConfigFactorRule")
+
+
+    def apply_ruleset(self, obj: BaseModel):
+        return all([rule.apply_rule(obj) for rule in self.factor_rules])

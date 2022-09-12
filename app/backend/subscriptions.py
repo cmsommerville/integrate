@@ -1,9 +1,5 @@
-from .observables import *
-from .observers import *
+from .observers import observers
 
-SUBSCRIPTIONS = [
-    {
-        "observer": Observer_ConfigAttributeMapperDetail_010, 
-        "observable": Observable_ConfigAttributeSet
-    }
+OBSERVERS = [
+    *observers
 ]

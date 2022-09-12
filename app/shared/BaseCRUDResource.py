@@ -17,11 +17,17 @@ class BaseCRUDResource(Resource):
         schema_instance = cls.schema()
         try: 
             obj = cls.model.find_one(id)
-            if obj: 
-                return schema_instance.dump(obj), 200
-            raise Exception(f"No data found for id {id}")
         except Exception as e:
             return {}, 200
+        
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('post', obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        return schema_instance.dump(obj), 200
   
     @classmethod  
     def post(cls, *args, **kwargs):
@@ -34,6 +40,13 @@ class BaseCRUDResource(Resource):
         
         try: 
             obj.save_to_db()
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('post', obj)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
@@ -52,6 +65,13 @@ class BaseCRUDResource(Resource):
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
         
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('put', obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
         try: 
             return schema_instance.dump(obj), 201
         except Exception as e:
@@ -74,6 +94,13 @@ class BaseCRUDResource(Resource):
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
         
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('patch', obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
         try:
             return schema_instance.dump(obj), 201
         except Exception as e:
@@ -86,6 +113,13 @@ class BaseCRUDResource(Resource):
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
         
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('delete', obj)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
         try: 
             obj.delete()
             return {"status": "Deleted"}, 204
@@ -108,6 +142,13 @@ class BaseCRUDResourceList(Resource):
             return {"status": "error", "message": str(e)}, 400
 
         try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('get', objs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
             if objs: 
                 return cls.schema(many=True).dump(objs), 200
             raise Exception("No data found")
@@ -121,6 +162,13 @@ class BaseCRUDResourceList(Resource):
             req = request.get_json()
             objs = schema_list_instance.load(req)
             cls.model.save_all_to_db(objs)
+        except Exception as e:
+            return {"status": "error", "message": str(e)}, 400
+
+        try: 
+            _observable = getattr(cls, 'observable', None)
+            if _observable:
+                _observable.notify('post', objs)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 

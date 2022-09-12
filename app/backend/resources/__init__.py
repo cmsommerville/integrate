@@ -43,6 +43,8 @@ from .Selection_CensusSet import CRUD_SelectionCensusSet, CRUD_SelectionCensusSe
 from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
 from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
 
+from .Selection_Plan import Test_SelectionPlan
+
 ns_crud = Namespace("crud", "Namespace containing standard CRUD endpoints")
 
 ns_crud.add_resource(CRUD_ConfigAgeBandDetail, '/crud/config/age-band-detail/<int:id>', '/crud/config/age-band-detail')
@@ -162,3 +164,4 @@ ns_crud.add_resource(CRUD_SelectionPlan_List, '/crud/selection/plan-list')
 ns_crud.add_resource(CRUD_SelectionProvision, '/crud/selection/provision/<int:id>', '/crud/selection/provision')
 ns_crud.add_resource(CRUD_SelectionProvision_List, '/crud/selection/provision-list')
 
+ns_crud.add_resource(Test_SelectionPlan, '/test/selection/plan/<int:id>')

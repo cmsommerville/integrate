@@ -6,7 +6,7 @@ from  ..models import Model_ConfigBenefitProductVariation, Model_SelectionPlan
 def PLAN(): 
     return Model_SelectionPlan.find_one_by_attr({
         'selection_plan_description': 'TEST__SM_DISTINCT__GENDER_COMPOSITE',
-    })
+    }, last=True)
 
 
 def BENEFITS(product_variation_id):

@@ -1,1 +1,7 @@
-from .Config_AttributeMapperDetail import Observer_ConfigAttributeMapperDetail_010
+from .Selection_Provision_CalcProductFactors import observer_selection_provision_calc_product_factors
+from .Selection_Provision_CalcRateTableFactors import observer_selection_provision_calc_rate_table_factors
+
+observers = [
+    observer_selection_provision_calc_product_factors, 
+    observer_selection_provision_calc_rate_table_factors
+]

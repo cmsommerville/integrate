@@ -7,7 +7,7 @@ from . import Config_AgeBand, Config_AgeDistribution, Config_AgeMapper, \
     Config_RateTable, Config_RelationshipMapper, \
     Ref_AttrMapperType, Ref_Benefit,Ref_CensusStrategy, Ref_ComparisonOperator, Ref_DataTypes, \
     Ref_InputType, Ref_ProductVariation,Ref_Provision, Ref_RatingStrategy, Ref_States, Ref_UnitType, \
-    Selection_AgeBand, Selection_Benefit, Selection_Plan, Selection_Provision
+    Selection_AgeBand, Selection_Benefit, Selection_BenefitDuration, Selection_Plan, Selection_Provision
 
 
 def load_refdata(hostname: str):
@@ -61,5 +61,6 @@ def load_rate_table(hostname: str):
 def load_selection(hostname: str): 
     Selection_Plan.load(hostname)
     Selection_Benefit.load(hostname)
+    Selection_BenefitDuration.load(hostname)
     Selection_Provision.load(hostname)
     Selection_AgeBand.load(hostname)

@@ -4,27 +4,34 @@ from collections.abc import Callable
 
 class BaseObserver:
 
-    def __init__(self, callback: Callable, methods: List[str], *args, **kwargs): 
-        self.callback = callback
-        self.GET = "GET" in methods
-        self.POST = "POST" in methods
-        self.PATCH = "PATCH" in methods
-        self.DELETE = "DELETE" in methods
-        self.PUT = "PUT" in methods
-        
+    def get(self):
+        pass
+
+    def post(self):
+        pass
+
+    def patch(self):
+        pass
+
+    def put(self):
+        pass
+
+    def delete(self):
+        pass
 
 class BaseObservable:
 
     def __init__(self): 
-        self.observers = {}
+        self.observers = set()
 
     def notify(self, method: str, payload: any, *args, **kwargs): 
-        for _, obs in self.observers.items():
-            if getattr(obs, method, False): 
-                obs.callback(payload)
+        for obs in self.observers:
+            callback = getattr(obs, method)
+            if callback: 
+                callback(payload)
 
     def subscribe(self, observer: BaseObserver):
-        self.observers[observer.endpoint] = observer
+        self.observers.add(observer)
 
     def unsubscribe(self, observer: BaseObserver):
-        self.observers.pop(observer.endpoint)
+        self.observers.discard(observer)
