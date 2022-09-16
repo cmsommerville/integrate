@@ -75,6 +75,15 @@ class BaseModel(db.Model):
             db.session.rollback()
             raise
 
+    @classmethod
+    def bulk_save_all_to_db(cls, data) -> None:
+        try: 
+            db.session.bulk_save_objects(data)
+            db.session.commit()
+        except: 
+            db.session.rollback()
+            raise
+
     def save_to_db(self) -> None:
         try:
             db.session.add(self)

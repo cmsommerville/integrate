@@ -1,1 +1,2 @@
+from .CensusHandler import CensusHandler
 from .RulesetApplicator import RulesetApplicator

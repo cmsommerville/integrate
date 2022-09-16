@@ -11,4 +11,4 @@ class Schema_SelectionBenefit(BaseSchema):
         include_relationships=True
         include_fk=True
 
-    config_benefit = ma.Nested(Schema_ConfigBenefit)
+    config_benefit = ma.Nested(Schema_ConfigBenefit, dump_only=True)

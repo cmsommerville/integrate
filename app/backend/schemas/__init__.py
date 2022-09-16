@@ -36,7 +36,9 @@ from .Config_RelationshipMapperSet import Schema_ConfigRelationshipMapperSet
 from .Selection_AgeBand import Schema_SelectionAgeBand
 from .Selection_Benefit import Schema_SelectionBenefit
 from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
+from .Selection_BenefitRateTable import Schema_SelectionBenefitRateTable
 from .Selection_CensusDetail import Schema_SelectionCensusDetail
 from .Selection_CensusSet import Schema_SelectionCensusSet
 from .Selection_Plan import Schema_SelectionPlan
 from .Selection_Provision import Schema_SelectionProvision
+from .Selection_RateTable import Schema_SelectionRateTable

@@ -1,7 +1,9 @@
+from .Selection_CensusHandler import observer_selection_census_handler
 from .Selection_Provision_CalcProductFactors import observer_selection_provision_calc_product_factors
 from .Selection_Provision_CalcRateTableFactors import observer_selection_provision_calc_rate_table_factors
 
 observers = [
+    observer_selection_census_handler,
     observer_selection_provision_calc_product_factors, 
     observer_selection_provision_calc_rate_table_factors
 ]

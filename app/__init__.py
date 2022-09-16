@@ -3,6 +3,10 @@ from flask import Flask
 from flask_cors import CORS
 from flask_restx import Resource
 from dotenv import load_dotenv
+import logging
+
+logging.basicConfig(filename='logs/info.log')
+logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 from app.extensions import db, ma, api
 from app.shared import bind_namespaces
@@ -20,20 +24,13 @@ def create_app(config):
 
     api.init_app(app)
 
+    # bind routes
     from .route_registration import NAMESPACES
     bind_namespaces(api, NAMESPACES, '/api')
+
+    # bind subscribers
     from .subscription_registration import SUBSCRIPTIONS
     for subscription in SUBSCRIPTIONS:
         subscription.subscribe()
-
-
-    # @app.route('/test')
-    # def tester(): 
-    #     from sqlalchemy.inspection import inspect
-    #     from app.backend.models import Model_ConfigAgeBandSet
-
-    #     for k, v in inspect(Model_ConfigAgeBandSet).relationships.items():
-    #         print(f"{v.relationship_code}")
-    #     return {"hello": "world"}, 200
 
     return app

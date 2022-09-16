@@ -18,7 +18,6 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
 
     def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
         print("In Observer_SelectionProvision_CalcRateTableFactors...")
-        product_factors = []
         if type(provisions) != list: 
             provisions = [provisions]
 
@@ -53,12 +52,7 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
             # get the factor value
             rate_table_factors.append(selection_rate_table_factor)
 
-        Model_SelectionRateTableFactor.save_all_to_db(rate_table_factors)
-
-
-
-
-        Model_SelectionProvision.save_all_to_db(product_factors)
+        Model_SelectionRateTableFactor.bulk_save_all_to_db(rate_table_factors)
 
 
 observer_selection_provision_calc_rate_table_factors = Observer_SelectionProvision_CalcRateTableFactors()

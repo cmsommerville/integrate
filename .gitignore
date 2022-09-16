@@ -4,6 +4,8 @@ Pipfile.lock
 files/*
 .vscode
 /work/*
+**/logs
+**/*.log
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

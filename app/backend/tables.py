@@ -37,11 +37,13 @@ TBL_NAMES = {
     "SELECTION_AGE_BAND": "selection_age_band", 
     "SELECTION_BENEFIT": "selection_benefit", 
     "SELECTION_BENEFIT_DURATION": "selection_benefit_duration", 
+    "SELECTION_BENEFIT_RATE_TABLE": "selection_benefit_rate_table", 
     "SELECTION_CENSUS_DETAIL": "selection_census_detail", 
     "SELECTION_CENSUS_SET": "selection_census_set", 
     "SELECTION_FACE_AMOUNTS": "selection_face_amounts", 
     "SELECTION_PLAN": "selection_plan",  
     "SELECTION_PROVISION": "selection_provision", 
     "SELECTION_RATE_GROUP_SUMMARY": "selection_rate_group_summary", 
+    "SELECTION_RATE_TABLE": "selection_rate_table", 
     "SELECTION_RATE_TABLE_FACTOR": "selection_rate_table_factor", 
 }

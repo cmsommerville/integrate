@@ -42,6 +42,7 @@ from .Selection_CensusDetail import CRUD_SelectionCensusDetail, CRUD_SelectionCe
 from .Selection_CensusSet import CRUD_SelectionCensusSet, CRUD_SelectionCensusSet_List
 from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
 from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
+from .Selection_BenefitRateTable import CRUD_SelectionBenefitRateTable
 
 from .Selection_Plan import Test_SelectionPlan
 
@@ -155,6 +156,7 @@ ns_crud.add_resource(CRUD_SelectionBenefit, '/crud/selection/benefit/<int:id>', 
 ns_crud.add_resource(CRUD_SelectionBenefit_List, '/crud/selection/benefit-list')
 ns_crud.add_resource(CRUD_SelectionBenefitDuration, '/crud/selection/benefit-duration/<int:id>', '/crud/selection/benefit-duration')
 ns_crud.add_resource(CRUD_SelectionBenefitDuration_List, '/crud/selection/benefit-duration-list')
+ns_crud.add_resource(CRUD_SelectionBenefitRateTable, '/crud/selection/rate-table/<int:plan_id>')
 ns_crud.add_resource(CRUD_SelectionCensusDetail, '/crud/selection/census-detail/<int:id>', '/crud/selection/census-detail')
 ns_crud.add_resource(CRUD_SelectionCensusDetail_List, '/crud/selection/census-detail-list')
 ns_crud.add_resource(CRUD_SelectionCensusSet, '/crud/selection/census-set/<int:id>', '/crud/selection/census-set')
