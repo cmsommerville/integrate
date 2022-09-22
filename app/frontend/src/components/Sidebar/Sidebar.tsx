@@ -59,7 +59,7 @@ const Sidebar = () => {
                 leaveFrom="translate-x-0"
                 leaveTo="-translate-x-full"
               >
-                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-indigo-700">
+                <Dialog.Panel className="relative flex w-full max-w-xs flex-1 flex-col bg-primary-700">
                   <Transition.Child
                     as={Fragment}
                     enter="ease-in-out duration-300"
@@ -87,7 +87,7 @@ const Sidebar = () => {
                     <div className="flex flex-shrink-0 items-center px-4">
                       <img
                         className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
+                        src="https://tailwindui.com/img/logos/mark.svg?color=primary&shade=300"
                         alt="Your Company"
                       />
                     </div>
@@ -98,13 +98,13 @@ const Sidebar = () => {
                           href={item.href}
                           className={classNames(
                             item.current
-                              ? "bg-indigo-800 text-white"
-                              : "text-white hover:bg-indigo-600 hover:bg-opacity-75",
+                              ? "bg-primary-800 text-white"
+                              : "text-white hover:bg-primary-600 hover:bg-opacity-75",
                             "group flex items-center px-2 py-2 text-base font-medium rounded-md"
                           )}
                         >
                           <item.icon
-                            className="mr-4 h-6 w-6 flex-shrink-0 text-indigo-300"
+                            className="mr-4 h-6 w-6 flex-shrink-0 text-primary-300"
                             aria-hidden="true"
                           />
                           {item.name}
@@ -112,7 +112,7 @@ const Sidebar = () => {
                       ))}
                     </nav>
                   </div>
-                  <div className="flex flex-shrink-0 border-t border-indigo-800 p-4">
+                  <div className="flex flex-shrink-0 border-t border-primary-800 p-4">
                     <a href="#" className="group block flex-shrink-0">
                       <div className="flex items-center">
                         <div>
@@ -126,7 +126,7 @@ const Sidebar = () => {
                           <p className="text-base font-medium text-white">
                             Tom Cook
                           </p>
-                          <p className="text-sm font-medium text-indigo-200 group-hover:text-white">
+                          <p className="text-sm font-medium text-primary-200 group-hover:text-white">
                             View profile
                           </p>
                         </div>
@@ -145,12 +145,12 @@ const Sidebar = () => {
         {/* Static sidebar for desktop */}
         <div className="hidden md:fixed md:inset-y-0 md:flex md:w-64 md:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex min-h-0 flex-1 flex-col bg-indigo-700">
+          <div className="flex min-h-0 flex-1 flex-col bg-primary-700">
             <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
               <div className="flex flex-shrink-0 items-center px-4">
                 <img
                   className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=300"
+                  src="https://tailwindui.com/img/logos/mark.svg?color=primary&shade=300"
                   alt="Your Company"
                 />
               </div>
@@ -161,13 +161,13 @@ const Sidebar = () => {
                     href={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-indigo-800 text-white"
-                        : "text-white hover:bg-indigo-600 hover:bg-opacity-75",
+                        ? "bg-primary-800 text-white"
+                        : "text-white hover:bg-primary-600 hover:bg-opacity-75",
                       "group flex items-center px-2 py-2 text-sm font-medium rounded-md"
                     )}
                   >
                     <item.icon
-                      className="mr-3 h-6 w-6 flex-shrink-0 text-indigo-300"
+                      className="mr-3 h-6 w-6 flex-shrink-0 text-primary-300"
                       aria-hidden="true"
                     />
                     {item.name}
@@ -175,7 +175,7 @@ const Sidebar = () => {
                 ))}
               </nav>
             </div>
-            <div className="flex flex-shrink-0 border-t border-indigo-800 p-4">
+            <div className="flex flex-shrink-0 border-t border-primary-800 p-4">
               <a href="#" className="group block w-full flex-shrink-0">
                 <div className="flex items-center">
                   <div>
@@ -187,7 +187,7 @@ const Sidebar = () => {
                   </div>
                   <div className="ml-3">
                     <p className="text-sm font-medium text-white">Tom Cook</p>
-                    <p className="text-xs font-medium text-indigo-200 group-hover:text-white">
+                    <p className="text-xs font-medium text-primary-200 group-hover:text-white">
                       View profile
                     </p>
                   </div>
@@ -200,7 +200,7 @@ const Sidebar = () => {
           <div className="sticky top-0 z-10 bg-gray-100 pl-1 pt-1 sm:pl-3 sm:pt-3 md:hidden">
             <button
               type="button"
-              className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              className="-ml-0.5 -mt-0.5 inline-flex h-12 w-12 items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
               onClick={() => setSidebarOpen(true)}
             >
               <span className="sr-only">Open sidebar</span>

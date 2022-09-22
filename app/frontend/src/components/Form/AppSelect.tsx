@@ -42,7 +42,7 @@ const AppSelect = ({ options, selected, ...props }: IProps) => {
               {props.children}
             </Listbox.Label>
             <div className="relative mt-1">
-              <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
+              <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 sm:text-sm">
                 <span className="block truncate">
                   {selection ? selection.label : null}
                 </span>
@@ -67,7 +67,9 @@ const AppSelect = ({ options, selected, ...props }: IProps) => {
                       key={opt.id}
                       className={({ active }) =>
                         classNames(
-                          active ? "text-white bg-indigo-600" : "text-gray-900",
+                          active
+                            ? "text-white bg-primary-600"
+                            : "text-gray-900",
                           "relative cursor-default select-none py-2 pl-3 pr-9"
                         )
                       }
@@ -87,7 +89,7 @@ const AppSelect = ({ options, selected, ...props }: IProps) => {
                           {selected ? (
                             <span
                               className={classNames(
-                                active ? "text-white" : "text-indigo-600",
+                                active ? "text-white" : "text-primary-600",
                                 "absolute inset-y-0 right-0 flex items-center pr-4"
                               )}
                             >
