@@ -3,20 +3,23 @@ from collections.abc import Callable
 
 
 class BaseObserver:
+    
+    def __repr__(self, *args, **kwargs):
+        return self.__class__.__name__
 
-    def get(self):
+    def get(self, *args, **kwargs):
         pass
 
-    def post(self):
+    def post(self, *args, **kwargs):
         pass
 
-    def patch(self):
+    def patch(self, *args, **kwargs):
         pass
 
-    def put(self):
+    def put(self, *args, **kwargs):
         pass
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         pass
 
 class BaseObservable:

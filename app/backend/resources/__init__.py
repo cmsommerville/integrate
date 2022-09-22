@@ -39,7 +39,8 @@ from .Selection_AgeBand import CRUD_SelectionAgeBand, CRUD_SelectionAgeBand_List
 from .Selection_Benefit import CRUD_SelectionBenefit, CRUD_SelectionBenefit_List
 from .Selection_BenefitDuration import CRUD_SelectionBenefitDuration, CRUD_SelectionBenefitDuration_List
 from .Selection_CensusDetail import CRUD_SelectionCensusDetail, CRUD_SelectionCensusDetail_List
-from .Selection_CensusSet import CRUD_SelectionCensusSet, CRUD_SelectionCensusSet_List
+from .Selection_CensusSet import CRUD_SelectionCensusSet, CRUD_SelectionCensusSet_List, \
+    SelectionCensusSet_CensusBuilder, SelectionCensusSet_UploadFile, SelectionCensusSet_Dropdown
 from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
 from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
 from .Selection_BenefitRateTable import CRUD_SelectionBenefitRateTable
@@ -47,6 +48,7 @@ from .Selection_BenefitRateTable import CRUD_SelectionBenefitRateTable
 from .Selection_Plan import Test_SelectionPlan
 
 ns_crud = Namespace("crud", "Namespace containing standard CRUD endpoints")
+ns_dd = Namespace("dropdowns", "Namespace containing standard dropdown endpoints")
 
 ns_crud.add_resource(CRUD_ConfigAgeBandDetail, '/crud/config/age-band-detail/<int:id>', '/crud/config/age-band-detail')
 ns_crud.add_resource(CRUD_ConfigAgeBandDetail_List, '/crud/config/age-band-detail-list')
@@ -166,4 +168,12 @@ ns_crud.add_resource(CRUD_SelectionPlan_List, '/crud/selection/plan-list')
 ns_crud.add_resource(CRUD_SelectionProvision, '/crud/selection/provision/<int:id>', '/crud/selection/provision')
 ns_crud.add_resource(CRUD_SelectionProvision_List, '/crud/selection/provision-list')
 
+ns_crud.add_resource(SelectionCensusSet_CensusBuilder, '/crud/selection/census/<int:plan_id>/build')
+ns_crud.add_resource(SelectionCensusSet_UploadFile, '/crud/selection/census/<int:plan_id>/upload')
 ns_crud.add_resource(Test_SelectionPlan, '/test/selection/plan/<int:id>')
+
+
+
+
+
+ns_dd.add_resource(SelectionCensusSet_Dropdown, '/dd/selection/census-set/<int:plan_id>')

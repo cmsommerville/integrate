@@ -1,5 +1,6 @@
 from typing import Union, List
 from app.shared import BaseObserver
+from app.extensions import db
 
 from ..classes import RulesetApplicator
 from ..models import Model_SelectionProvision, Model_SelectionRateTableFactor
@@ -13,11 +14,19 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
     def subscribe(self): 
         Observable_SelectionProvision.subscribe(self)
 
-    def get(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
-        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+    def _delete_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+        if type(provisions) != list: 
+            provisions = [provisions]
+            
+        rtfs = Model_SelectionRateTableFactor.find_selection_provisions([prov.selection_provision_id for prov in provisions])
+        rtfs.delete()
+        try: 
+            db.session.commit()
+        except: 
+            db.session.rollback()
 
-    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
-        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+
+    def _change_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
         if type(provisions) != list: 
             provisions = [provisions]
 
@@ -54,5 +63,20 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
 
         Model_SelectionRateTableFactor.bulk_save_all_to_db(rate_table_factors)
 
+    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+        self._change_handler(provisions)
 
+    def put(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+        self._change_handler(provisions)
+
+    def patch(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+        self._change_handler(provisions)
+
+    def delete(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+        print("In Observer_SelectionProvision_CalcRateTableFactors...")
+        self._delete_handler(provisions)
+    
 observer_selection_provision_calc_rate_table_factors = Observer_SelectionProvision_CalcRateTableFactors()

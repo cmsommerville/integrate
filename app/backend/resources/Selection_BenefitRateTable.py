@@ -9,4 +9,4 @@ class CRUD_SelectionBenefitRateTable(Resource):
         _schema_list = Schema_SelectionRateTable(many=True)
         Model_SelectionBenefitRateTable.create_rate_table(plan_id)
         rate_tables = Model_SelectionRateTable.find_by_plan(plan_id)
-        return _schema_list.dump(rate_tables)
+        return _schema_list.dump(rate_tables), 201

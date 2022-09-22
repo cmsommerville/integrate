@@ -8,15 +8,17 @@ class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
     observable: BaseObservable = None
+    model_args: dict = {}
+    schema_args: dict = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
     def get(cls, id, *args, **kwargs):
-        schema_instance = cls.schema()
+        schema_instance = cls.schema(**cls.schema_args)
         try: 
-            obj = cls.model.find_one(id)
+            obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
             return {}, 200
         
@@ -31,7 +33,7 @@ class BaseCRUDResource(Resource):
   
     @classmethod  
     def post(cls, *args, **kwargs):
-        schema_instance = cls.schema()
+        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
             obj = schema_instance.load(req)
@@ -57,7 +59,7 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     def put(cls, *args, **kwargs): 
-        schema_instance = cls.schema()
+        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
             obj = schema_instance.load(req)
@@ -79,12 +81,11 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     def patch(cls, id, *args, **kwargs): 
-        schema_instance = cls.schema()
+        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
-            print(req)
             # get existing data 
-            orig_obj = cls.model.find_one(id)
+            orig_obj = cls.model.find_one(id, **cls.model_args)
             # dump existing data to json 
             data = schema_instance.dump(orig_obj)
             # add the modified data and load to object
@@ -109,7 +110,7 @@ class BaseCRUDResource(Resource):
     @classmethod
     def delete(cls, id): 
         try: 
-            obj = cls.model.find_one(id)
+            obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
         
@@ -130,6 +131,9 @@ class BaseCRUDResource(Resource):
 class BaseCRUDResourceList(Resource):
     model: BaseModel
     schema: BaseSchema
+    observable: BaseObservable = None
+    model_args: dict = {}
+    schema_args: dict = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__()
@@ -137,11 +141,7 @@ class BaseCRUDResourceList(Resource):
     @classmethod
     def get(cls, **kwargs):
         try: 
-            objs = cls.model.find_all(**kwargs)
-        except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
-
-        try: 
+            objs = cls.model.find_all(**cls.model_args)
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('get', objs)
@@ -150,7 +150,7 @@ class BaseCRUDResourceList(Resource):
 
         try: 
             if objs: 
-                return cls.schema(many=True).dump(objs), 200
+                return cls.schema(many=True, **cls.schema_args).dump(objs), 200
             raise Exception("No data found")
         except Exception as e:
             return [], 200
@@ -158,7 +158,7 @@ class BaseCRUDResourceList(Resource):
     @classmethod  
     def post(cls):
         try: 
-            schema_list_instance = cls.schema(many=True)
+            schema_list_instance = cls.schema(many=True, **cls.schema_args)
             req = request.get_json()
             objs = schema_list_instance.load(req)
             cls.model.save_all_to_db(objs)

@@ -13,11 +13,7 @@ class Observer_SelectionProvision_CalcProductFactors(BaseObserver):
     def subscribe(self): 
         Observable_SelectionProvision.subscribe(self)
 
-    def get(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
-        print("In Observer_SelectionProvision_CalcProductFactors...")
-
-    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
-        print("In Observer_SelectionProvision_CalcProductFactors...")
+    def _change_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
         product_factors = []
         if type(provisions) != list: 
             provisions = [provisions]
@@ -36,5 +32,16 @@ class Observer_SelectionProvision_CalcProductFactors(BaseObserver):
 
         Model_SelectionProvision.save_all_to_db(product_factors)
 
+    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+        print("In Observer_SelectionProvision_CalcProductFactors...")
+        self._change_handler(provisions)
 
+    def put(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+        print("In Observer_SelectionProvision_CalcProductFactors...")
+        self._change_handler(provisions)
+
+    def patch(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+        print("In Observer_SelectionProvision_CalcProductFactors...")
+        self._change_handler(provisions)
+    
 observer_selection_provision_calc_product_factors = Observer_SelectionProvision_CalcProductFactors()

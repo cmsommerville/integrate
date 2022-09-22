@@ -4,4 +4,4 @@ from flask_restx import Api
 
 db = SQLAlchemy(engine_options={"fast_executemany": True})
 ma = Marshmallow()
-api = Api()
+api = Api(doc='/api/doc/')

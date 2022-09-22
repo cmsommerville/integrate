@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy.sql import text
+from sqlalchemy.types import VARBINARY
 from app.extensions import db
 from app.shared import BaseModel
 
@@ -12,6 +13,7 @@ SELECTION_AGE_BAND = TBL_NAMES['SELECTION_AGE_BAND']
 SELECTION_BENEFIT = TBL_NAMES['SELECTION_BENEFIT']
 SELECTION_BENEFIT_RATE_TABLE = TBL_NAMES['SELECTION_BENEFIT_RATE_TABLE']
 SELECTION_PLAN = TBL_NAMES['SELECTION_PLAN']
+SELECTION_RATE_TABLE = TBL_NAMES['SELECTION_RATE_TABLE']
 
 
 
@@ -22,11 +24,13 @@ class Model_SelectionBenefitRateTable(BaseModel):
     selection_plan_id = db.Column(db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"))
     selection_benefit_id = db.Column(db.ForeignKey(f"{SELECTION_BENEFIT}.selection_benefit_id"))
     selection_age_band_id = db.Column(db.ForeignKey(f'{SELECTION_AGE_BAND}.selection_age_band_id'))
+    selection_rate_table_id = db.Column(db.ForeignKey(f'{SELECTION_RATE_TABLE}.selection_rate_table_id'))
     config_rate_group_id = db.Column(db.ForeignKey(f'{CONFIG_RATE_GROUP}.config_rate_group_id'))
     config_gender_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     config_smoker_status_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     config_relationship_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     annual_rate = db.Column(db.Numeric(12,5), default=0)
+    row_hash = db.Column(VARBINARY(40))
 
     @classmethod
     def find_by_plan(cls, plan_id: int):

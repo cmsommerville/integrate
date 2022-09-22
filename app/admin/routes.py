@@ -12,4 +12,7 @@ ns_admin.add_resource(Resource_AdminInitRateTable, *['/admin/tables/_load/rate-t
 ns_admin.add_resource(Resource_AdminHealthCheck, *['/admin/health'])
 ns_admin.add_resource(Resource_AdminSelectionData, *['/admin/tables/_load/selections'])
 
+ns_admin.add_resource(REST_Observable_SelectionPlan, '/admin/observables/selection/plan')
+ns_admin.add_resource(REST_Observable_SelectionProvision, '/admin/observables/selection/provision')
+
 

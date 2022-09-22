@@ -46,6 +46,9 @@ class Model_ConfigProduct(BaseModel):
         comment="Default distribution of ages at issue")
     age_rating_strategy_id = db.Column(db.ForeignKey(F'{REF_MASTER}.ref_id'),
         comment="Indicates whether age is used for rating, underwriting, or not at all. Allows for other strategies to be created.")
+    
+    relationship_attr_set_id = db.Column(db.ForeignKey(F'{CONFIG_ATTRIBUTE_SET}.config_attr_set_id'), 
+        comment="Specifies which relationship attributes are used with this product")
         
     allow_employer_paid = db.Column(db.Boolean, nullable=False)
     voluntary_census_strategy_id = db.Column(db.ForeignKey(F"{REF_MASTER}.ref_id"), nullable=False, 

@@ -15,7 +15,7 @@ class Model_SelectionCensusDetail(BaseModel):
     )
 
     selection_census_detail_id = db.Column(db.Integer, primary_key=True)
-    selection_census_set_id = db.Column(db.ForeignKey(f"{SELECTION_CENSUS_SET}.selection_census_set_id"), nullable=False)
+    selection_census_set_id = db.Column(db.ForeignKey(f"{SELECTION_CENSUS_SET}.selection_census_set_id"))
     config_gender_detail_id = db.Column(db.ForeignKey(f"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"), nullable=False)
     config_smoker_status_detail_id = db.Column(db.ForeignKey(f"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"), nullable=False)
     age_value = db.Column(db.Integer, nullable=False)

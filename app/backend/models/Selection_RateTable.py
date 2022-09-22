@@ -26,6 +26,7 @@ class Model_SelectionRateTable(BaseModel):
     config_smoker_status_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     config_relationship_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     annual_rate = db.Column(db.Numeric(12,5), default=0)
+    discretionary_factor = db.Column(db.Numeric(8,5), default=1)
 
     config_rate_group = db.relationship("Model_ConfigRateGroup")
     age_band = db.relationship("Model_SelectionAgeBand")

@@ -5,8 +5,8 @@ from flask_restx import Resource
 from dotenv import load_dotenv
 import logging
 
-logging.basicConfig(filename='logs/info.log')
-logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+# logging.basicConfig(filename='logs/info.log')
+# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 from app.extensions import db, ma, api
 from app.shared import bind_namespaces

@@ -1,5 +1,7 @@
 import requests
 from requests.compat import urljoin
+
+from app.backend.models.Config_AttributeSet import Model_ConfigAttributeSet_Relationship
 from  ..models import Model_ConfigAttributeDistributionSet_SmokerStatus, \
     Model_ConfigAttributeSet_SmokerStatus, Model_RefRatingStrategy, \
     Model_ConfigAttributeSet_Gender, Model_ConfigAttributeDistributionSet_Gender, \
@@ -44,6 +46,10 @@ def DATA_PRODUCT():
         "age_rating_strategy_id": Model_RefRatingStrategy.find_one_by_attr({
             "ref_attr_code": "rating"
         }).ref_id,
+
+        'relationship_attr_set_id': Model_ConfigAttributeSet_Relationship.find_one_by_attr({
+            "config_attr_set_label": "Standard EE/SP/CH"
+        }).config_attr_set_id, 
 
         "allow_employer_paid": True,  
         "voluntary_census_strategy_id": Model_RefCensusStrategy.find_one_by_attr({

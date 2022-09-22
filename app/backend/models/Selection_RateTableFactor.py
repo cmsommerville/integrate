@@ -28,6 +28,13 @@ class Model_SelectionRateTableFactor(BaseModel):
     selection_provision = db.relationship("Model_SelectionProvision")
 
     @classmethod
+    def find_selection_provisions(cls, selection_provision_ids: List[int], *args, **kwargs): 
+        """
+        Return query object containing the selection provisions. Must call the `all()` method to return the result set.
+        """
+        return cls.query.filter(cls.selection_provision_id.in_(selection_provision_ids))
+
+    @classmethod
     def get_rate_table_factors(cls, selection_provision_ids: List[int], selection_plan_id: int):
         """
         Join rate table, selected benefits, and selected provisions by way of the configured benefit-provisions
