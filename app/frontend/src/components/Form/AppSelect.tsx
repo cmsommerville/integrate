@@ -5,6 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
 
 export type IAppSelectOption = {
   id: number | string;
+  code?: number | string | boolean;
   label: number | string | boolean;
 };
 
