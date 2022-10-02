@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigRelationshipMapperDetail
 
 class CRUD_ConfigRelationshipMapperDetail(BaseCRUDResource): 
     model = Model_ConfigRelationshipMapperDetail
-    schema = Schema_ConfigRelationshipMapperDetail
+    schema = Schema_ConfigRelationshipMapperDetail()
 
 class CRUD_ConfigRelationshipMapperDetail_List(BaseCRUDResourceList): 
     model = Model_ConfigRelationshipMapperDetail
-    schema = Schema_ConfigRelationshipMapperDetail
+    schema = Schema_ConfigRelationshipMapperDetail(many=True)

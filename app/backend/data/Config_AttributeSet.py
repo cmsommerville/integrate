@@ -103,6 +103,22 @@ DATA_RELATIONSHIP = [
 ]
 
 
+DATA_NO_JOINS = [
+    {
+        'config_attr_set_id': -1, 
+        'config_attr_type_code': '__nojoin__', 
+        'config_attr_set_label': 'No Join', 
+        'attributes': [
+            {
+                'config_attr_detail_id': -1, 
+                'config_attr_detail_code': '',
+                'config_attr_detail_label': '',
+                'is_composite_id': False
+            }, 
+        ]
+    }, 
+]
+
 
 def load(hostname: str) -> None:
     url = urljoin(hostname, 'api/crud/config/attribute-set-gender-list')
@@ -115,5 +131,9 @@ def load(hostname: str) -> None:
         raise Exception(res.text)
     url = urljoin(hostname, 'api/crud/config/attribute-set-relationship-list')
     res = requests.post(url, json=DATA_RELATIONSHIP)
+    if not res.ok: 
+        raise Exception(res.text)
+    url = urljoin(hostname, 'api/crud/config/attribute-set-list')
+    res = requests.post(url, json=DATA_NO_JOINS)
     if not res.ok: 
         raise Exception(res.text)

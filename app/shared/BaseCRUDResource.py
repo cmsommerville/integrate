@@ -9,14 +9,12 @@ class BaseCRUDResource(Resource):
     schema: BaseSchema
     observable: BaseObservable = None
     model_args: dict = {}
-    schema_args: dict = {}
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
     def get(cls, id, *args, **kwargs):
-        schema_instance = cls.schema(**cls.schema_args)
         try: 
             obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
@@ -25,18 +23,17 @@ class BaseCRUDResource(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('post', obj)
+                _observable.notify('get', obj, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
-        return schema_instance.dump(obj), 200
+        return cls.schema.dump(obj), 200
   
     @classmethod  
     def post(cls, *args, **kwargs):
-        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
-            obj = schema_instance.load(req)
+            obj = cls.schema.load(req)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
         
@@ -48,21 +45,20 @@ class BaseCRUDResource(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('post', obj)
+                _observable.notify('post', obj, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
         try: 
-            return schema_instance.dump(obj), 201
+            return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
     @classmethod
     def put(cls, *args, **kwargs): 
-        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
-            obj = schema_instance.load(req)
+            obj = cls.schema.load(req)
             obj.save_to_db()
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
@@ -70,26 +66,23 @@ class BaseCRUDResource(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('put', obj)
+                _observable.notify('put', obj, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
         try: 
-            return schema_instance.dump(obj), 201
+            return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
     @classmethod
     def patch(cls, id, *args, **kwargs): 
-        schema_instance = cls.schema(**cls.schema_args)
         try: 
             req = request.get_json()
             # get existing data 
-            orig_obj = cls.model.find_one(id, **cls.model_args)
-            # dump existing data to json 
-            data = schema_instance.dump(orig_obj)
-            # add the modified data and load to object
-            obj = schema_instance.load({**data, **req})
+            obj = cls.model.find_one(id, **cls.model_args)
+            for attr, val in req.items(): 
+                setattr(obj, attr, val)
             # save object to database 
             obj.save_to_db()
         except Exception as e:
@@ -98,12 +91,12 @@ class BaseCRUDResource(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('patch', obj)
+                _observable.notify('patch', obj, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
         try:
-            return schema_instance.dump(obj), 201
+            return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
@@ -117,7 +110,7 @@ class BaseCRUDResource(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('delete', obj)
+                _observable.notify('delete', obj, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
@@ -144,13 +137,13 @@ class BaseCRUDResourceList(Resource):
             objs = cls.model.find_all(**cls.model_args)
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('get', objs)
+                _observable.notify('get', objs, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
         try: 
             if objs: 
-                return cls.schema(many=True, **cls.schema_args).dump(objs), 200
+                return cls.schema.dump(objs), 200
             raise Exception("No data found")
         except Exception as e:
             return [], 200
@@ -158,9 +151,8 @@ class BaseCRUDResourceList(Resource):
     @classmethod  
     def post(cls):
         try: 
-            schema_list_instance = cls.schema(many=True, **cls.schema_args)
             req = request.get_json()
-            objs = schema_list_instance.load(req)
+            objs = cls.schema.load(req)
             cls.model.save_all_to_db(objs)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
@@ -168,11 +160,11 @@ class BaseCRUDResourceList(Resource):
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('post', objs)
+                _observable.notify('post', objs, request)
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400
 
         try:
-            return schema_list_instance.dump(objs), 201
+            return cls.schema.dump(objs), 201
         except Exception as e:
             return {"status": "error", "message": str(e)}, 400

@@ -1,5 +1,6 @@
 from typing import List
 from collections.abc import Callable
+from flask import request as flask_request
 
 
 class BaseObserver:
@@ -27,11 +28,11 @@ class BaseObservable:
     def __init__(self): 
         self.observers = set()
 
-    def notify(self, method: str, payload: any, *args, **kwargs): 
+    def notify(self, method: str, payload: any, request: flask_request, *args, **kwargs): 
         for obs in self.observers:
             callback = getattr(obs, method)
             if callback: 
-                callback(payload)
+                callback(payload, request)
 
     def subscribe(self, observer: BaseObserver):
         self.observers.add(observer)

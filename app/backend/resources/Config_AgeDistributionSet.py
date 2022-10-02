@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigAgeDistributionSet
 
 class CRUD_ConfigAgeDistributionSet(BaseCRUDResource): 
     model = Model_ConfigAgeDistributionSet
-    schema = Schema_ConfigAgeDistributionSet
+    schema = Schema_ConfigAgeDistributionSet()
 
 class CRUD_ConfigAgeDistributionSet_List(BaseCRUDResourceList): 
     model = Model_ConfigAgeDistributionSet
-    schema = Schema_ConfigAgeDistributionSet
+    schema = Schema_ConfigAgeDistributionSet(many=True)

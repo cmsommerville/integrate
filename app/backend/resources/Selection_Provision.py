@@ -9,11 +9,11 @@ from ..observables import Observable_SelectionProvision
 
 class CRUD_SelectionProvision(BaseCRUDResource): 
     model = Model_SelectionProvision
-    schema = Schema_SelectionProvision
+    schema = Schema_SelectionProvision()
     observable = Observable_SelectionProvision
 
 
 class CRUD_SelectionProvision_List(BaseCRUDResourceList): 
     model = Model_SelectionProvision
-    schema = Schema_SelectionProvision
+    schema = Schema_SelectionProvision(many=True)
     observable = Observable_SelectionProvision

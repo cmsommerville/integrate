@@ -5,16 +5,16 @@ from ..schemas import Schema_ConfigProductMapperSet_Gender, Schema_ConfigProduct
 
 class CRUD_ConfigProductMapperSet_Gender(BaseCRUDResource): 
     model = Model_ConfigProductMapperSet_Gender
-    schema = Schema_ConfigProductMapperSet_Gender
+    schema = Schema_ConfigProductMapperSet_Gender()
 
 class CRUD_ConfigProductMapperSet_Gender_List(BaseCRUDResourceList): 
     model = Model_ConfigProductMapperSet_Gender
-    schema = Schema_ConfigProductMapperSet_Gender
+    schema = Schema_ConfigProductMapperSet_Gender(many=True)
 
 class CRUD_ConfigProductMapperSet_SmokerStatus(BaseCRUDResource): 
     model = Model_ConfigProductMapperSet_SmokerStatus
-    schema = Schema_ConfigProductMapperSet_SmokerStatus
+    schema = Schema_ConfigProductMapperSet_SmokerStatus()
 
 class CRUD_ConfigProductMapperSet_SmokerStatus_List(BaseCRUDResourceList): 
     model = Model_ConfigProductMapperSet_SmokerStatus
-    schema = Schema_ConfigProductMapperSet_SmokerStatus
+    schema = Schema_ConfigProductMapperSet_SmokerStatus(many=True)

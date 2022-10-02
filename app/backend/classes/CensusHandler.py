@@ -161,7 +161,8 @@ class CensusHandler:
         if census_strategy.ref_attr_code.upper() == 'REQUIRED':
             raise Exception("A census is required for this product but was not provided. Please provide a census.")
 
-        return self._generate_census()
+        self.df_census = self._generate_census()
+        return self.df_census
 
 
     def _handle_census_provided(self) -> pd.DataFrame: 

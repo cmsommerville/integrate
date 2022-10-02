@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigProductState
 
 class CRUD_ConfigProductState(BaseCRUDResource): 
     model = Model_ConfigProductState
-    schema = Schema_ConfigProductState
+    schema = Schema_ConfigProductState()
 
 class CRUD_ConfigProductState_List(BaseCRUDResourceList): 
     model = Model_ConfigProductState
-    schema = Schema_ConfigProductState
+    schema = Schema_ConfigProductState(many=True)

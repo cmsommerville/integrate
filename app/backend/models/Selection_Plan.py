@@ -37,3 +37,8 @@ class Model_SelectionPlan(BaseModel):
     benefits = db.relationship("Model_SelectionBenefit")
     census_set = db.relationship("Model_SelectionCensusSet", foreign_keys=[selection_census_set_id], 
         primaryjoin="Model_SelectionPlan.selection_census_set_id == Model_SelectionCensusSet.selection_census_set_id")
+    
+    gender_mapper_set = db.relationship("Model_ConfigProductMapperSet_Gender", 
+        primaryjoin="Model_SelectionPlan.config_gender_product_mapper_set_id == Model_ConfigProductMapperSet_Gender.config_product_mapper_set_id")
+    smoker_status_mapper_set = db.relationship("Model_ConfigProductMapperSet_SmokerStatus", 
+        primaryjoin="Model_SelectionPlan.config_smoker_status_product_mapper_set_id == Model_ConfigProductMapperSet_SmokerStatus.config_product_mapper_set_id")

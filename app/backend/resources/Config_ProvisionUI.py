@@ -16,7 +16,7 @@ def discriminator(item):
 
 class CRUD_ConfigProvisionUI(BaseCRUDResource): 
     model = Model_ConfigProvisionUI
-    schema = Schema_ConfigProvisionUI
+    schema = Schema_ConfigProvisionUI()
 
     @classmethod
     def post(cls):
@@ -38,7 +38,7 @@ class CRUD_ConfigProvisionUI(BaseCRUDResource):
 
 class CRUD_ConfigProvisionUI_List(BaseCRUDResourceList): 
     model = Model_ConfigProvisionUI
-    schema = Schema_ConfigProvisionUI
+    schema = Schema_ConfigProvisionUI(many=True)
 
     @classmethod
     def post(cls):

@@ -5,8 +5,8 @@ from ..schemas import Schema_SelectionBenefitDuration
 
 class CRUD_SelectionBenefitDuration(BaseCRUDResource): 
     model = Model_SelectionBenefitDuration
-    schema = Schema_SelectionBenefitDuration
+    schema = Schema_SelectionBenefitDuration()
 
 class CRUD_SelectionBenefitDuration_List(BaseCRUDResourceList): 
     model = Model_SelectionBenefitDuration
-    schema = Schema_SelectionBenefitDuration
+    schema = Schema_SelectionBenefitDuration(many=True)

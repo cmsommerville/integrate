@@ -28,6 +28,7 @@ TBL_NAMES = {
     "CONFIG_PROVISION_STATE": "config_provision_state",
     "CONFIG_PROVISION_UI": "config_provision_ui",
     "CONFIG_RATE_GROUP": "config_rate_group", 
+    "CONFIG_RATE_GROUP_FACE_AMOUNTS": "config_rate_group_face_amounts", 
     "CONFIG_RATE_TABLE": "config_rate_table", 
     "CONFIG_RELATIONSHIP_MAPPER_DETAIL": "config_relationship_mapper_detail", 
     "CONFIG_RELATIONSHIP_MAPPER_SET": "config_relationship_mapper_set", 
@@ -44,6 +45,7 @@ TBL_NAMES = {
     "SELECTION_PLAN": "selection_plan",  
     "SELECTION_PROVISION": "selection_provision", 
     "SELECTION_RATE_GROUP_SUMMARY": "selection_rate_group_summary", 
+    "SELECTION_RATE_GROUP_FACE_AMOUNTS": "selection_rate_group_face_amounts", 
     "SELECTION_RATE_TABLE": "selection_rate_table", 
     "SELECTION_RATE_TABLE_FACTOR": "selection_rate_table_factor", 
 }

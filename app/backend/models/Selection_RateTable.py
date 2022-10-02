@@ -1,3 +1,4 @@
+import pandas as pd
 from typing import List
 from sqlalchemy.sql import text
 from app.extensions import db
@@ -38,5 +39,8 @@ class Model_SelectionRateTable(BaseModel):
         primaryjoin="Model_SelectionRateTable.config_relationship_detail_id == Model_ConfigAttributeDetail.config_attr_detail_id")
 
     @classmethod
-    def find_by_plan(cls, plan_id: int):
-        return cls.query.filter(cls.selection_plan_id == plan_id).all()
+    def find_by_plan(cls, plan_id: int, as_pandas=False):
+        qry = cls.query.filter(cls.selection_plan_id == plan_id)
+        if as_pandas: 
+            return pd.read_sql(qry.statement, qry.session.bind)
+        return qry.all()

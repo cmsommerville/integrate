@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigProductMapperDetail
 
 class CRUD_ConfigProductMapperDetail(BaseCRUDResource): 
     model = Model_ConfigProductMapperDetail
-    schema = Schema_ConfigProductMapperDetail
+    schema = Schema_ConfigProductMapperDetail()
 
 class CRUD_ConfigProductMapperDetail_List(BaseCRUDResourceList): 
     model = Model_ConfigProductMapperDetail
-    schema = Schema_ConfigProductMapperDetail
+    schema = Schema_ConfigProductMapperDetail(many=True)

@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigFactorRule
 
 class CRUD_ConfigFactorRule(BaseCRUDResource): 
     model = Model_ConfigFactorRule
-    schema = Schema_ConfigFactorRule
+    schema = Schema_ConfigFactorRule()
 
 class CRUD_ConfigFactorRule_List(BaseCRUDResourceList): 
     model = Model_ConfigFactorRule
-    schema = Schema_ConfigFactorRule
+    schema = Schema_ConfigFactorRule(many=True)

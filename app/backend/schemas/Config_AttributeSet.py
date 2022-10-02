@@ -2,7 +2,15 @@ from app.extensions import ma
 from app.shared import BaseSchema
 
 from ..models import Model_ConfigAttributeSet_Gender, \
-    Model_ConfigAttributeSet_SmokerStatus, Model_ConfigAttributeSet_Relationship
+    Model_ConfigAttributeSet_SmokerStatus, Model_ConfigAttributeSet_Relationship, \
+    Model_ConfigAttributeSet
+
+class Schema_ConfigAttributeSet(BaseSchema):
+    class Meta:
+        model = Model_ConfigAttributeSet
+        load_instance = True
+        include_relationships=True
+
 
 class Schema_ConfigAttributeSet_Gender(BaseSchema):
     class Meta:

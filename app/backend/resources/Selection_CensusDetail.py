@@ -5,8 +5,8 @@ from ..schemas import Schema_SelectionCensusDetail
 
 class CRUD_SelectionCensusDetail(BaseCRUDResource): 
     model = Model_SelectionCensusDetail
-    schema = Schema_SelectionCensusDetail
+    schema = Schema_SelectionCensusDetail()
 
 class CRUD_SelectionCensusDetail_List(BaseCRUDResourceList): 
     model = Model_SelectionCensusDetail
-    schema = Schema_SelectionCensusDetail
+    schema = Schema_SelectionCensusDetail(many=True)

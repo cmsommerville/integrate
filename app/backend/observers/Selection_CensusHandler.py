@@ -2,7 +2,7 @@ import os
 import requests
 import pandas as pd
 from typing import Union, List
-from flask import request
+from flask import request as flask_request
 from app.shared import BaseObserver, upload_file, NoFileProvidedException
 
 from ..classes import CensusHandler
@@ -21,7 +21,7 @@ class Observer_SelectionCensusHandler(BaseObserver):
         Observable_SelectionPlan.subscribe(self)
 
     @classmethod
-    def post(cls, plans: Union[Model_SelectionPlan, List[Model_SelectionPlan]]): 
+    def post(cls, plans: Union[Model_SelectionPlan, List[Model_SelectionPlan]], request: flask_request, *args, **kwargs): 
         print("In Observer_SelectionCensusHandler...")
 
         _plans = []

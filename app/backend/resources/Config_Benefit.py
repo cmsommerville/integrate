@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigBenefit
 
 class CRUD_ConfigBenefit(BaseCRUDResource): 
     model = Model_ConfigBenefit
-    schema = Schema_ConfigBenefit
+    schema = Schema_ConfigBenefit()
 
 class CRUD_ConfigBenefit_List(BaseCRUDResourceList): 
     model = Model_ConfigBenefit
-    schema = Schema_ConfigBenefit
+    schema = Schema_ConfigBenefit(many=True)

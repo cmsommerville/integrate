@@ -1,3 +1,4 @@
+from flask import request as flask_request
 from typing import Union, List
 from app.shared import BaseObserver
 
@@ -13,7 +14,9 @@ class Observer_SelectionProvision_CalcProductFactors(BaseObserver):
     def subscribe(self): 
         Observable_SelectionProvision.subscribe(self)
 
-    def _change_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+    def _change_handler(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], 
+        *args, **kwargs):
         product_factors = []
         if type(provisions) != list: 
             provisions = [provisions]
@@ -32,15 +35,21 @@ class Observer_SelectionProvision_CalcProductFactors(BaseObserver):
 
         Model_SelectionProvision.save_all_to_db(product_factors)
 
-    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+    def post(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], 
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcProductFactors...")
         self._change_handler(provisions)
 
-    def put(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+    def put(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], 
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcProductFactors...")
         self._change_handler(provisions)
 
-    def patch(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+    def patch(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], 
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcProductFactors...")
         self._change_handler(provisions)
     

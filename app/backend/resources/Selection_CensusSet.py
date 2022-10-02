@@ -18,11 +18,11 @@ HOSTNAME = os.getenv('HOSTNAME')
 
 class CRUD_SelectionCensusSet(BaseCRUDResource): 
     model = Model_SelectionCensusSet
-    schema = Schema_SelectionCensusSet
+    schema = Schema_SelectionCensusSet()
 
 class CRUD_SelectionCensusSet_List(BaseCRUDResourceList): 
     model = Model_SelectionCensusSet
-    schema = Schema_SelectionCensusSet
+    schema = Schema_SelectionCensusSet(many=True)
 
 class SelectionCensusSet_Dropdown(Resource):
     

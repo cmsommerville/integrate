@@ -5,8 +5,8 @@ from ..schemas import Schema_RefStates
 
 class CRUD_RefStates(BaseCRUDResource): 
     model = Model_RefStates
-    schema = Schema_RefStates
+    schema = Schema_RefStates()
 
 class CRUD_RefStates_List(BaseCRUDResourceList): 
     model = Model_RefStates
-    schema = Schema_RefStates
+    schema = Schema_RefStates(many=True)

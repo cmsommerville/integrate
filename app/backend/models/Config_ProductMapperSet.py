@@ -29,6 +29,10 @@ class Model_ConfigProductMapperSet(BaseModel):
         'polymorphic_identity': '__default__'
     }
 
+    @classmethod
+    def find_by_product(cls, product_id):
+        return cls.query.filter(cls.config_product_id == product_id).all()
+
 class Model_ConfigProductMapperSet_Gender(Model_ConfigProductMapperSet): 
     mappers = db.relationship("Model_ConfigProductMapperDetail", 
         primaryjoin="Model_ConfigProductMapperSet_Gender.config_product_mapper_set_id == Model_ConfigProductMapperDetail.config_product_mapper_set_id")

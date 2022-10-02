@@ -15,3 +15,5 @@ class Model_ConfigRateGroup(BaseModel):
     config_rate_group_label = db.Column(db.String(100), nullable=False)
     unit_value = db.Column(db.Numeric(10,2), default=1)
     apply_discretionary_factor = db.Column(db.Boolean, default=True)
+
+    face_amounts = db.relationship("Model_ConfigRateGroupFaceAmounts")

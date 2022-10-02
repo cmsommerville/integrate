@@ -57,21 +57,33 @@ class Model_ConfigProduct(BaseModel):
         comment="Indicates a specific strategy for handling custom censuses for employer paid quotes")
 
 
-    states = db.relationship("Model_ConfigProductState")
     gender_attr_set = db.relationship("Model_ConfigAttributeSet_Gender",
         primaryjoin="Model_ConfigProduct.gender_attr_set_id == Model_ConfigAttributeSet_Gender.config_attr_set_id")
+    gender_rating_strategy = db.relationship("Model_RefRatingStrategy", 
+        primaryjoin="Model_ConfigProduct.gender_rating_strategy_id == Model_RefRatingStrategy.ref_id")
     gender_distribution_set = db.relationship("Model_ConfigAttributeDistributionSet_Gender",
         primaryjoin="Model_ConfigProduct.gender_distribution_set_id == Model_ConfigAttributeDistributionSet_Gender.config_attr_distribution_set_id")
 
     smoker_status_attr_set = db.relationship("Model_ConfigAttributeSet_SmokerStatus",
         primaryjoin="Model_ConfigProduct.smoker_status_attr_set_id == Model_ConfigAttributeSet_SmokerStatus.config_attr_set_id")
+    smoker_status_rating_strategy = db.relationship("Model_RefRatingStrategy", 
+        primaryjoin="Model_ConfigProduct.smoker_status_rating_strategy_id == Model_RefRatingStrategy.ref_id")
     smoker_status_distribution_set = db.relationship("Model_ConfigAttributeDistributionSet_SmokerStatus",
         primaryjoin="Model_ConfigProduct.smoker_status_distribution_set_id == Model_ConfigAttributeDistributionSet_SmokerStatus.config_attr_distribution_set_id")
     
     age_distribution_set = db.relationship("Model_ConfigAgeDistributionSet",
         primaryjoin="Model_ConfigProduct.age_distribution_set_id == Model_ConfigAgeDistributionSet.config_age_distribution_set_id")
+    age_rating_strategy = db.relationship("Model_RefRatingStrategy", 
+        primaryjoin="Model_ConfigProduct.age_rating_strategy_id == Model_RefRatingStrategy.ref_id")
     
+    relationship_attr_set = db.relationship("Model_ConfigAttributeSet_Relationship",
+        primaryjoin="Model_ConfigProduct.relationship_attr_set_id == Model_ConfigAttributeSet_Relationship.config_attr_set_id")
+
     voluntary_census_strategy = db.relationship("Model_RefCensusStrategy", 
         primaryjoin="Model_ConfigProduct.voluntary_census_strategy_id == Model_RefCensusStrategy.ref_id")
     employer_paid_census_strategy = db.relationship("Model_RefCensusStrategy", 
         primaryjoin="Model_ConfigProduct.employer_paid_census_strategy_id == Model_RefCensusStrategy.ref_id")
+
+
+    states = db.relationship("Model_ConfigProductState")
+    config_rate_groups = db.relationship("Model_ConfigRateGroup")

@@ -1,3 +1,4 @@
+from flask import request as flask_request
 from typing import Union, List
 from app.shared import BaseObserver
 from app.extensions import db
@@ -14,7 +15,9 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
     def subscribe(self): 
         Observable_SelectionProvision.subscribe(self)
 
-    def _delete_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+    def _delete_handler(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], 
+        *args, **kwargs):
         if type(provisions) != list: 
             provisions = [provisions]
             
@@ -26,7 +29,9 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
             db.session.rollback()
 
 
-    def _change_handler(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]]):
+    def _change_handler(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]],
+        *args, **kwargs):
         if type(provisions) != list: 
             provisions = [provisions]
 
@@ -63,19 +68,27 @@ class Observer_SelectionProvision_CalcRateTableFactors(BaseObserver):
 
         Model_SelectionRateTableFactor.bulk_save_all_to_db(rate_table_factors)
 
-    def post(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+    def post(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]],
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcRateTableFactors...")
         self._change_handler(provisions)
 
-    def put(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+    def put(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]],
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcRateTableFactors...")
         self._change_handler(provisions)
 
-    def patch(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+    def patch(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]],
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcRateTableFactors...")
         self._change_handler(provisions)
 
-    def delete(self, provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]], *args, **kwargs):
+    def delete(self, 
+        provisions: Union[Model_SelectionProvision, List[Model_SelectionProvision]],
+        request: flask_request, *args, **kwargs):
         print("In Observer_SelectionProvision_CalcRateTableFactors...")
         self._delete_handler(provisions)
     

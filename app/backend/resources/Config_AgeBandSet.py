@@ -5,8 +5,8 @@ from ..schemas import Schema_ConfigAgeBandSet
 
 class CRUD_ConfigAgeBandSet(BaseCRUDResource): 
     model = Model_ConfigAgeBandSet
-    schema = Schema_ConfigAgeBandSet
+    schema = Schema_ConfigAgeBandSet()
 
 class CRUD_ConfigAgeBandSet_List(BaseCRUDResourceList): 
     model = Model_ConfigAgeBandSet
-    schema = Schema_ConfigAgeBandSet
+    schema = Schema_ConfigAgeBandSet(many=True)
