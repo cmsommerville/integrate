@@ -24,7 +24,7 @@ class Model_SelectionBenefitRateTable(BaseModel):
     selection_plan_id = db.Column(db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"))
     selection_benefit_id = db.Column(db.ForeignKey(f"{SELECTION_BENEFIT}.selection_benefit_id"))
     selection_age_band_id = db.Column(db.ForeignKey(f'{SELECTION_AGE_BAND}.selection_age_band_id'))
-    selection_rate_table_id = db.Column(db.ForeignKey(f'{SELECTION_RATE_TABLE}.selection_rate_table_id'))
+    selection_rate_table_id = db.Column(db.Integer, nullable=False)
     config_rate_group_id = db.Column(db.ForeignKey(f'{CONFIG_RATE_GROUP}.config_rate_group_id'))
     config_gender_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))
     config_smoker_status_detail_id = db.Column(db.ForeignKey(f'{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id'))

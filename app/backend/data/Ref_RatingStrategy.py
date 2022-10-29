@@ -20,7 +20,7 @@ DATA_RATING_STRATEGY = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/rating-strategy-list')
     res = requests.post(url, json=DATA_RATING_STRATEGY)
     if not res.ok: 

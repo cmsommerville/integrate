@@ -14,7 +14,7 @@ DATA_ATTR_MAPPER_TYPE = [
     },
 ]
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/attr-mapper-type-list')
     res = requests.post(url, json=DATA_ATTR_MAPPER_TYPE)
     if not res.ok: 

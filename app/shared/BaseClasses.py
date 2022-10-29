@@ -11,7 +11,6 @@ class BaseRule():
     def apply_rule(self):
         pass
 
-
     def nested_getattr(self, obj, nested_attr):
         """
         Returns a deeply nested relationship expressed as a string with dot notation.
@@ -21,3 +20,5 @@ class BaseRule():
         """
         _attrs = nested_attr.split('.')
         return reduce(lambda o, next_attr: getattr(o, next_attr, None), _attrs, obj)
+
+

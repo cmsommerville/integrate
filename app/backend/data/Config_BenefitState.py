@@ -217,7 +217,7 @@ def DATA_BENEFIT_STATES():
     } for state in BENEFITS()['skin_cancer']],
 ]
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-state-list')
     res = requests.post(url, json=DATA_BENEFIT_STATES())
     if not res.ok: 

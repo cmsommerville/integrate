@@ -21,7 +21,7 @@ DATA_CENSUS_STRATEGY = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/census-strategy-list')
     res = requests.post(url, json=DATA_CENSUS_STRATEGY)
     if not res.ok: 

@@ -40,7 +40,7 @@ DATA_INPUT_TYPES = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/input-type-list')
     res = requests.post(url, json=DATA_INPUT_TYPES)
     if not res.ok: 

@@ -186,7 +186,7 @@ def DATA_FACE_AMOUNTS():
     }
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/rate-group-face-amounts-list')
     res = requests.post(url, json=DATA_FACE_AMOUNTS())
     if not res.ok: 

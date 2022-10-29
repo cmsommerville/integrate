@@ -3,6 +3,7 @@ from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
 from .BaseObservable import BaseObservable
+from .BaseDecorators import app_auth_required
 
 class BaseCRUDResource(Resource):
     model: BaseModel
@@ -132,6 +133,7 @@ class BaseCRUDResourceList(Resource):
         super().__init__()
 
     @classmethod
+    @app_auth_required()
     def get(cls, **kwargs):
         try: 
             objs = cls.model.find_all(**cls.model_args)

@@ -74,8 +74,8 @@ def DATA_AGE_MAPPER():
   ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/age-mapper-detail-list')
-    res = requests.post(url, json=DATA_AGE_MAPPER())
+    res = requests.post(url, json=DATA_AGE_MAPPER(), **kwargs)
     if not res.ok: 
         raise Exception(res.text)

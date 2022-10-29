@@ -4,11 +4,12 @@ from flask_cors import CORS
 from flask_restx import Resource
 from dotenv import load_dotenv
 import logging
+from sqlalchemy import event
 
 # logging.basicConfig(filename='logs/info.log')
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-from app.extensions import db, ma, api
+from app.extensions import db, ma, api, jwt
 from app.shared import bind_namespaces
 
 load_dotenv()        
@@ -23,7 +24,8 @@ def create_app(config):
     app.config["SESSION_SQLALCHEMY"] = db
 
     api.init_app(app)
-
+    jwt.init_app(app)
+    
     # bind routes
     from .route_registration import NAMESPACES
     bind_namespaces(api, NAMESPACES, '/api')
@@ -32,5 +34,7 @@ def create_app(config):
     from .subscription_registration import SUBSCRIPTIONS
     for subscription in SUBSCRIPTIONS:
         subscription.subscribe()
+
+    import app.auth as auth
 
     return app

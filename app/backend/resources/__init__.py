@@ -49,3 +49,5 @@ from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List, Resourc
 from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
 from .Selection_RateGroupFaceAmounts import CRUD_SelectionRateGroupFaceAmounts, CRUD_SelectionRateGroupFaceAmounts_List
 from .Selection_RateTable import Resource_SelectionRateTable
+
+from .Rating_PremiumCalculator import Resource_RatingPremiumCalculator

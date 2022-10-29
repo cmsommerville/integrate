@@ -35,7 +35,7 @@ def DATA_COVERAGE():
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/coverage-list')
     res = requests.post(url, json=DATA_COVERAGE())
     if not res.ok: 

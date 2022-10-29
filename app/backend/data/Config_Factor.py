@@ -189,7 +189,7 @@ def DATA_FACTOR():
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/factor-list')
     res = requests.post(url, json=DATA_FACTOR())
     if not res.ok: 

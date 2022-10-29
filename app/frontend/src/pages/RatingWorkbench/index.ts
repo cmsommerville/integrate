@@ -1,3 +1,4 @@
+export { default as Accordion} from './Accordion'
 export { default as SelectCensusSet } from './SelectCensusSet'
 export { default as SelectSmokerStatus } from './SelectSmokerStatus'
 export { default as SelectGender } from './SelectGender'

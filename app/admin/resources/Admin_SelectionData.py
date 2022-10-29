@@ -15,5 +15,5 @@ class Resource_AdminSelectionData(Resource):
         hostname = os.getenv('HOSTNAME')
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
-        load_selection(hostname)
+        load_selection(hostname, headers=request.headers)
         return {"status": "success", "message": "Selections successfully loaded"}

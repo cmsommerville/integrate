@@ -56,7 +56,7 @@ def DATA_PRODUCT_VARIATION_STATE():
 
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/product-variation-state-list')
     res = requests.post(url, json=DATA_PRODUCT_VARIATION_STATE())
     if not res.ok: 

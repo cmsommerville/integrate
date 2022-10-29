@@ -3,6 +3,7 @@ import { useParams } from "react-router";
 import { RadioGroup } from "@headlessui/react";
 import _ from "lodash";
 import {
+  Accordion,
   SelectCensusSet,
   SelectSmokerStatus,
   SelectGender,
@@ -113,6 +114,7 @@ export const RateDisplayTemplateAgeBand = ({ product, rates }: IProps) => {
   }, [product, rates]);
 
   const pivotedRates = useMemo(() => {
+    if (rates.length === 0) return {};
     const pivoted = pivot(
       rates,
       [
@@ -163,7 +165,11 @@ export const RateDisplayTemplateAgeBand = ({ product, rates }: IProps) => {
       rateFilter.smoker_status,
       rateFilter.relationship,
     ].join(":");
-    return pivotedRates[key];
+    let display_rates = pivotedRates[key];
+    if (!display_rates) return [];
+    return display_rates.sort((a: any, b: any) => {
+      return a.age_band.lower_age_value < b.age_band.lower_age_value ? -1 : 1;
+    });
   }, [pivotedRates, rateFilter]);
 
   return (
@@ -226,7 +232,8 @@ export const RateDisplayTemplateAgeBand = ({ product, rates }: IProps) => {
             </div>
           </div>
           <div className="col-span-1 flex flex-col">
-            <div className="rounded-r-lg shadow-lg px-4 py-8 space-y-8">
+            <Accordion />
+            {/* <div className="rounded-r-lg shadow-lg px-4 py-8 space-y-8">
               {showRatingStrategies.includes(
                 product.gender_rating_strategy.ref_attr_code
               ) ? (
@@ -362,7 +369,7 @@ export const RateDisplayTemplateAgeBand = ({ product, rates }: IProps) => {
                   </div>
                 </RadioGroup>
               </div>
-            </div>
+            </div> */}
             <div className="h-full w-full"></div>
           </div>
         </div>

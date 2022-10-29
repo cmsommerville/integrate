@@ -40,7 +40,7 @@ def DATA_BENEFIT_DURATION():
 
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-duration-set-list')
     res = requests.post(url, json=DATA_BENEFIT_DURATION())
     data = res.json()

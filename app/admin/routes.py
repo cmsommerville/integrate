@@ -4,6 +4,8 @@ from .resources import *
 
 ns_admin = Namespace('admin', description='Reference data REST API')
 
+ns_admin.add_resource(Resource_AdminAssignUserRole, *['/admin/user/roles/add'])
+ns_admin.add_resource(Resource_AdminRemoveUserRole, *['/admin/user/roles/remove'])
 ns_admin.add_resource(Resource_AdminCreateTables, *['/admin/tables/_create'])
 ns_admin.add_resource(Resource_AdminDropTables, *['/admin/tables/_drop'])
 ns_admin.add_resource(Resource_AdminInitRefData, *['/admin/tables/_load/refdata'])

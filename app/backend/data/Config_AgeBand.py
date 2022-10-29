@@ -30,8 +30,8 @@ DATA_AGE_BANDS = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/age-band-set-list')
-    res = requests.post(url, json=DATA_AGE_BANDS)
+    res = requests.post(url, json=DATA_AGE_BANDS, **kwargs)
     if not res.ok: 
         raise Exception(res.text)

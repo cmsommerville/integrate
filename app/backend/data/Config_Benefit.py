@@ -2,6 +2,7 @@ import requests
 from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_RefBenefit, \
     Model_ConfigCoverage, Model_ConfigRateGroup, Model_RefUnitCode
+from app.shared import app_set_superuser
 
 def DATA_BENEFIT():
     return [
@@ -19,10 +20,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cancer', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 100, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -43,10 +56,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_heart_attack', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 100, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -67,10 +92,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_stroke', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 100, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -91,10 +128,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_renal_failure', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 100, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -115,10 +164,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_transplant', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 100, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -139,10 +200,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cis', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 6.25, 
-        'default_value': 25, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -163,10 +236,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cabg', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 6.25, 
-        'default_value': 25, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -187,10 +272,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_hsb', 
-        'min_value': 0, 
-        'max_value': 150, 
-        'step_value': 5, 
-        'default_value': 50, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "dollars"
         }).ref_id, 
@@ -211,10 +308,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_skin_cancer', 
-        'min_value': 0, 
-        'max_value': 1000, 
-        'step_value': 50, 
-        'default_value': 250, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 500, 
+                'step_value': 25, 
+                'default_value': 250, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 1000, 
+                'step_value': 25, 
+                'default_value': 500, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "dollars"
         }).ref_id, 
@@ -235,10 +344,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_ms', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 0, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -259,10 +380,22 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_als', 
-        'min_value': 0, 
-        'max_value': 100, 
-        'step_value': 12.5, 
-        'default_value': 0, 
+        'benefit_authority': [
+            {
+                'user_access_level': 10, 
+                'min_value': 0, 
+                'max_value': 25, 
+                'step_value': 12.5, 
+                'default_value': 25, 
+            }, 
+            {
+                'user_access_level': 20, 
+                'min_value': 0, 
+                'max_value': 100, 
+                'step_value': 12.5, 
+                'default_value': 100, 
+            }, 
+        ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
@@ -271,9 +404,8 @@ def DATA_BENEFIT():
     }, 
 ]
 
-
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-list')
-    res = requests.post(url, json=DATA_BENEFIT())
+    res = requests.post(url, json=DATA_BENEFIT(), **kwargs)
     if not res.ok: 
         raise Exception(res.text)

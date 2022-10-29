@@ -1,3 +1,4 @@
+import pandas as pd
 from app.backend.models.Config_AttributeDetail import CONFIG_ATTRIBUTE_DETAIL
 from app.extensions import db
 from app.shared import BaseModel
@@ -24,11 +25,18 @@ class Model_SelectionRateGroupFaceAmounts(BaseModel):
     config_gender_detail_id = db.Column(db.ForeignKey(F"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"), nullable=False)
     config_smoker_status_detail_id = db.Column(db.ForeignKey(F"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"), nullable=False)
     config_relationship_detail_id = db.Column(db.ForeignKey(F"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"), nullable=False)
-    config_rate_group_face_amount_id = db.Column(db.ForeignKey(F"{CONFIG_RATE_GROUP_FACE_AMOUNTS}.config_rate_group_face_amount_id"), nullable=False)
+    config_rate_group_face_amount_id = db.Column(db.ForeignKey(F"{CONFIG_RATE_GROUP_FACE_AMOUNTS}.config_rate_group_face_amount_id"))
     face_amount_value = db.Column(db.Numeric(10, 2), nullable=False)
 
     @classmethod
-    def delete_by_plan(cls, plan_id: int):
+    def find_by_plan(cls, plan_id: int, as_pandas=False, *args, **kwargs):
+        qry = cls.query.filter(cls.selection_plan_id == plan_id)
+        if as_pandas: 
+            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False)
+        return qry.all()
+
+    @classmethod
+    def delete_by_plan(cls, plan_id: int, *args, **kwargs):
         try: 
             cls.query.filter(cls.selection_plan_id==plan_id).delete()
             db.session.commit()

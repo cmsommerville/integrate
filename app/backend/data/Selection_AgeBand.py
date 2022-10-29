@@ -40,7 +40,7 @@ def DATA_SELECTION_AGE_BANDS():
     ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/selection/age-band-list')
     res = requests.post(url, json=DATA_SELECTION_AGE_BANDS())
     if not res.ok: 

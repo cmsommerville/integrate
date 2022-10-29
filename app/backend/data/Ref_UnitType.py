@@ -16,7 +16,7 @@ DATA_UNIT_TYPE = [
     },
 ]
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/unit-code-list')
     res = requests.post(url, json=DATA_UNIT_TYPE)
     if not res.ok: 

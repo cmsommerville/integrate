@@ -42,5 +42,5 @@ class Model_SelectionRateTable(BaseModel):
     def find_by_plan(cls, plan_id: int, as_pandas=False):
         qry = cls.query.filter(cls.selection_plan_id == plan_id)
         if as_pandas: 
-            return pd.read_sql(qry.statement, qry.session.bind)
+            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False)
         return qry.all()

@@ -15,6 +15,7 @@ params = urllib.parse.quote_plus(SQL_SERVER_CONNECTION_STRING)
 
 
 class BaseConfig():
+    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     PROPAGATE_EXCEPTIONS = True
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")

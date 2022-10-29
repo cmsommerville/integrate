@@ -126,5 +126,6 @@ ns_crud.add_resource(CRUD_SelectionProvision_List, '/crud/selection/provision-li
 ns_crud.add_resource(CRUD_SelectionRateGroupFaceAmounts, '/crud/selection/rate-group-face-amounts/<int:id>', '/crud/selection/rate-group-face-amounts')
 ns_crud.add_resource(CRUD_SelectionRateGroupFaceAmounts_List, '/crud/selection/rate-group-face-amounts-list')
 
-ns_crud.add_resource(SelectionCensusSet_CensusBuilder, '/crud/selection/census/<int:plan_id>/build')
-ns_crud.add_resource(SelectionCensusSet_UploadFile, '/crud/selection/census/<int:plan_id>/upload')
+ns_crud.add_resource(SelectionCensusSet_CensusBuilder, '/crud/selection/plan/<int:plan_id>/census/build')
+ns_crud.add_resource(SelectionCensusSet_UploadFile, '/crud/selection/plan/<int:plan_id>/census/upload')
+ns_crud.add_resource(Resource_RatingPremiumCalculator, '/crud/selection/plan/<int:plan_id>/rating/premium')

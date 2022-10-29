@@ -120,7 +120,7 @@ DATA_NO_JOINS = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/attribute-set-gender-list')
     res = requests.post(url, json=DATA_GENDER)
     if not res.ok: 

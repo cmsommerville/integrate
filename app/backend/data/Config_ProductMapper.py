@@ -116,7 +116,7 @@ def DATA_PRODUCT_MAPPER__SMOKER_STATUS():
 
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/product-mapper-set-gender-list')
     res = requests.post(url, json=DATA_PRODUCT_MAPPER__GENDER())
     if not res.ok: 

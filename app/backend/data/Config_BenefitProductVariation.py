@@ -21,7 +21,7 @@ def DATA_BENEFIT_VARIATIONS():
     return data
     
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-product-variation-list')
     res = requests.post(url, json=DATA_BENEFIT_VARIATIONS())
     if not res.ok: 

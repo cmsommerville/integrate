@@ -20,7 +20,7 @@ DATA_PROVISION = [
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/ref/provision-list')
     res = requests.post(url, json=DATA_PROVISION)
     if not res.ok: 

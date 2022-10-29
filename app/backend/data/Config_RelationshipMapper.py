@@ -111,7 +111,7 @@ def DATA_RELATIONSHIP_MAPPER():
 
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/relationship-mapper-set-list')
     res = requests.post(url, json=DATA_RELATIONSHIP_MAPPER())
     if not res.ok: 

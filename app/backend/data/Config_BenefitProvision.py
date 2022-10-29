@@ -21,7 +21,7 @@ def DATA_BENEFIT_PROVISIONS():
     return data
     
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-provision-list')
     res = requests.post(url, json=DATA_BENEFIT_PROVISIONS())
     if not res.ok: 

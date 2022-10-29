@@ -10,6 +10,7 @@ TBL_NAMES = {
     "CONFIG_ATTRIBUTE_MAPPER_DETAIL": "config_attr_mappre_detail",
     "CONFIG_ATTRIBUTE_SET": "config_attr_set",  
     "CONFIG_BENEFIT": "config_benefit",
+    "CONFIG_BENEFIT_AUTHORITY": "config_benefit_authority",
     "CONFIG_BENEFIT_DURATION_DETAIL": "config_benefit_duration_detail",
     "CONFIG_BENEFIT_DURATION_SET": "config_benefit_duration_set",
     "CONFIG_BENEFIT_PRODUCT_VARIATION": "config_benefit_product_variation",

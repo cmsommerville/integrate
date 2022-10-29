@@ -25,7 +25,7 @@ def DATA_RATE_GROUP():
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/rate-group-list')
     res = requests.post(url, json=DATA_RATE_GROUP())
     if not res.ok: 

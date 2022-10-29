@@ -1,11 +1,13 @@
 from __future__ import annotations
+import os
 import pandas as pd
 from functools import reduce
 from flask import current_app
 from typing import List
-from sqlalchemy import text
+from sqlalchemy import text, event
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
+from sqlalchemy.orm import ORMExecuteState
 from app.extensions import db
 
 
@@ -50,18 +52,18 @@ class BaseModel(db.Model):
             qry = qry.order_by(cls.created_dts.desc())
         
         if as_pandas:
-            return pd.read_sql(qry.statement, qry.session.bind).iloc[0]
+            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False).iloc[0]
         return qry.first()
 
     @classmethod
     def find_all_by_attr(cls, attrs: dict, as_of_ts=None, as_pandas=False, *args, **kwargs) -> List[BaseModel]:
         SUPPORT_TEMPORAL_TABLES = current_app.config.get("SUPPORT_TEMPORAL_TABLES", False)
-        qry = cls.query.filter(*[getattr(cls, k) == v for k, v in attrs.items()])
+        qry = cls.query.filter(*[getattr(cls, k).in_(v) if type(v) == list else getattr(cls, k) == v for k, v in attrs.items()])
         if as_of_ts and SUPPORT_TEMPORAL_TABLES: 
             qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
         
         if as_pandas: 
-            return pd.read_sql(qry.statement, qry.session.bind)
+            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False)
         return qry.all()
 
     @classmethod
@@ -71,7 +73,7 @@ class BaseModel(db.Model):
         if as_of_ts and SUPPORT_TEMPORAL_TABLES: 
             qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
         if as_pandas: 
-            return pd.read_sql(qry.statement, qry.session.bind).iloc[offset:(offset + limit)]
+            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False).iloc[offset:(offset + limit)]
         return qry.slice(offset, offset+limit).all()
 
     @classmethod
@@ -121,3 +123,74 @@ class BaseRuleModel(BaseModel):
         """
         _attrs = nested_attr.split('.')
         return reduce(lambda o, next_attr: getattr(o, next_attr, None), _attrs, obj)
+
+
+
+class BaseRowLevelSecurityTable:
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @classmethod
+    def add_rls(cls, model):
+        rls_schema = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", 'rls')
+        table_schema = model.__table__.schema
+        _schema = 'dbo' if table_schema is None else f"{table_schema}"
+        _tablename = model.__tablename__
+        _fn_name = f"fn_rls__{_schema}_{_tablename}"
+        _policy_name = f"policy_rls__{_schema}_{_tablename}"
+
+        sql = f"""
+            CREATE FUNCTION {rls_schema}.{_fn_name}()
+                RETURNS TABLE
+            WITH SCHEMABINDING
+            AS
+            RETURN SELECT 1 AS {_fn_name}_output
+            WHERE 
+                'user0100' IN (
+                    SELECT role_name 
+                    FROM dbo.auth_role 
+                    WHERE user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                ) OR 'superuser' = (
+                    SELECT user_name 
+                    FROM dbo.auth_user
+                    WHERE user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                )
+            """
+        db.session.execute(sql)
+        db.session.commit()
+
+        sql = f"""
+            CREATE SECURITY POLICY {rls_schema}.{_policy_name}
+            ADD FILTER PREDICATE {rls_schema}.{_fn_name}() ON {_schema}.{_tablename}
+            WITH (STATE = ON)
+        """
+        db.session.execute(sql)
+        db.session.commit()
+
+
+    @classmethod
+    def drop_rls(cls, model):
+        rls_schema = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", 'rls')
+        table_schema = model.__table__.schema
+        _schema = 'dbo' if table_schema is None else f"{table_schema}"
+        _tablename = model.__tablename__
+        _fn_name = f"fn_rls__{_schema}_{_tablename}"
+        _policy_name = f"policy_rls__{_schema}_{_tablename}"
+        
+        sql = f"""
+            DROP SECURITY POLICY {rls_schema}.{_policy_name};
+        """
+        try: 
+            db.session.execute(sql)
+        except: 
+            pass
+
+        sql = f"""
+            DROP FUNCTION {rls_schema}.{_fn_name};
+        """
+        try: 
+            db.session.execute(sql)
+            db.session.commit()
+        except: 
+            pass

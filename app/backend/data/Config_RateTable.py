@@ -53,7 +53,7 @@ def DATA_RATE_TABLE():
     return data
     
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/rate-table-list')
     res = requests.post(url, json=DATA_RATE_TABLE())
     if not res.ok: 

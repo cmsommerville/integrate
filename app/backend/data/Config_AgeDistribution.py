@@ -71,8 +71,8 @@ DATA_AGE_DISTRIBUTION = [
     }, 
 ]
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/age-distribution-set-list')
-    res = requests.post(url, json=DATA_AGE_DISTRIBUTION)
+    res = requests.post(url, json=DATA_AGE_DISTRIBUTION, **kwargs)
     if not res.ok: 
         raise Exception(res.text)

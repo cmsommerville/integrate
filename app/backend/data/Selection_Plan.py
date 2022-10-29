@@ -39,7 +39,7 @@ def DATA_SELECTION_PLAN():
 ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/selection/plan-list')
     res = requests.post(url, json=DATA_SELECTION_PLAN())
     if not res.ok: 

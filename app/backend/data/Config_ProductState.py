@@ -66,7 +66,7 @@ def DATA_PRODUCT_STATES():
     }, 
 ]
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/product-state-list')
     res = requests.post(url, json=DATA_PRODUCT_STATES())
     if not res.ok: 

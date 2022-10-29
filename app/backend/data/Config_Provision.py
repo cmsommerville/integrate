@@ -50,7 +50,7 @@ def DATA_PROVISION_RATE_TABLE():
     ]
 
 
-def load(hostname: str) -> None:
+def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/provision-product-list')
     res = requests.post(url, json=DATA_PROVISION_PRODUCT())
     if not res.ok: 
