@@ -3,10 +3,18 @@ from requests.compat import urljoin
 
 from  ..models import Model_ConfigProductState, Model_ConfigProductVariation, \
     Model_ConfigProductMapperSet_Gender, Model_ConfigProductMapperSet_SmokerStatus, \
-    Model_RefProductVariation, Model_RefAttrMapperType
+    Model_RefProductVariation, Model_RefAttrMapperType, Model_ConfigProduct
 
-def PRODUCT_STATE(_id=1): 
-    return Model_ConfigProductState.find_one(_id)
+def PRODUCT():
+    return Model_ConfigProduct.find_one_by_attr({
+        "config_product_code": "CI21000"
+    })
+
+def PRODUCT_STATE(): 
+    product = PRODUCT()
+    return Model_ConfigProductState.find_one_by_attr({
+        "config_product_id": product.config_product_id
+    })
 
 def PRODUCT_VARIATION(): 
     return Model_ConfigProductVariation.find_one_by_attr({

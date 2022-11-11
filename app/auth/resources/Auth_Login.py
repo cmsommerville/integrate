@@ -3,9 +3,9 @@ from flask import request, jsonify
 from flask_restx import Resource
 from flask_jwt_extended import create_access_token
 from ..models import Model_AuthUser
-from ..schemas import Schema_AuthUser
+from ..schemas import Schema_AuthUser_JWT
 
-_schema = Schema_AuthUser()
+_schema = Schema_AuthUser_JWT()
 
 class Resource_AuthLogin(Resource): 
     

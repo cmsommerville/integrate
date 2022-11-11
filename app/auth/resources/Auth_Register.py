@@ -3,10 +3,11 @@ from flask import request, jsonify
 from flask_restx import Resource
 from flask_jwt_extended import create_access_token
 from ..models import Model_AuthUser
-from ..schemas import Schema_AuthUser
+from ..schemas import Schema_AuthUser, Schema_AuthUser_JWT
 from ..constants import BCRYPT_ROUNDS_WORK_FACTOR
 
 _schema = Schema_AuthUser()
+_schema_jwt = Schema_AuthUser_JWT()
 
 
 class Resource_AuthRegister(Resource): 
@@ -35,7 +36,7 @@ class Resource_AuthRegister(Resource):
             })
 
             user.save_to_db()
-            user_data = _schema.dump(user)
+            user_data = _schema_jwt.dump(user)
             access_token = create_access_token(identity=user_data)
             return {"token": access_token}, 201
 

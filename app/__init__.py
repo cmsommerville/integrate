@@ -9,7 +9,7 @@ from sqlalchemy import event
 # logging.basicConfig(filename='logs/info.log')
 # logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-from app.extensions import db, ma, api, jwt
+from app.extensions import db, ma, api, sess, jwt
 from app.shared import bind_namespaces
 
 load_dotenv()        
@@ -25,10 +25,14 @@ def create_app(config):
 
     api.init_app(app)
     jwt.init_app(app)
+    sess.init_app(app)
     
     # bind routes
     from .route_registration import NAMESPACES
     bind_namespaces(api, NAMESPACES, '/api')
+
+    from work.test import Resource_TestSQLJSON
+    api.add_resource(Resource_TestSQLJSON, '/work/test')
 
     # bind subscribers
     from .subscription_registration import SUBSCRIPTIONS

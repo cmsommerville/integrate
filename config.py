@@ -1,6 +1,7 @@
 import os
 import urllib
 from dotenv import load_dotenv
+from redis import Redis
 
 load_dotenv()
 
@@ -20,6 +21,7 @@ class BaseConfig():
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
     SESSION_TYPE = os.getenv("SESSION_TYPE")
+    SESSION_REDIS = Redis(host="localhost", port=6379, db=0)
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "None"
     SQLALCHEMY_TRACK_MODIFICATIONS = False

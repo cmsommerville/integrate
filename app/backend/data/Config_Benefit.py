@@ -2,7 +2,8 @@ import requests
 from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_RefBenefit, \
     Model_ConfigCoverage, Model_ConfigRateGroup, Model_RefUnitCode
-from app.shared import app_set_superuser
+
+from app.auth.models import Model_AuthRole
 
 def DATA_BENEFIT():
     return [
@@ -20,26 +21,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cancer', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -56,26 +67,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_heart_attack', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -92,26 +113,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_stroke', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -128,26 +159,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_renal_failure', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -164,26 +205,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_transplant', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -200,26 +251,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cis', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -236,26 +297,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_cabg', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -272,26 +343,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_hsb', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "dollars"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -308,26 +389,35 @@ def DATA_BENEFIT():
             "config_rate_group_code": "FLAT"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_skin_cancer', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 500, 
                 'step_value': 25, 
                 'default_value': 250, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 1000, 
                 'step_value': 25, 
                 'default_value': 500, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "dollars"
         }).ref_id, 
-        'is_durational': True,
         'config_benefit_description': "" 
     }, 
     {
@@ -344,26 +434,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_ms', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
     {
@@ -380,26 +480,36 @@ def DATA_BENEFIT():
             "config_rate_group_code": "APU"
         }).config_rate_group_id,
         'config_benefit_version_code': 'std_als', 
-        'benefit_authority': [
+        'benefit_auth': [
             {
-                'user_access_level': 10, 
+                'priority': 10, 
                 'min_value': 0, 
                 'max_value': 25, 
                 'step_value': 12.5, 
                 'default_value': 25, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                    }
+                ]
             }, 
             {
-                'user_access_level': 20, 
+                'priority': 20, 
                 'min_value': 0, 
                 'max_value': 100, 
                 'step_value': 12.5, 
                 'default_value': 100, 
+                'acl': [
+                    {
+                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                    }
+                ]
             }, 
         ], 
         'unit_type_id': Model_RefUnitCode.find_one_by_attr({
             "ref_attr_code": "percent"
         }).ref_id, 
-        'is_durational': False,
+        
         'config_benefit_description': "" 
     }, 
 ]

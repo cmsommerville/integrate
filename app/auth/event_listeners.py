@@ -1,5 +1,5 @@
-from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from sqlalchemy import event
+from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 from app.extensions import db
 
 
@@ -8,8 +8,10 @@ def set_db_user_id(session, transaction, connection, *args, **kwargs):
     try: 
         verify_jwt_in_request()
         identity = get_jwt_identity()
-        user_id = identity.get('user_id', 0)
-        stmt = f"EXEC sp_set_session_context 'user_id', {user_id}"
+        roles = ';'.join(identity.get('roles', []))
+        stmt = f"EXEC sp_set_session_context 'user_id', {identity.get('auth_user_id')}"
+        connection.execute(stmt)
+        stmt = f"EXEC sp_set_session_context 'user_roles', {roles}"
         connection.execute(stmt)
     except: 
         pass

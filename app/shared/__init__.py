@@ -6,4 +6,3 @@ from .BaseRouter import bind_namespaces
 from .BaseTemporalTable import BaseTemporalTable
 from .BaseObservable import BaseObservable, BaseObserver
 from .BaseFileHandlers import upload_file, NoFileProvidedException
-from .BaseDecorators import app_auth_required, app_set_superuser

@@ -2,7 +2,13 @@ from app.extensions import ma
 from app.shared import BaseSchema
 
 from ..models import Model_AuthUser
-from .AuthRole import Schema_AuthRole
+from .AuthUserRole import Schema_AuthUserRole
+
+class Schema_AuthUser_JWT(BaseSchema):
+    auth_user_id = ma.Integer()
+    user_name = ma.String()
+    roles = ma.Function(lambda obj: [r.role.auth_role_code for r in obj.roles])
+
 
 class Schema_AuthUser(BaseSchema):
     class Meta:
@@ -11,8 +17,8 @@ class Schema_AuthUser(BaseSchema):
         include_fk = True
         include_relationships = True
 
-    user_id = ma.Integer()
+    auth_user_id = ma.Integer()
     user_name = ma.String()
     hashed_password = ma.Raw(load_only=True)
 
-    roles = ma.Nested(Schema_AuthRole, many=True)
+    roles = ma.Nested(Schema_AuthUserRole, many=True)

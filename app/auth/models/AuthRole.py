@@ -1,34 +1,39 @@
+from typing import List
 from app.extensions import db
 
-from ..tables import TBL_NAMES
+from ..tables import TBL_NAMES, SCHEMA_NAME
 
 AUTH_ROLE = TBL_NAMES['AUTH_ROLE']
-AUTH_USER = TBL_NAMES['AUTH_USER']
 
 class Model_AuthRole(db.Model):
     __tablename__ = AUTH_ROLE
     __table_args__ = (
-        db.UniqueConstraint('user_id', 'role_name'),
+        db.UniqueConstraint('auth_role_code'),
+        {"schema": SCHEMA_NAME}
     )
 
-    role_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.ForeignKey(f"{AUTH_USER}.user_id"))
-    role_name = db.Column(db.String(200), nullable=False)
+
+    auth_role_id = db.Column(db.Integer, primary_key=True)
+    auth_role_code = db.Column(db.String(30), nullable=False)
+    auth_role_label = db.Column(db.String(100), nullable=False)
+    auth_role_description = db.Column(db.String(1000))
+
 
     def __repr__(self): 
         """
         Print instance as <[Model Name]: [Row SK]>
         """
-        return f'<Model_AuthRole: {self.role_id}>'
+        return f'<Model_AuthRole: {self.auth_role_id}>'
 
 
     @classmethod
     def find_one(cls, id, *args, **kwargs) -> db.Model:
-        return cls.query.get(id)
+        qry = cls.query
+        return qry.get(id)
 
     @classmethod
-    def find_by_user_id(cls, user_id, *args, **kwargs) -> db.Model:
-        return cls.query.filter(cls.user_id==user_id).all()
+    def find_by_code(cls, auth_role_codes: List[str], *args, **kwargs) -> List[db.Model]:
+        return cls.query.filter(cls.auth_role_code.in_(auth_role_codes)).all()
 
     def save_to_db(self) -> None:
         try:
@@ -39,13 +44,10 @@ class Model_AuthRole(db.Model):
             raise
 
     @classmethod
-    def delete(cls, roles):
-        try: 
-            for role in roles:
-                db.session.delete(role)
+    def save_all_to_db(self, objs) -> None:
+        try:
+            db.session.add_all(objs)
             db.session.commit()
-        except: 
+        except Exception:
             db.session.rollback()
             raise
-
-

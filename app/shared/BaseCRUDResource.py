@@ -3,18 +3,20 @@ from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
 from .BaseObservable import BaseObservable
-from .BaseDecorators import app_auth_required
+from app.auth import authorize, ResourcePermissions
 
 class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
     observable: BaseObservable = None
     model_args: dict = {}
+    permissions = ResourcePermissions()
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
+    @authorize
     def get(cls, id, *args, **kwargs):
         try: 
             obj = cls.model.find_one(id, **cls.model_args)
@@ -133,7 +135,6 @@ class BaseCRUDResourceList(Resource):
         super().__init__()
 
     @classmethod
-    @app_auth_required()
     def get(cls, **kwargs):
         try: 
             objs = cls.model.find_all(**cls.model_args)

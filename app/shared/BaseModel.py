@@ -9,6 +9,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
 from sqlalchemy.orm import ORMExecuteState
 from app.extensions import db
+from app.auth.tables import SCHEMA_NAME
 
 
 class BaseModel(db.Model):
@@ -141,20 +142,24 @@ class BaseRowLevelSecurityTable:
         _policy_name = f"policy_rls__{_schema}_{_tablename}"
 
         sql = f"""
-            CREATE FUNCTION {rls_schema}.{_fn_name}()
+            CREATE FUNCTION {rls_schema}.{_fn_name}(@user_id INT, @role_id INT)
                 RETURNS TABLE
             WITH SCHEMABINDING
             AS
             RETURN SELECT 1 AS {_fn_name}_output
             WHERE 
-                'user0100' IN (
-                    SELECT role_name 
-                    FROM dbo.auth_role 
-                    WHERE user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
-                ) OR 'superuser' = (
-                    SELECT user_name 
-                    FROM dbo.auth_user
-                    WHERE user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                @user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                OR @role_id IN (
+                    SELECT auth_role_id 
+                    FROM {SCHEMA_NAME}.auth_user_role
+                    WHERE auth_user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                )
+                OR 'superuser' IN (
+                    SELECT R.auth_role_code 
+                    FROM {SCHEMA_NAME}.auth_user_role AS U
+                    INNER JOIN {SCHEMA_NAME}.auth_role AS R ON 
+                        U.auth_role_id = R.auth_role_id
+                    WHERE U.auth_user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
                 )
             """
         db.session.execute(sql)
@@ -162,7 +167,7 @@ class BaseRowLevelSecurityTable:
 
         sql = f"""
             CREATE SECURITY POLICY {rls_schema}.{_policy_name}
-            ADD FILTER PREDICATE {rls_schema}.{_fn_name}() ON {_schema}.{_tablename}
+            ADD FILTER PREDICATE {rls_schema}.{_fn_name}(auth_user_id, auth_role_id) ON {_schema}.{_tablename}
             WITH (STATE = ON)
         """
         db.session.execute(sql)
