@@ -30,9 +30,11 @@ class BaseConfig():
 
 class DevConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = "mssql+pyodbc:///?odbc_connect=%s" % params
+    DB_USER_NAME = os.getenv('DEV_DATABASE_UID')
 
 class TestConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv("TEST_SQLALCHEMY_DATABASE_URI")
+    DB_USER_NAME = os.getenv('DEV_DATABASE_UID')
 
 CONFIG = {
     "DEV": DevConfig(),

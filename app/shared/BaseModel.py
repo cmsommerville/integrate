@@ -141,25 +141,24 @@ class BaseRowLevelSecurityTable:
         _fn_name = f"fn_rls__{_schema}_{_tablename}"
         _policy_name = f"policy_rls__{_schema}_{_tablename}"
 
+        DB_USER_NAME = current_app.config.get("DB_USER_NAME", '')
+
         sql = f"""
-            CREATE FUNCTION {rls_schema}.{_fn_name}(@user_id INT, @role_id INT)
+            CREATE FUNCTION {rls_schema}.{_fn_name}(@user_role VARCHAR(30))
                 RETURNS TABLE
             WITH SCHEMABINDING
             AS
             RETURN SELECT 1 AS {_fn_name}_output
             WHERE 
-                @user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
-                OR @role_id IN (
-                    SELECT auth_role_id 
-                    FROM {SCHEMA_NAME}.auth_user_role
-                    WHERE auth_user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
-                )
-                OR 'superuser' IN (
-                    SELECT R.auth_role_code 
-                    FROM {SCHEMA_NAME}.auth_user_role AS U
-                    INNER JOIN {SCHEMA_NAME}.auth_role AS R ON 
-                        U.auth_role_id = R.auth_role_id
-                    WHERE U.auth_user_id = CAST(SESSION_CONTEXT(N'user_id') AS INT)
+                SUSER_NAME() <> '{DB_USER_NAME}' OR (
+                    @user_role IN (
+                        SELECT value AS user_role 
+                        FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
+                    )
+                    OR 'superuser' IN (
+                        SELECT value AS user_role 
+                        FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
+                    )
                 )
             """
         db.session.execute(sql)
@@ -167,7 +166,7 @@ class BaseRowLevelSecurityTable:
 
         sql = f"""
             CREATE SECURITY POLICY {rls_schema}.{_policy_name}
-            ADD FILTER PREDICATE {rls_schema}.{_fn_name}(auth_user_id, auth_role_id) ON {_schema}.{_tablename}
+            ADD FILTER PREDICATE {rls_schema}.{_fn_name}(auth_role_code) ON {_schema}.{_tablename}
             WITH (STATE = ON)
         """
         db.session.execute(sql)

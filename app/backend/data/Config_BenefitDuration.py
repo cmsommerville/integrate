@@ -18,21 +18,50 @@ def DATA_BENEFIT_DURATION():
                 "config_benefit_duration_detail_code": "1", 
                 "config_benefit_duration_detail_label": "1 per year", 
                 "config_benefit_duration_factor": 0.85, 
+                "acl": [
+                    {
+                        'auth_role_code': 'uw900'
+                    }, 
+                    {
+                        'auth_role_code': 'uw1000'
+                    }
+                ]
             }, 
             {
                 "config_benefit_duration_detail_code": "2", 
                 "config_benefit_duration_detail_label": "2 per year", 
                 "config_benefit_duration_factor": 0.95, 
+                "acl": [
+                    {
+                        'auth_role_code': 'uw900'
+                    }, 
+                    {
+                        'auth_role_code': 'uw1000'
+                    }
+                ]
             }, 
             {
                 "config_benefit_duration_detail_code": "3", 
                 "config_benefit_duration_detail_label": "3 per year", 
                 "config_benefit_duration_factor": 1, 
+                "acl": [
+                    {
+                        'auth_role_code': 'uw900'
+                    }, 
+                    {
+                        'auth_role_code': 'uw1000'
+                    }
+                ]
             }, 
             {
                 "config_benefit_duration_detail_code": "4", 
                 "config_benefit_duration_detail_label": "4 per year", 
                 "config_benefit_duration_factor": 1.1, 
+                "acl": [
+                    {
+                        'auth_role_code': 'uw1000'
+                    }
+                ]
             }, 
         ]
     }, 
@@ -42,7 +71,8 @@ def DATA_BENEFIT_DURATION():
 
 def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, 'api/crud/config/benefit-duration-set-list')
-    res = requests.post(url, json=DATA_BENEFIT_DURATION())
+    d = DATA_BENEFIT_DURATION()
+    res = requests.post(url, json=d, **kwargs)
     data = res.json()
     if not res.ok: 
         raise Exception(res.text)
@@ -50,7 +80,8 @@ def load(hostname: str, *args, **kwargs) -> None:
     for item in data:
         config_benefit_duration_set_id = item['config_benefit_duration_set_id']
         url = urljoin(hostname, f'api/crud/config/benefit-duration-set/{config_benefit_duration_set_id}')
-        default_id = item.get('duration_items')[-1]
-        res = requests.patch(url, json={'default_config_benefit_duration_detail_id': default_id})
+        default_item = item.get('duration_items')[-1]
+        default_id = default_item.get('config_benefit_duration_detail_id')
+        res = requests.patch(url, json={'default_config_benefit_duration_detail_id': default_id}, **kwargs)
         if not res.ok: 
             raise Exception(res.text)

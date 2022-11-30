@@ -1,12 +1,13 @@
 from . import Config_AgeBand, Config_AgeDistribution, Config_AgeMapper, \
     Config_AttributeDistribution, Config_AttributeSet, Config_Benefit, Config_BenefitDuration,\
-    Config_BenefitProductVariation, Config_BenefitProvision, \
+    Config_BenefitProductVariation, Config_BenefitProvision, Config_BenefitCovariance, \
     Config_BenefitState, Config_Coverage, Config_Factor, Config_Product, Config_ProductMapper, \
     Config_ProductState, Config_ProductVariation, Config_ProductVariationState,\
     Config_Provision, Config_ProvisionState, Config_ProvisionUI, Config_RateGroup, \
     Config_RateGroupFaceAmounts, Config_RateTable, Config_RelationshipMapper, \
     Ref_AttrMapperType, Ref_Benefit,Ref_CensusStrategy, Ref_ComparisonOperator, Ref_DataTypes, \
-    Ref_InputType, Ref_PremiumFrequency, Ref_ProductVariation,Ref_Provision, Ref_RatingStrategy, Ref_States, Ref_UnitType, \
+    Ref_InputType, Ref_Optionality, Ref_PremiumFrequency, Ref_ProductVariation,Ref_Provision, \
+    Ref_RatingStrategy, Ref_States, Ref_UnitType, \
     Selection_AgeBand, Selection_Benefit, Selection_BenefitDuration, Selection_Plan, Selection_Provision
 
 
@@ -17,6 +18,7 @@ def load_refdata(hostname: str, *args, **kwargs):
     Ref_ComparisonOperator.load(hostname, **kwargs)
     Ref_DataTypes.load(hostname, **kwargs)
     Ref_InputType.load(hostname, **kwargs)
+    Ref_Optionality.load(hostname, **kwargs)
     Ref_PremiumFrequency.load(hostname, **kwargs)
     Ref_ProductVariation.load(hostname, **kwargs)
     Ref_Provision.load(hostname, **kwargs)
@@ -54,6 +56,7 @@ def load_config(hostname: str, *args, **kwargs):
 
     Config_BenefitProductVariation.load(hostname, **kwargs)
     Config_BenefitProvision.load(hostname, **kwargs)
+    Config_BenefitCovariance.load(hostname, **kwargs)
 
 
 def load_rate_table(hostname: str, *args, **kwargs):  

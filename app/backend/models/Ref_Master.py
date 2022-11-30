@@ -67,6 +67,11 @@ class Model_RefInputTypes(Model_RefMaster):
         'polymorphic_identity': 'input_type'
     }
 
+class Model_RefOptionality(Model_RefMaster):
+    __mapper_args__ = {
+        'polymorphic_identity': 'optionality'
+    }
+
 class Model_RefPremiumFrequency(Model_RefMaster):
     __mapper_args__ = {
         'polymorphic_identity': 'premium_frequency'

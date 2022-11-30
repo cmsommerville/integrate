@@ -92,6 +92,17 @@ class Schema_RefInputTypes(BaseSchema):
     ref_attr_label = ma.String()
     ref_attr_description = ma.String()
 
+class Schema_RefOptionality(BaseSchema):
+    class Meta:
+        model = models.Model_RefOptionality
+        load_instance = True
+
+    ref_entity_code = ma.Constant('optionality')
+    ref_id = ma.Integer()
+    ref_attr_code = ma.String()
+    ref_attr_label = ma.String()
+    ref_attr_description = ma.String()
+
 class Schema_RefPremiumFrequency(BaseSchema):
     class Meta:
         model = models.Model_RefPremiumFrequency

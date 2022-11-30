@@ -5,14 +5,31 @@ from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 class ResourcePermissions:
     """
     A class that defines the roles allowed to perform the HTTP methods of a REST API resource
+
+    Pass the `role` key to grant GET/POST/PATCH/PUT/DELETE permissions to the specified roles.
+
+    Otherwise, pass the `get`, `post`, `patch`, `put`, and `delete` keyword arguments individually with their specific permissions.
+
+    If no arguments are passed to the constructor, `*` access is given to every HTTP method.
     """
 
     def __init__(self, *args, **kwargs):
-        self.get = kwargs.get('get', ['*'])
-        self.post = kwargs.get('post', ['*'])
-        self.patch = kwargs.get('patch', ['*'])
-        self.put = kwargs.get('put', ['*'])
-        self.delete = kwargs.get('delete', ['*'])
+        role = kwargs.get('role')
+        if role is None:
+            self.get = kwargs.get('get', ['*'])
+            self.post = kwargs.get('post', ['*'])
+            self.patch = kwargs.get('patch', ['*'])
+            self.put = kwargs.get('put', ['*'])
+            self.delete = kwargs.get('delete', ['*'])
+            return 
+
+        if not isinstance(role, (list, set,)):
+            role = [role]
+        self.get = [*role]
+        self.post = [*role]
+        self.patch = [*role]
+        self.put = [*role]
+        self.delete = [*role]
         
     def add(self, method: str, permission: str, *args, **kwargs):
         permissions = getattr(self, method)

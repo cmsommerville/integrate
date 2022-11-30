@@ -30,7 +30,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -42,7 +42,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -76,7 +76,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -88,7 +88,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -122,7 +122,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -134,7 +134,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -168,7 +168,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -180,7 +180,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -214,7 +214,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -226,7 +226,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -260,7 +260,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -272,7 +272,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -306,7 +306,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -318,7 +318,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -352,7 +352,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -364,7 +364,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -398,7 +398,7 @@ def DATA_BENEFIT():
                 'default_value': 250, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -410,7 +410,7 @@ def DATA_BENEFIT():
                 'default_value': 500, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -443,7 +443,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -455,7 +455,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 
@@ -489,7 +489,7 @@ def DATA_BENEFIT():
                 'default_value': 25, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw900'])[0].auth_role_id
+                        'auth_role_code': 'uw900'
                     }
                 ]
             }, 
@@ -501,7 +501,7 @@ def DATA_BENEFIT():
                 'default_value': 100, 
                 'acl': [
                     {
-                        'auth_role_id': Model_AuthRole.find_by_code(['uw1000'])[0].auth_role_id
+                        'auth_role_code': 'uw1000'
                     }
                 ]
             }, 

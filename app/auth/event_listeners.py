@@ -9,9 +9,7 @@ def set_db_user_id(session, transaction, connection, *args, **kwargs):
         verify_jwt_in_request()
         identity = get_jwt_identity()
         roles = ';'.join(identity.get('roles', []))
-        stmt = f"EXEC sp_set_session_context 'user_id', {identity.get('auth_user_id')}"
-        connection.execute(stmt)
-        stmt = f"EXEC sp_set_session_context 'user_roles', {roles}"
+        stmt = f"EXEC sp_set_session_context 'user_roles', N'{roles}'"
         connection.execute(stmt)
     except: 
         pass

@@ -68,6 +68,14 @@ class CRUD_RefInputTypes_List(BaseCRUDResourceList):
     model = models.Model_RefInputTypes
     schema = schemas.Schema_RefInputTypes(many=True)
 
+class CRUD_RefOptionality(BaseCRUDResource): 
+    model = models.Model_RefOptionality
+    schema = schemas.Schema_RefOptionality()
+
+class CRUD_RefOptionality_List(BaseCRUDResourceList): 
+    model = models.Model_RefOptionality
+    schema = schemas.Schema_RefOptionality(many=True)
+
 class CRUD_RefPremiumFrequency(BaseCRUDResource): 
     model = models.Model_RefPremiumFrequency
     schema = schemas.Schema_RefPremiumFrequency()

@@ -104,7 +104,7 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "message": str(e)}, 400
 
     @classmethod
-    def delete(cls, id): 
+    def delete(cls, id, *args, **kwargs): 
         try: 
             obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
@@ -135,7 +135,7 @@ class BaseCRUDResourceList(Resource):
         super().__init__()
 
     @classmethod
-    def get(cls, **kwargs):
+    def get(cls, *args, **kwargs):
         try: 
             objs = cls.model.find_all(**cls.model_args)
             _observable = getattr(cls, 'observable', None)
@@ -152,7 +152,7 @@ class BaseCRUDResourceList(Resource):
             return [], 200
   
     @classmethod  
-    def post(cls):
+    def post(cls, *args, **kwargs):
         try: 
             req = request.get_json()
             objs = cls.schema.load(req)
