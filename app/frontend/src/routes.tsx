@@ -1,12 +1,12 @@
 import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 
-import RatingWorkbench from "@/pages/RatingWorkbench";
+import { ConfigProductDetail } from "./pages/ConfigProduct";
 
 export const routes = [
   {
-    key: "RatingWorkbench",
-    path: "/app/plan/:plan_id/rating/workbench",
-    element: <RatingWorkbench />,
+    key: "ConfigProductDetail",
+    path: "/app/config/product/:product_id",
+    element: <ConfigProductDetail />,
   },
 ];

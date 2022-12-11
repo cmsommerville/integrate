@@ -237,7 +237,7 @@ const MainLayout = (props: any) => {
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col xl:pl-64">
+        <div className="flex flex-1 flex-col xl:pl-64 h-screen">
           <div className="flex h-16 flex-shrink-0 border-b border-gray-200 bg-white">
             <button
               type="button"
@@ -357,7 +357,7 @@ const MainLayout = (props: any) => {
               </div>
             </div>
           </div>
-          <main className="flex-1 p-4">{props.children}</main>
+          <main className="flex-1 bg-gray-100 p-6">{props.children}</main>
         </div>
       </div>
     </>
