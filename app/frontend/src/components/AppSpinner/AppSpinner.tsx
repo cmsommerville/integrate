@@ -6,7 +6,7 @@ interface SpinnerProps extends React.ComponentProps<"div"> {}
 
 const AppSpinner = (props: SpinnerProps) => {
   return (
-    <div role="status" className="pl-2">
+    <div role="status" className="pl-1">
       <svg
         className={classNames(
           "inline mr-2 w-6 h-6 text-gray-200 animate-spin fill-primary-500",

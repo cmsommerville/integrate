@@ -8,7 +8,8 @@ from . import Config_AgeBand, Config_AgeDistribution, Config_AgeMapper, \
     Ref_AttrMapperType, Ref_Benefit,Ref_CensusStrategy, Ref_ComparisonOperator, Ref_DataTypes, \
     Ref_InputType, Ref_Optionality, Ref_PremiumFrequency, Ref_ProductVariation,Ref_Provision, \
     Ref_RatingStrategy, Ref_States, Ref_UnitType, \
-    Selection_AgeBand, Selection_Benefit, Selection_BenefitDuration, Selection_Plan, Selection_Provision
+    Selection_AgeBand, Selection_Benefit, Selection_BenefitDuration, Selection_Plan, Selection_Provision, \
+    Selection_BenefitRateTable
 
 
 def load_refdata(hostname: str, *args, **kwargs):
@@ -69,3 +70,4 @@ def load_selection(hostname: str, *args, **kwargs):
     Selection_BenefitDuration.load(hostname, **kwargs)
     Selection_Provision.load(hostname, **kwargs)
     Selection_AgeBand.load(hostname, **kwargs)
+    Selection_BenefitRateTable.load(hostname, **kwargs)
