@@ -11,4 +11,4 @@ class Schema_ConfigProductState(BaseSchema):
         include_relationships=True
         include_fk=True
 
-    state = ma.Nested(Schema_RefStates(exclude=('svg_path',)))
+    state = ma.Nested(Schema_RefStates(exclude=('svg_path',)), dump_only=True)

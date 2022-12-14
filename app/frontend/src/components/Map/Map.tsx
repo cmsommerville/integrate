@@ -18,10 +18,12 @@ interface Coordinates {
 interface Props extends React.ComponentPropsWithRef<"div"> {
   disabled?: StateSVG[];
   fill?: FillInterface;
+  multiple?: boolean;
+  onClickState?: (selectedStates: StateSVG[]) => any;
   tooltip?: (hoverState: StateSVG) => JSX.Element;
 }
 
-const Map = ({ disabled, fill, ...props }: Props) => {
+const Map = ({ disabled, fill, multiple, onClickState, ...props }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const [states, setStates] = useState<StateSVG[]>([]);
   const [hoverState, setHoverState] = useState<StateSVG | undefined>();
@@ -38,18 +40,25 @@ const Map = ({ disabled, fill, ...props }: Props) => {
         const isDisabled = disabled.findIndex(
           (st) => st.state_id === state.state_id
         );
-        if (isDisabled > -1) return "fill-primary-900 cursor-not-allowed";
+        if (isDisabled > -1)
+          return `${
+            fill && fill.disabled ? fill.disabled : "fill-gray-200"
+          } stroke-primary-200 cursor-not-allowed`;
       }
 
       // check if state is selected
       const isSelected = localSelected.findIndex(
         (st) => st.state_id === state.state_id
       );
-      if (isSelected > -1)
-        return "fill-primary-300 hover:fill-primary-500 cursor-pointer";
-
+      if (isSelected > -1) {
+        return `${
+          fill && fill.selected ? fill.selected : "fill-primary-400"
+        } hover:fill-primary-500 cursor-pointer`;
+      }
       // return fallback
-      return "fill-gray-300 hover:fill-primary-500 cursor-pointer";
+      return `${
+        fill && fill.default ? fill.default : "fill-gray-300"
+      } hover:fill-primary-500 cursor-pointer`;
     },
     [localSelected, disabled]
   );
@@ -64,18 +73,18 @@ const Map = ({ disabled, fill, ...props }: Props) => {
       if (!div) return;
 
       // switch the tooltip from the right to left if approaching right edge of div
-      if (ev.nativeEvent.offsetX > div.offsetWidth - 250) {
-        c.right = `${div.offsetWidth - ev.nativeEvent.offsetX - 30}px`;
-      } else {
-        c.left = `${ev.nativeEvent.offsetX + 20}px`;
-      }
+      // if (ev.nativeEvent.offsetX > div.offsetWidth / 2) {
+      //   c.right = `${div.offsetWidth - ev.nativeEvent.offsetX - 30}px`;
+      // } else {
+      c.left = `${ev.nativeEvent.offsetX + 20}px`;
+      // }
 
       // switch the tooltip from the bottom to top if approaching bottom edge
-      if (ev.nativeEvent.offsetY > div.offsetHeight - 50) {
-        c.bottom = `${div.offsetHeight - ev.nativeEvent.offsetY}px`;
-      } else {
-        c.top = `${ev.nativeEvent.offsetY}px`;
-      }
+      // if (ev.nativeEvent.offsetY > div.offsetHeight / 2) {
+      //   c.bottom = `${div.offsetHeight - ev.nativeEvent.offsetY}px`;
+      // } else {
+      c.top = `${ev.nativeEvent.offsetY}px`;
+      // }
       setCoords(c);
     },
     []
@@ -92,8 +101,11 @@ const Map = ({ disabled, fill, ...props }: Props) => {
     setHoverState(undefined);
   }, [setHoverState]);
 
-  const onClickState = useCallback(
+  const _onClickState = useCallback(
     (state: StateSVG) => {
+      if (!multiple) {
+        setLocalSelected([]);
+      }
       const isSelected = localSelected.findIndex(
         (st) => st.state_id === state.state_id
       );
@@ -108,6 +120,13 @@ const Map = ({ disabled, fill, ...props }: Props) => {
     },
     [localSelected]
   );
+
+  useEffect(() => {
+    // callback to send local selections back to parent
+    if (onClickState) {
+      onClickState(localSelected);
+    }
+  }, [onClickState, localSelected]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -167,7 +186,7 @@ const Map = ({ disabled, fill, ...props }: Props) => {
             preserveAspectRatio="xMinYMin meet"
             x="0px"
             y="0px"
-            viewBox="110 100 1000 600"
+            viewBox="160 100 950 600"
             enableBackground="new 0 0 959 593"
             xmlSpace="preserve"
           >
@@ -186,11 +205,14 @@ const Map = ({ disabled, fill, ...props }: Props) => {
               {_states.map((state) => {
                 return (
                   <path
-                    className={fillHandler(state)}
+                    className={classNames(
+                      "transition duration-300 ease",
+                      fillHandler(state)
+                    )}
                     key={state.state_code}
                     id={state.state_code}
                     d={state.svg_path}
-                    onClick={() => onClickState(state)}
+                    onClick={() => _onClickState(state)}
                     onMouseLeave={onMouseLeaveState}
                     onMouseOver={() => onMouseOverState(state)}
                     onMouseMove={setTooltipCoordinates}
@@ -207,13 +229,16 @@ const Map = ({ disabled, fill, ...props }: Props) => {
                     />
                     <circle
                       id="circleDC"
-                      className={fillHandler(dist)}
+                      className={classNames(
+                        "transition duration-300 ease",
+                        fillHandler(dist)
+                      )}
                       stroke={dist.stroke}
                       strokeWidth={dist.strokeWidth}
                       cx={dist.cx}
                       cy={dist.cy}
                       r={dist.r}
-                      onClick={() => onClickState(dist)}
+                      onClick={() => _onClickState(dist)}
                       onMouseLeave={onMouseLeaveState}
                       onMouseOver={() => onMouseOverState(dist)}
                     />
@@ -242,5 +267,9 @@ const Map = ({ disabled, fill, ...props }: Props) => {
     </>
   );
 };
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export default Map;

@@ -1,1 +1,1 @@
-export {default as ConfigProductState} from './ConfigProductState'
+export {default as ConfigProductStateDetail} from './ConfigProductStateDetail'

@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route, Link } from "react-router-dom";
 
 import { ConfigProductDetail } from "./pages/ConfigProduct";
-import { ConfigProductState } from "./pages/ConfigProductState";
+import { ConfigProductStateDetail } from "./pages/ConfigProductState";
 
 export const routes = [
   {
@@ -13,6 +13,6 @@ export const routes = [
   {
     key: "ConfigProductState",
     path: "/app/config/product/:product_id/states",
-    element: <ConfigProductState />,
+    element: <ConfigProductStateDetail />,
   },
 ];
