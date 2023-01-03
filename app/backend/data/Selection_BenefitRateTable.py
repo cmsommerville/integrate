@@ -10,7 +10,7 @@ def PLAN():
 
 def load(hostname: str, *args, **kwargs) -> None:
     plan = PLAN()
-    url = urljoin(hostname, f'api/crud/selection/rate-table/{plan.selection_plan_id}')
+    url = urljoin(hostname, f'api/selection/rate-table/{plan.selection_plan_id}')
     res = requests.post(url)
     if not res.ok: 
         raise Exception(res.text)

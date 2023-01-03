@@ -89,3 +89,8 @@ class Model_ConfigBenefit(BaseModel):
     @hybrid_property
     def default_value(self):
         return next((x.default_value for x in self.benefit_auth), None)
+
+    @classmethod
+    def find_by_product(cls, id: int):
+        return cls.query.filter(cls.config_product_id == id).all()
+

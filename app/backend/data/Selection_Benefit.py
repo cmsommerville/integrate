@@ -27,7 +27,7 @@ def DATA_SELECTION_BENEFITS():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/selection/benefit-list')
+    url = urljoin(hostname, 'api/selection/benefit-list')
     res = requests.post(url, json=DATA_SELECTION_BENEFITS())
     if not res.ok: 
         raise Exception(res.text)

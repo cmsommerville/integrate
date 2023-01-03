@@ -121,19 +121,19 @@ DATA_NO_JOINS = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/attribute-set-gender-list')
+    url = urljoin(hostname, 'api/config/attribute/sets/gender')
     res = requests.post(url, json=DATA_GENDER)
     if not res.ok: 
         raise Exception(res.text)
-    url = urljoin(hostname, 'api/crud/config/attribute-set-smoker-status-list')
+    url = urljoin(hostname, 'api/config/attribute/sets/smoker_status')
     res = requests.post(url, json=DATA_SMOKER_STATUS)
     if not res.ok: 
         raise Exception(res.text)
-    url = urljoin(hostname, 'api/crud/config/attribute-set-relationship-list')
+    url = urljoin(hostname, 'api/config/attribute/sets/relationship')
     res = requests.post(url, json=DATA_RELATIONSHIP)
     if not res.ok: 
         raise Exception(res.text)
-    url = urljoin(hostname, 'api/crud/config/attribute-set-list')
+    url = urljoin(hostname, 'api/config/attribute/sets/__nojoin__')
     res = requests.post(url, json=DATA_NO_JOINS)
     if not res.ok: 
         raise Exception(res.text)

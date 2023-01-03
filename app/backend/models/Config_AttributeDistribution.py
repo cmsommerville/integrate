@@ -17,3 +17,5 @@ class Model_ConfigAttributeDistribution(BaseModel):
     config_attr_distribution_set_id = db.Column(db.ForeignKey(f"{CONFIG_ATTRIBUTE_DISTRIBUTION_SET}.config_attr_distribution_set_id", onupdate="CASCADE", ondelete="CASCADE"))
     config_attr_detail_id = db.Column(db.ForeignKey(f"{CONFIG_ATTRIBUTE_DETAIL}.config_attr_detail_id"))
     weight = db.Column(db.Numeric(12,5), nullable=False)
+ 
+    attr_detail = db.relationship("Model_ConfigAttributeDetail")

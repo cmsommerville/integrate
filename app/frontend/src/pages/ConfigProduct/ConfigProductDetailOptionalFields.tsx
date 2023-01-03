@@ -1,9 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import moment from "moment";
-import { Product } from "./types";
+import { ConfigProduct } from "./types";
 
 type Props = {
-  product: Product;
+  product: ConfigProduct;
   onChange(key: string, val: string): void;
 };
 

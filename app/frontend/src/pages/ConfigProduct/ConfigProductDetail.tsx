@@ -1,30 +1,60 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams } from "react-router";
 import moment from "moment";
 import { BriefcaseIcon, PuzzlePieceIcon } from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
+import AppSnackbar from "@/components/AppSnackbar";
 import AppButton from "@/components/AppButton";
 import ConfigProductDetailBasicInfo from "./ConfigProductDetailBasicInfo";
 import ConfigProductDetailOptionalFields from "./ConfigProductDetailOptionalFields";
-import { Product } from "./types";
+import { ConfigProduct } from "./types";
+import { Breadcrumb, PageTitle } from "./Components";
 
 const ConfigProductDetail = () => {
   const { product_id } = useParams();
+  const ref: any = useRef(null);
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isValid, setIsValid] = useState(true);
+  const [isDirty, setIsDirty] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [product, setProduct] = useState<Product>(DEFAULT_CONFIG_PRODUCT);
-  const [isSaving, setIsSaving] = useState(false);
+  const [product, setProduct] = useState<ConfigProduct>(DEFAULT_CONFIG_PRODUCT);
 
   const productSetter = useCallback(
-    (key: keyof Product, val: number | string | null | undefined) => {
+    (key: keyof ConfigProduct, val: number | string | null | undefined) => {
       setProduct((old) => ({ ...old, [key]: val }));
     },
     [setProduct]
   );
 
+  const title = useCallback(
+    (isNew: boolean) => {
+      return isNew ? "Create New Product" : "Configure the Product";
+    },
+    [product_id]
+  );
+
+  const subtitle = useCallback(
+    (isNew: boolean) => {
+      return "Enter the basics, then add optional fields.";
+    },
+    [product_id]
+  );
+
+  const showSnackbar = () => {
+    if (!ref || !ref.current) return;
+    const { clickHandler } = ref.current;
+    clickHandler();
+  };
+
   const clickHandler = () => {
     setIsSaving(true);
+    if (!isDirty) {
+      return;
+    }
+
     fetch(`/api/config/product/${product_id}`, {
       method: "POST",
       headers: {
@@ -79,16 +109,19 @@ const ConfigProductDetail = () => {
 
   return (
     <>
-      <div className="flex justify-between pb-6">
-        <div className="">
-          <h2 className="text-2xl font-light tracking-wide text-gray-700">
-            Configure the Product
-          </h2>
-          <p className="text-sm text-gray-400">
-            Enter the basics, then add optional fields.
-          </p>
-        </div>
-      </div>
+      <AppSnackbar ref={ref} message={"This is a test"}></AppSnackbar>
+      <PageTitle title={title(!product_id)} subtitle={subtitle(!product_id)}>
+        <>
+          <AppButton onClick={showSnackbar}>Click</AppButton>
+          <AppButton
+            disabled={!isValid}
+            isLoading={isSaving}
+            onClick={clickHandler}
+          >
+            Next
+          </AppButton>
+        </>
+      </PageTitle>
       <div className="grid grid-cols-6 gap-x-6">
         <div className="col-span-4 flex flex-col space-y-4">
           <AppPanel className="pb-16 pt-2 h-fit">
@@ -128,12 +161,9 @@ const ConfigProductDetail = () => {
               {tabComponentPicker(selectedTab, product, productSetter)}
             </>
           </AppPanel>
-
-          <div className="flex justify-end items-end">
-            <AppButton isLoading={isSaving} onClick={clickHandler}>
-              Save
-            </AppButton>
-          </div>
+        </div>
+        <div className="col-span-2 flex flex-col items-end">
+          <Breadcrumb step="basic-info" />
         </div>
       </div>
     </>
@@ -159,8 +189,11 @@ const tabs = [
 
 const tabComponentPicker = (
   selectedTab: number,
-  product: Product,
-  setter: (key: keyof Product, val: number | string | null | undefined) => void
+  product: ConfigProduct,
+  setter: (
+    key: keyof ConfigProduct,
+    val: number | string | null | undefined
+  ) => void
 ) => {
   switch (tabs[selectedTab].code) {
     case "basic":

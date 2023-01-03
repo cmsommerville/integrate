@@ -32,8 +32,12 @@ class Model_ConfigAttributeSet_SmokerStatus(Model_ConfigAttributeSet):
         'polymorphic_identity': 'smoker_status'
     }
 
-
 class Model_ConfigAttributeSet_Relationship(Model_ConfigAttributeSet):
     __mapper_args__ = {
         'polymorphic_identity': 'relationship'
+    }
+
+class Model_ConfigAttributeSet_NoJoin(Model_ConfigAttributeSet):
+    __mapper_args__ = {
+        'polymorphic_identity': '__nojoin__'
     }

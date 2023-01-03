@@ -17,7 +17,7 @@ DATA_PRODUCT_VARIATION = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/product-variation-list')
+    url = urljoin(hostname, 'api/ref/product-variations')
     res = requests.post(url, json=DATA_PRODUCT_VARIATION)
     if not res.ok: 
         raise Exception(res.text)

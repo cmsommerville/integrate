@@ -42,7 +42,7 @@ class CRUD_ConfigRateGroupFaceAmounts_List(BaseCRUDResourceList):
     schema = Schema_ConfigRateGroupFaceAmounts(many=True)
 
     @classmethod
-    def post(cls):
+    def post(cls, *args, **kwargs):
         try: 
             data = request.get_json()
             dict_face_amounts = face_amount_handler(data)

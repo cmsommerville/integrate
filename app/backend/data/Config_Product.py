@@ -64,7 +64,7 @@ def DATA_PRODUCT():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/product-list')
+    url = urljoin(hostname, 'api/config/products')
     res = requests.post(url, json=DATA_PRODUCT())
     if not res.ok: 
         raise Exception(res.text)

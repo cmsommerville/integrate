@@ -1,1 +1,1 @@
-from .namespaces import ns_crud, ns_dd, ns_getters
+from .namespaces import NAMESPACES

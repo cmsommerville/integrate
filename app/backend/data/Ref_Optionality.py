@@ -22,7 +22,7 @@ DATA_OPTIONALITY = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/optionality-list')
+    url = urljoin(hostname, 'api/ref/optionalities')
     res = requests.post(url, json=DATA_OPTIONALITY, **kwargs)
     if not res.ok: 
         raise Exception(res.text)

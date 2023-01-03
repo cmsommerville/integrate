@@ -1,18 +1,44 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { RouteObject, createBrowserRouter } from "react-router-dom";
 
-import { ConfigProductDetail } from "./pages/ConfigProduct";
+import {
+  ConfigProductDetail,
+  ConfigProductDetailRatingAttributes,
+  ConfigProductDetailRatingDistributions,
+  ConfigProductDetailRatingStrategy,
+} from "./pages/ConfigProduct";
 import { ConfigProductStateDetail } from "./pages/ConfigProductState";
 
-export const routes = [
+interface AppRouteObject extends RouteObject {
+  props?: any;
+  children?: AppRouteObject[];
+}
+
+export const routes: AppRouteObject[] = [
   {
-    key: "ConfigProductDetail",
+    path: "/app/config/product",
+    element: <ConfigProductDetail />,
+  },
+  {
     path: "/app/config/product/:product_id",
     element: <ConfigProductDetail />,
   },
   {
-    key: "ConfigProductState",
+    path: "app/config/product/:product_id/rating/attrs",
+    element: <ConfigProductDetailRatingAttributes />,
+  },
+  {
+    path: "app/config/product/:product_id/rating/dists",
+    element: <ConfigProductDetailRatingDistributions />,
+  },
+  {
+    path: "app/config/product/:product_id/rating/strategy",
+    element: <ConfigProductDetailRatingStrategy />,
+  },
+  {
     path: "/app/config/product/:product_id/states",
     element: <ConfigProductStateDetail />,
   },
 ];
+
+export const router = createBrowserRouter(routes);

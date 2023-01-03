@@ -160,7 +160,7 @@ REF_STATES = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/state-list')
+    url = urljoin(hostname, 'api/ref/states')
     res = requests.post(url, json=REF_STATES)
     if not res.ok: 
         raise Exception(res.text)

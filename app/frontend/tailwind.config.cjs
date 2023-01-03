@@ -11,8 +11,9 @@ module.exports = {
       colors: {
         primary: colors.indigo,
         accent: colors.lime,
+        warning: colors.amber,
       },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/line-clamp")],
 };

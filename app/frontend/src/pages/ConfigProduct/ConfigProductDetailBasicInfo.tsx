@@ -1,9 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
-import moment from "moment";
-import { Product } from "./types";
+import { ConfigProduct } from "./types";
 
 type Props = {
-  product: Product;
+  product: ConfigProduct;
   onChange(key: string, val: string): void;
 };
 
@@ -11,7 +9,7 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const ConfigProductDetailOptionalFields = ({
+const ConfigProductDetailBasicInfo = ({
   product,
   onChange,
   ...props
@@ -106,4 +104,4 @@ const ConfigProductDetailOptionalFields = ({
   );
 };
 
-export default ConfigProductDetailOptionalFields;
+export default ConfigProductDetailBasicInfo;

@@ -36,6 +36,12 @@ class Model_ConfigProvision(BaseModel):
         'polymorphic_on': config_provision_type_code,
         'polymorphic_identity': '__default__'
     }
+    
+    @classmethod
+    def find_by_product(cls, id: int):
+        return cls.query.filter(cls.config_product_id == id).all()
+
+
 
 
 class Model_ConfigProvision_Product(Model_ConfigProvision):

@@ -1,6 +1,13 @@
 import requests
 from requests.compat import urljoin
-from  ..models import Model_ConfigRateGroup, Model_ConfigAttributeDetail
+from  ..models import Model_ConfigProduct, Model_ConfigRateGroup, Model_ConfigAttributeDetail
+
+
+def PRODUCT_ID(): 
+    return Model_ConfigProduct.find_one_by_attr({
+            "config_product_code": "CI21000"
+        }).config_product_id
+
 
 def DATA_FACE_AMOUNTS(): 
     return {
@@ -187,7 +194,8 @@ def DATA_FACE_AMOUNTS():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/rate-group-face-amounts-list')
+    product_id = PRODUCT_ID()
+    url = urljoin(hostname, f'api/config/product/{product_id}/rate-group/face-amounts')
     res = requests.post(url, json=DATA_FACE_AMOUNTS())
     if not res.ok: 
         raise Exception(res.text)

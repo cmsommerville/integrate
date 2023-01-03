@@ -7,5 +7,12 @@ def bind_namespaces(api: Api, namespaces: List[Namespace], prefix: str = None) -
     Binds a list of API routes to the API object
     """
     for ns in namespaces: 
-        api.add_namespace(ns, path=prefix)
+        namespace = ns['namespace']
+        ns_path = ns.get('path')
+        if ns_path.startswith("/"):
+            ns_path = ns_path[1:]
+        
+        if ns_path.endswith("/"): 
+            ns_path = ns_path[:-1]
+        api.add_namespace(namespace, path=f"{prefix}/{ns_path}")
 

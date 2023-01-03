@@ -3,14 +3,17 @@ import json
 from requests.compat import urljoin
 from  ..models import Model_ConfigBenefit, Model_RefBenefit
 
-def DATA_BENEFIT_DURATION():
-    return [
-    {
-        'config_benefit_id': Model_ConfigBenefit.find_one_by_attr({
+def BENEFIT_ID(): 
+    return Model_ConfigBenefit.find_one_by_attr({
             "ref_benefit_id": Model_RefBenefit.find_one_by_attr({
                 "ref_attr_code": "skin_cancer"
             }).ref_id
-        }).config_benefit_id, 
+        }).config_benefit_id
+
+def DATA_BENEFIT_DURATION(benefit_id: int):
+    return [
+    {
+        'config_benefit_id': benefit_id, 
         'config_benefit_duration_set_code': 'annual_payments', 
         'config_benefit_duration_set_label': "Number of Payments per Year", 
         "duration_items": [
@@ -70,8 +73,9 @@ def DATA_BENEFIT_DURATION():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/benefit-duration-set-list')
-    d = DATA_BENEFIT_DURATION()
+    benefit_id = BENEFIT_ID()
+    url = urljoin(hostname, f'api/config/benefit/{benefit_id}/duration/sets')
+    d = DATA_BENEFIT_DURATION(benefit_id)
     res = requests.post(url, json=d, **kwargs)
     data = res.json()
     if not res.ok: 
@@ -79,7 +83,7 @@ def load(hostname: str, *args, **kwargs) -> None:
 
     for item in data:
         config_benefit_duration_set_id = item['config_benefit_duration_set_id']
-        url = urljoin(hostname, f'api/crud/config/benefit-duration-set/{config_benefit_duration_set_id}')
+        url = urljoin(hostname, f'api/config/benefit/{benefit_id}/duration/set/{config_benefit_duration_set_id}')
         default_item = item.get('duration_items')[-1]
         default_id = default_item.get('config_benefit_duration_detail_id')
         res = requests.patch(url, json={'default_config_benefit_duration_detail_id': default_id}, **kwargs)

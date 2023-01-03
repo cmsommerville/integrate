@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
 
-import { routes } from "./routes";
+import { router } from "./routes";
 
 const App = () => {
   return (
     <MainLayout>
-      <Routes>
-        {routes.map((route_config) => {
-          return React.createElement(Route, route_config);
-        })}
-      </Routes>
+      <RouterProvider router={router} />
     </MainLayout>
   );
 };

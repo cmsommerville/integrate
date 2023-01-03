@@ -3,7 +3,13 @@ from requests.compat import urljoin
 from  ..models import Model_ConfigProduct, Model_ConfigBenefitProductVariation, \
     Model_ConfigBenefit, Model_ConfigProductVariation, Model_RefOptionality
 
-def DATA_BENEFIT_COVARIANCE():
+
+def PRODUCT_ID(): 
+    return Model_ConfigProduct.find_one_by_attr({
+            "config_product_code": "CI21000"
+        }).config_product_id
+
+def DATA_BENEFIT_COVARIANCE(product_id: int):
     return [
     {
         'config_benefit_product_variation_id': Model_ConfigBenefitProductVariation.find_one_by_attr({
@@ -14,9 +20,7 @@ def DATA_BENEFIT_COVARIANCE():
                 'config_product_variation_version_code': 'std_issue_age'
             }).config_product_variation_id
         }).config_benefit_product_variation_id, 
-        'config_product_id': Model_ConfigProduct.find_one_by_attr({
-            "config_product_code": "CI21000"
-        }).config_product_id, 
+        'config_product_id': product_id, 
         'ref_optionality_id': Model_RefOptionality.find_one_by_attr({
             "ref_attr_code": "required"
         }).ref_id, 
@@ -47,9 +51,7 @@ def DATA_BENEFIT_COVARIANCE():
                 'config_product_variation_version_code': 'std_issue_age'
             }).config_product_variation_id
         }).config_benefit_product_variation_id, 
-        'config_product_id': Model_ConfigProduct.find_one_by_attr({
-            "config_product_code": "CI21000"
-        }).config_product_id, 
+        'config_product_id': product_id, 
         'ref_optionality_id': Model_RefOptionality.find_one_by_attr({
             "ref_attr_code": "required"
         }).ref_id, 
@@ -73,7 +75,8 @@ def DATA_BENEFIT_COVARIANCE():
 ]
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/benefit-covariance-set-list')
-    res = requests.post(url, json=DATA_BENEFIT_COVARIANCE(), **kwargs)
+    product_id = PRODUCT_ID()
+    url = urljoin(hostname, f'api/config/product/{product_id}/benefit-covariance/sets')
+    res = requests.post(url, json=DATA_BENEFIT_COVARIANCE(product_id), **kwargs)
     if not res.ok: 
         raise Exception(res.text)

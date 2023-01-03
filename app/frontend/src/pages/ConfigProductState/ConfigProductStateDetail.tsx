@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { useParams } from "react-router";
 import moment from "moment";
 
@@ -44,11 +44,13 @@ const ConfigProductStateMapTooltip = ({
 };
 
 const ConfigProductState = () => {
+  const refState = useRef(null);
   const { product_id } = useParams();
 
   const [selectedState, setSelectedState] = useState<ConfigProductStateType>(
     DEFAULT_CONFIG_PRODUCT_STATE
   );
+  const [selectedStateBBox, setSelectedStateBBox] = useState("0 0 0 0");
   const [productStateList, setProductStateList] = useState<
     ConfigProductStateType[]
   >([]);
@@ -83,7 +85,7 @@ const ConfigProductState = () => {
         });
       }
     },
-    [productStateList]
+    [productStateList, refState]
   );
 
   const clickHandler = () => {
@@ -143,6 +145,15 @@ const ConfigProductState = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const svgpath = refState.current as SVGGraphicsElement | null;
+    if (svgpath) {
+      const { x, y, width, height } = svgpath.getBBox();
+      console.log(svgpath.getBBox());
+      setSelectedStateBBox(`${x} ${y} ${width} ${height}`);
+    }
+  }, [refState, selectedState]);
+
   const Tooltip = (hoverState: StateSVG) => {
     return (
       <ConfigProductStateMapTooltip
@@ -181,7 +192,33 @@ const ConfigProductState = () => {
             <form className="">
               <div className="flex justify-center border-b border-gray-200 pb-4 mb-6">
                 <h3 className="tracking-wide font-light">
-                  {selectedState.state.state_name}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                    version="1.1"
+                    id="us-map"
+                    preserveAspectRatio="xMinYMin meet"
+                    x="0px"
+                    y="0px"
+                    width="100px"
+                    height="100px"
+                    viewBox={selectedStateBBox}
+                    xmlSpace="preserve"
+                  >
+                    <g ref={refState}>
+                      <path
+                        className={classNames(
+                          "transition duration-300 ease",
+                          "fill-gray-200"
+                        )}
+                        id="selected-state"
+                        d={selectedState.state.svg_path}
+                      />
+                    </g>
+                  </svg>
+                  {selectedState.state.state_name
+                    ? selectedState.state.state_name
+                    : "Select a state"}
                 </h3>
               </div>
               <div className="flex flex-col space-y-8">

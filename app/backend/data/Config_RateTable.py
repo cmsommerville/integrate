@@ -2,8 +2,14 @@ import numpy as np
 import requests
 from requests.compat import urljoin
 from itertools import product
-from  ..models import Model_ConfigBenefitProductVariation, Model_ConfigAttributeSet_Gender, \
+from  ..models import Model_ConfigProduct, Model_ConfigBenefitProductVariation, Model_ConfigAttributeSet_Gender, \
     Model_ConfigAttributeSet_Relationship, Model_ConfigAttributeSet_SmokerStatus
+
+
+def PRODUCT_ID(): 
+    return Model_ConfigProduct.find_one_by_attr({
+            "config_product_code": "CI21000"
+        }).config_product_id
 
 
 def GENDERS(composite: bool):
@@ -54,7 +60,8 @@ def DATA_RATE_TABLE():
     
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/rate-table-list')
+    product_id = PRODUCT_ID()
+    url = urljoin(hostname, f'api/config/product/{product_id}/rate-tables')
     res = requests.post(url, json=DATA_RATE_TABLE())
     if not res.ok: 
         raise Exception(res.text)

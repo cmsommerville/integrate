@@ -18,7 +18,7 @@ const AppButton = ({ children, isLoading, ...props }: ButtonProps) => {
       className={classNames(
         "bg-primary-600 px-8 py-2 rounded-lg text-white transition duration-300 ease",
         "hover:ring-2 hover:ring-offset-2 hover:ring-primary-600",
-        "disabled:bg-gray-600 disabled:ring-gray-600",
+        "disabled:bg-gray-600 disabled:ring-0",
         props.className
       )}
     >

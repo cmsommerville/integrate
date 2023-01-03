@@ -20,7 +20,7 @@ DATA_DATA_TYPES = [
 ]
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/data-type-list')
+    url = urljoin(hostname, 'api/ref/data-types')
     res = requests.post(url, json=DATA_DATA_TYPES)
     if not res.ok: 
         raise Exception(res.text)

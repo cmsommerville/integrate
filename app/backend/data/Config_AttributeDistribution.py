@@ -68,12 +68,12 @@ def DATA_SMOKER_DIST():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/attribute-distribution-set-gender-list')
+    url = urljoin(hostname, 'api/config/attribute-distribution/sets/gender')
     res = requests.post(url, json=DATA_GENDER_DIST(), **kwargs)
     if not res.ok: 
         raise Exception(res.text)
 
-    url = urljoin(hostname, 'api/crud/config/attribute-distribution-set-smoker-status-list')
+    url = urljoin(hostname, 'api/config/attribute-distribution/sets/smoker_status')
     res = requests.post(url, json=DATA_SMOKER_DIST(), **kwargs)
     if not res.ok: 
         raise Exception(res.text)

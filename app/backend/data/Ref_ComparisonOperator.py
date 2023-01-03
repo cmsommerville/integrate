@@ -42,7 +42,7 @@ DATA_COMPARISON_OPERATOR = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/comparison-operator-list')
+    url = urljoin(hostname, 'api/ref/comparison-operators')
     res = requests.post(url, json=DATA_COMPARISON_OPERATOR)
     if not res.ok: 
         raise Exception(res.text)

@@ -19,7 +19,7 @@ class CRUD_ConfigProvisionUI(BaseCRUDResource):
     schema = Schema_ConfigProvisionUI()
 
     @classmethod
-    def post(cls):
+    def post(cls, *args, **kwargs):
         data = request.get_json()
         try: 
             model, schema = discriminator(data)
@@ -41,7 +41,7 @@ class CRUD_ConfigProvisionUI_List(BaseCRUDResourceList):
     schema = Schema_ConfigProvisionUI(many=True)
 
     @classmethod
-    def post(cls):
+    def post(cls, *args, **kwargs):
         data = request.get_json()
         try: 
             for item in data: 

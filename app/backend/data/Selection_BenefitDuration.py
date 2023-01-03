@@ -38,7 +38,7 @@ def DATA_SELECTION_BENEFIT_DURATIONS():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/selection/benefit-duration-list')
+    url = urljoin(hostname, 'api/selection/benefit-duration-list')
     res = requests.post(url, json=DATA_SELECTION_BENEFIT_DURATIONS())
     if not res.ok: 
         raise Exception(res.text)

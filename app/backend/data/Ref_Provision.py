@@ -21,7 +21,7 @@ DATA_PROVISION = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/provision-list')
+    url = urljoin(hostname, 'api/ref/provisions')
     res = requests.post(url, json=DATA_PROVISION)
     if not res.ok: 
         raise Exception(res.text)

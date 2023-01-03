@@ -67,7 +67,7 @@ DATA_BENEFIT = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/benefit-list')
+    url = urljoin(hostname, 'api/ref/benefits')
     res = requests.post(url, json=DATA_BENEFIT)
     if not res.ok: 
         raise Exception(res.text)

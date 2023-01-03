@@ -31,7 +31,7 @@ DATA_PREMIUM_FREQUENCIES = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/ref/premium-frequency-list')
+    url = urljoin(hostname, 'api/ref/premium-frequencies')
     res = requests.post(url, json=DATA_PREMIUM_FREQUENCIES)
     if not res.ok: 
         raise Exception(res.text)

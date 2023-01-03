@@ -1,8 +1,11 @@
 import requests
 from requests.compat import urljoin
-from  ..models import Model_ConfigProvision, Model_ConfigProvisionUI_Input, Model_ConfigProvisionUI_Checkbox, \
-    Model_ConfigProvisionUI_Select, Model_ConfigProvisionUI_SelectItem, Model_RefProvision, \
-    Model_RefInputTypes
+from  ..models import Model_ConfigProvision, Model_ConfigProduct, Model_RefProvision, Model_RefInputTypes
+
+def PRODUCT_ID():
+    return Model_ConfigProduct.find_one_by_attr({
+        "config_product_code": "CI21000"
+    }).config_product_id
 
 def DATA_PROVISION_UI(): 
     return [
@@ -39,7 +42,8 @@ def DATA_PROVISION_UI():
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, 'api/crud/config/provision-ui-list')
+    product_id = PRODUCT_ID()
+    url = urljoin(hostname, f'api/config/product/{product_id}/provision/ui-components')
     res = requests.post(url, json=DATA_PROVISION_UI())
     if not res.ok: 
         raise Exception(res.text)
