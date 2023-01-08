@@ -25,8 +25,8 @@ class Model_ConfigProduct(BaseModel):
     product_issue_date = db.Column(db.Date)
     master_product_code = db.Column(db.String(30))
     form_code = db.Column(db.String(30))
-    min_issue_age = db.Column(db.Integer, nullable=False)
-    max_issue_age = db.Column(db.Integer, nullable=False)
+    min_issue_age = db.Column(db.Integer, default=0)
+    max_issue_age = db.Column(db.Integer, default=999)
 
     smoker_status_distribution_set_id = db.Column(db.ForeignKey(F'{CONFIG_ATTRIBUTE_DISTRIBUTION_SET}.config_attr_distribution_set_id'), 
         comment="Default distribution of smokers")
@@ -50,10 +50,10 @@ class Model_ConfigProduct(BaseModel):
     relationship_attr_set_id = db.Column(db.ForeignKey(F'{CONFIG_ATTRIBUTE_SET}.config_attr_set_id'), 
         comment="Specifies which relationship attributes are used with this product")
         
-    allow_employer_paid = db.Column(db.Boolean, nullable=False)
-    voluntary_census_strategy_id = db.Column(db.ForeignKey(F"{REF_MASTER}.ref_id"), nullable=False, 
+    allow_employer_paid = db.Column(db.Boolean, default=False)
+    voluntary_census_strategy_id = db.Column(db.ForeignKey(F"{REF_MASTER}.ref_id"), 
         comment="Indicates a specific strategy for handling custom censuses for voluntary quotes")
-    employer_paid_census_strategy_id = db.Column(db.ForeignKey(F"{REF_MASTER}.ref_id"), nullable=False, 
+    employer_paid_census_strategy_id = db.Column(db.ForeignKey(F"{REF_MASTER}.ref_id"), 
         comment="Indicates a specific strategy for handling custom censuses for employer paid quotes")
 
 

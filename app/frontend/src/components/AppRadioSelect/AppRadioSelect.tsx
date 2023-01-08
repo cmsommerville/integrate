@@ -41,7 +41,7 @@ const AppRadioSelect = ({
   onClick,
   ...props
 }: Props) => {
-  const [selection, setSelection] = useState<string | number | undefined>();
+  const [selection, setSelection] = useState<string | number | undefined>(-1);
 
   const { _id, _label } = useMemo(() => {
     let _id, _label;
@@ -78,16 +78,26 @@ const AppRadioSelect = ({
     [onClick, _id]
   );
 
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+    setSelection(defaultValue);
+  }, [items, defaultValue]);
+
+  const _items = useMemo(() => {
+    return [
+      {
+        [_id]: -1,
+        [_label]: "Select an option",
+        hidden: true,
+      },
+      ...items,
+    ];
+  }, [items, _id, _label]);
+
   const selectionItem = useMemo(() => {
     if (!selection) return {};
-    return items.find((item) => item[_id] === selection);
-  }, [selection, _id, items]);
-
-  useEffect(() => {
-    if (selection != null) return;
-    if (!defaultValue) return;
-    setSelection(defaultValue);
-  }, [selection, defaultValue]);
+    return _items.find((item) => item[_id] === selection);
+  }, [selection, _id, _items]);
 
   return (
     <fieldset name={group}>
@@ -97,7 +107,7 @@ const AppRadioSelect = ({
             <div key={item[_id]} className="relative flex items-start">
               <div className="flex h-5 items-center">
                 <input
-                  id={`${item[_id]}`}
+                  id={`${group}-${item[_id]}`}
                   key={defaultValue} // this makes sure that the defaultvalue gets rendered
                   name={group}
                   type="radio"
@@ -109,7 +119,7 @@ const AppRadioSelect = ({
               </div>
               <div className="ml-3 text-sm">
                 <label
-                  htmlFor={`${item[_id]}`}
+                  htmlFor={`${group}-${item[_id]}`}
                   className="font-medium cursor-pointer"
                 >
                   {item[_label]}
@@ -128,7 +138,7 @@ const AppRadioSelect = ({
           {({ open }) => (
             <>
               <Listbox.Label className="block text-sm font-medium text-gray-700">
-                Assigned to
+                {props.label}
               </Listbox.Label>
               <div className="relative mt-1">
                 <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm">
@@ -151,9 +161,9 @@ const AppRadioSelect = ({
                   leaveTo="opacity-0"
                 >
                   <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                    {items.map((item) => (
+                    {_items.map((item) => (
                       <Listbox.Option
-                        key={item[_id]}
+                        key={`${group}-${item[_id]}`}
                         className={({ active }) =>
                           classNames(
                             active
@@ -163,6 +173,7 @@ const AppRadioSelect = ({
                           )
                         }
                         value={item[_id]}
+                        hidden={item.hidden ?? false}
                       >
                         {({ selected, active }) => (
                           <>

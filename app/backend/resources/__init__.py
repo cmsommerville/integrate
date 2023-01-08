@@ -24,7 +24,7 @@ from .Config_BenefitState import CRUD_ConfigBenefitState, CRUD_ConfigBenefitStat
 from .Config_Coverage import CRUD_ConfigCoverage, CRUD_ConfigCoverage_List 
 from .Config_Factor import CRUD_ConfigFactor, CRUD_ConfigFactor_List
 from .Config_FactorRule import CRUD_ConfigFactorRule, CRUD_ConfigFactorRule_List
-from .Config_Product import CRUD_ConfigProduct, CRUD_ConfigProduct_List 
+from .Config_Product import CRUD_ConfigProduct, CRUD_ConfigProduct_List, Progress_ConfigProduct
 from .Config_ProductMapperDetail import CRUD_ConfigProductMapperDetail, CRUD_ConfigProductMapperDetail_List
 from .Config_ProductMapperSet import CRUD_ConfigProductMapperSet_Gender, CRUD_ConfigProductMapperSet_Gender_List, \
     CRUD_ConfigProductMapperSet_SmokerStatus, CRUD_ConfigProductMapperSet_SmokerStatus_List, \

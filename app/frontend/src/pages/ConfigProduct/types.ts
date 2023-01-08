@@ -1,5 +1,5 @@
 export type ConfigProduct = {
-    config_product_id: number;
+    config_product_id?: number;
     config_product_code: string;
     config_product_label: string;
     config_product_effective_date: string;
@@ -75,6 +75,16 @@ export type ConfigAttributeDistributionSet_SmokerStatus = {
 }
 
 export type RefRatingStrategy = {
+    ref_id: number; 
+    ref_entity_code: string; 
+    ref_attr_code: string; 
+    ref_attr_label: string; 
+    ref_attr_description?: string; 
+    ref_attr_symbol?: string; 
+    ref_attr_value?: number; 
+}
+
+export type RefCensusStrategy = {
     ref_id: number; 
     ref_entity_code: string; 
     ref_attr_code: string; 

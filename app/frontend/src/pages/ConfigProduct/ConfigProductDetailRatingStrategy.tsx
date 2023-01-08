@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams } from "react-router";
+import { Link } from "react-router-dom";
 import {
   ConfigProduct_Basic,
   ConfigProduct_RatingStrategies,
 } from "@/types/config";
 import { RefRatingStrategy } from "../ConfigProduct/types";
 import { CalendarIcon, HeartIcon, MoonIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
 import AppButton from "@/components/AppButton";
@@ -13,10 +15,10 @@ import AppRadioSelect from "@/components/AppRadioSelect";
 import { Breadcrumb, PageTitle } from "./Components";
 
 const PAGE_DETAILS = {
-  id: "attr-sets",
-  title: "Attributes",
+  id: "rating-strategies",
+  title: "Rating Strategy",
   subtitle:
-    "Specify the attributes used for smoker disposition, gender, and relationships...",
+    "Specify whether smoker disposition, gender, and age are rated, underwritten, or neither...",
 };
 
 const ConfigProductDetailRatingGender = () => {
@@ -97,77 +99,54 @@ const ConfigProductDetailRatingGender = () => {
   return (
     <>
       <PageTitle title={PAGE_DETAILS.title} subtitle={PAGE_DETAILS.subtitle}>
-        <AppButton disabled={!isValid} onClick={clickHandler}>
-          Next
-        </AppButton>
+        <div className="space-x-6 flex">
+          <Link to={`/app/config/product/${product_id}/rating/dists`}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              <ChevronLeftIcon className="h-5 w-5" />
+              Prev
+            </span>
+          </Link>
+        </div>
       </PageTitle>
-      <div className="grid grid-cols-6 gap-x-6">
+      <div className="grid grid-cols-3 gap-x-6">
         <div className="col-span-2 flex flex-col space-y-6">
-          <AppPanel className="pt-0 pl-0 pr-0 h-fit space-y-6">
+          <AppPanel className="px-0 py-0">
             <>
-              <h3 className="font-normal text-white py-4 px-4 bg-primary-700 rounded-t-lg flex space-x-2">
-                <HeartIcon className="h-6 w-6" aria-hidden="true" />
-                <span>Genders</span>
-              </h3>
-              <div className="px-4 pb-4">
+              <div className="mt-4 mb-8 px-4 space-y-6">
                 <AppRadioSelect
+                  radioMax={1}
                   group="gender"
+                  label="Gender"
                   items={strategies}
                   itemId="ref_id"
                   itemLabel="ref_attr_label"
-                  itemDescription={(item) => {
-                    return item.ref_attr_description;
-                  }}
+                  itemDescription={(item) => item.ref_attr_description}
                   defaultValue={product?.gender_rating_strategy_id}
                   onClick={(item) =>
                     setter("gender_rating_strategy_id", item.ref_id)
                   }
                 />
-              </div>
-            </>
-          </AppPanel>
-
-          <AppPanel className="pt-0 pl-0 pr-0 h-fit space-y-6">
-            <>
-              <h3 className="font-normal text-white py-4 px-4 bg-primary-700 rounded-t-lg flex space-x-2">
-                <MoonIcon className="h-6 w-6" aria-hidden="true" />
-                <span>Smoker Dispositions</span>
-              </h3>
-              <div className="px-4 pb-4">
                 <AppRadioSelect
+                  radioMax={1}
                   group="smoker_status"
+                  label="Smoker Disposition"
                   items={strategies}
                   itemId="ref_id"
                   itemLabel="ref_attr_label"
-                  itemDescription={(item) => {
-                    return item.ref_attr_description;
-                  }}
+                  itemDescription={(item) => item.ref_attr_description}
                   defaultValue={product?.smoker_status_rating_strategy_id}
                   onClick={(item) =>
                     setter("smoker_status_rating_strategy_id", item.ref_id)
                   }
                 />
-              </div>
-            </>
-          </AppPanel>
-        </div>
-        <div className="col-span-2 flex flex-col space-y-4">
-          <AppPanel className="pt-0 pl-0 pr-0 h-fit space-y-6">
-            <>
-              <h3 className="font-normal text-white py-4 px-4 bg-primary-700 rounded-t-lg flex space-x-2">
-                <CalendarIcon className="h-6 w-6" aria-hidden="true" />
-                <span>Age</span>
-              </h3>
-
-              <div className="px-4 pb-4">
                 <AppRadioSelect
+                  radioMax={1}
                   group="age"
+                  label="Age"
                   items={strategies}
                   itemId="ref_id"
                   itemLabel="ref_attr_label"
-                  itemDescription={(item) => {
-                    return item.ref_attr_description;
-                  }}
+                  itemDescription={(item) => item.ref_attr_description}
                   defaultValue={product?.age_rating_strategy_id}
                   onClick={(item) =>
                     setter("age_rating_strategy_id", item.ref_id)
@@ -177,8 +156,16 @@ const ConfigProductDetailRatingGender = () => {
             </>
           </AppPanel>
         </div>
-        <div className="col-span-2 flex flex-col items-end">
+        <div className="flex flex-col items-end space-y-6">
           <Breadcrumb step="rating-strategies" />
+
+          <AppButton
+            disabled={!isValid || !isDirty}
+            isLoading={isSaving}
+            onClick={clickHandler}
+          >
+            Save
+          </AppButton>
         </div>
       </div>
     </>

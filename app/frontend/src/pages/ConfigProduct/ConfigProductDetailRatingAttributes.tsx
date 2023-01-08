@@ -1,11 +1,13 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import {
   ConfigProduct_Basic,
   ConfigAttributeSet,
   ConfigProduct_AttrSets,
 } from "@/types/config";
 import { UsersIcon, HeartIcon, MoonIcon } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
 import AppButton from "@/components/AppButton";
@@ -25,6 +27,7 @@ const ConfigProductDetailRatingAttributes = () => {
 
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const [product, setProduct] = useState<
     ConfigProduct_Basic & ConfigProduct_AttrSets
@@ -79,8 +82,6 @@ const ConfigProductDetailRatingAttributes = () => {
 
   const clickHandler = () => {
     if (!isDirty) {
-      navigate(`../dists`, { relative: "path" });
-      // navigate(`/app/config/product/${product_id}/rating/dists`);
       return;
     }
     fetch(`/api/config/product/${product_id}`, {
@@ -91,7 +92,14 @@ const ConfigProductDetailRatingAttributes = () => {
       body: JSON.stringify(selection),
     })
       .then((res) => {
-        navigate(`/app/config/product/${product_id}/rating/dists`);
+        if (!res.ok) {
+          throw new Error("Cannot save to database");
+        }
+        return res.json();
+      })
+      .then((res) => {
+        setProduct(res);
+        setIsDirty(false);
       })
       .finally(() => {});
   };
@@ -99,9 +107,20 @@ const ConfigProductDetailRatingAttributes = () => {
   return (
     <>
       <PageTitle title={PAGE_DETAILS.title} subtitle={PAGE_DETAILS.subtitle}>
-        <AppButton disabled={!isValid} onClick={clickHandler}>
-          Next
-        </AppButton>
+        <div className="space-x-6 flex">
+          <Link to={`/app/config/product/${product_id}/`}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              <ChevronLeftIcon className="h-5 w-5" />
+              Prev
+            </span>
+          </Link>
+          <Link to={`/app/config/product/${product_id}/rating/dists`}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              Next
+              <ChevronRightIcon className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
       </PageTitle>
       <div className="grid grid-cols-6 gap-x-6">
         <div className="col-span-2 flex flex-col space-y-6">
@@ -195,8 +214,15 @@ const ConfigProductDetailRatingAttributes = () => {
             </>
           </AppPanel>
         </div>
-        <div className="col-span-2 flex flex-col items-end">
+        <div className="col-span-2 flex flex-col items-end space-y-6">
           <Breadcrumb step="attr-sets" />
+          <AppButton
+            disabled={!isValid || !isDirty}
+            isLoading={isSaving}
+            onClick={clickHandler}
+          >
+            Save
+          </AppButton>
         </div>
       </div>
     </>

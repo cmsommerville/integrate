@@ -137,7 +137,7 @@ export const PageTitle = (props: PageTitleProps) => {
           <p className="text-sm text-gray-400">{props.subtitle}</p>
         ) : null}
       </div>
-      <div className="flex justify-end items-end">{props?.children}</div>
+      <div className="flex justify-end items-end">{props.children ?? null}</div>
     </div>
   );
 };

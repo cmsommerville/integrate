@@ -7,3 +7,5 @@ ns_getters.add_resource(Resource_SelectionPlan_ConfigProduct, '/selection/plan/<
 ns_getters.add_resource(Resource_SelectionPlan_GenderProductMapper, '/selection/plan/<int:id>/gender-mapper-list')
 ns_getters.add_resource(Resource_SelectionPlan_SmokerStatusProductMapper, '/selection/plan/<int:id>/smoker-status-mapper-list')
 ns_getters.add_resource(Resource_SelectionRateTable, '/selection/plan/<int:plan_id>/rate-table')
+
+ns_getters.add_resource(Progress_ConfigProduct, '/config/product/<int:id>/progress')

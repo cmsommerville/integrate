@@ -6,6 +6,7 @@ import {
   ConfigProductDetailRatingAttributes,
   ConfigProductDetailRatingDistributions,
   ConfigProductDetailRatingStrategy,
+  ConfigProductDetailCensus,
 } from "./pages/ConfigProduct";
 import { ConfigProductStateDetail } from "./pages/ConfigProductState";
 
@@ -34,6 +35,10 @@ export const routes: AppRouteObject[] = [
   {
     path: "app/config/product/:product_id/rating/strategy",
     element: <ConfigProductDetailRatingStrategy />,
+  },
+  {
+    path: "app/config/product/:product_id/rating/census",
+    element: <ConfigProductDetailCensus />,
   },
   {
     path: "/app/config/product/:product_id/states",

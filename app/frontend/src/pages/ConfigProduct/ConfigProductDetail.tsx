@@ -1,7 +1,13 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import moment from "moment";
-import { BriefcaseIcon, PuzzlePieceIcon } from "@heroicons/react/20/solid";
+import {
+  BriefcaseIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  PuzzlePieceIcon,
+} from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
 import AppSnackbar from "@/components/AppSnackbar";
@@ -13,7 +19,9 @@ import { Breadcrumb, PageTitle } from "./Components";
 
 const ConfigProductDetail = () => {
   const { product_id } = useParams();
+  const navigate = useNavigate();
   const ref: any = useRef(null);
+  const ref2 = useRef(null);
 
   const [isSaving, setIsSaving] = useState(false);
   const [isValid, setIsValid] = useState(true);
@@ -25,6 +33,7 @@ const ConfigProductDetail = () => {
   const productSetter = useCallback(
     (key: keyof ConfigProduct, val: number | string | null | undefined) => {
       setProduct((old) => ({ ...old, [key]: val }));
+      setIsDirty(true);
     },
     [setProduct]
   );
@@ -49,13 +58,18 @@ const ConfigProductDetail = () => {
     clickHandler();
   };
 
-  const clickHandler = () => {
+  const saveHandler = () => {
     setIsSaving(true);
     if (!isDirty) {
+      setIsSaving(false);
       return;
     }
 
-    fetch(`/api/config/product/${product_id}`, {
+    const url = product_id
+      ? `/api/config/product/${product_id}`
+      : `/api/config/product`;
+
+    fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,6 +93,11 @@ const ConfigProductDetail = () => {
       });
   };
 
+  const nextUrl = useMemo(() => {
+    if (!product.config_product_id) return "#";
+    return `/app/config/product/${product.config_product_id}/rating/attrs`;
+  }, [product]);
+
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -94,6 +113,7 @@ const ConfigProductDetail = () => {
       .then((res) => {
         if (res.config_product_id) {
           setProduct(res);
+          setIsDirty(false);
         }
       })
       .catch((err) => {
@@ -111,16 +131,14 @@ const ConfigProductDetail = () => {
     <>
       <AppSnackbar ref={ref} message={"This is a test"}></AppSnackbar>
       <PageTitle title={title(!product_id)} subtitle={subtitle(!product_id)}>
-        <>
-          <AppButton onClick={showSnackbar}>Click</AppButton>
-          <AppButton
-            disabled={!isValid}
-            isLoading={isSaving}
-            onClick={clickHandler}
-          >
-            Next
-          </AppButton>
-        </>
+        <div className="space-x-6 flex">
+          <Link to={nextUrl}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              Next
+              <ChevronRightIcon className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
       </PageTitle>
       <div className="grid grid-cols-6 gap-x-6">
         <div className="col-span-4 flex flex-col space-y-4">
@@ -162,8 +180,15 @@ const ConfigProductDetail = () => {
             </>
           </AppPanel>
         </div>
-        <div className="col-span-2 flex flex-col items-end">
+        <div className="col-span-2 flex flex-col items-end space-y-6">
           <Breadcrumb step="basic-info" />
+          <AppButton
+            disabled={!isValid || !isDirty}
+            isLoading={isSaving}
+            onClick={saveHandler}
+          >
+            Save
+          </AppButton>
         </div>
       </div>
     </>
@@ -171,7 +196,6 @@ const ConfigProductDetail = () => {
 };
 
 const DEFAULT_CONFIG_PRODUCT = {
-  config_product_id: 0,
   config_product_code: "",
   config_product_label: "",
   config_product_effective_date: moment().format("YYYY-MM-DD"),

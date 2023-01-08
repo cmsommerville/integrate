@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
+import { Link } from "react-router-dom";
 import {
   ConfigProduct_Basic,
   ConfigAttributeDistributionSet_Gender,
@@ -8,8 +9,10 @@ import {
   ConfigProduct_DistributionSets,
 } from "@/types/config";
 import { CalendarIcon, HeartIcon, MoonIcon } from "@heroicons/react/24/outline";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
+import AppRadioSelect from "@/components/AppRadioSelect";
 import AppButton from "@/components/AppButton";
 import { Breadcrumb, PageTitle } from "./Components";
 
@@ -22,6 +25,7 @@ const PAGE_DETAILS = {
 
 const ConfigProductDetailRatingDistributions = () => {
   const { product_id } = useParams();
+  const navigate = useNavigate();
 
   const [isDirty, setIsDirty] = useState(false);
   const [isValid, setIsValid] = useState(true);
@@ -106,7 +110,9 @@ const ConfigProductDetailRatingDistributions = () => {
   };
 
   const clickHandler = () => {
-    if (!isDirty) return;
+    if (!isDirty) {
+      return;
+    }
     setIsSaving(true);
     fetch(`/api/config/product/${product_id}`, {
       method: "PATCH",
@@ -115,7 +121,16 @@ const ConfigProductDetailRatingDistributions = () => {
       },
       body: JSON.stringify(selection),
     })
-      .then((res) => {})
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Cannot save to database");
+        }
+        return res.json();
+      })
+      .then((res) => {
+        setProduct(res);
+        setIsDirty(false);
+      })
       .finally(() => {
         setIsSaving(false);
       });
@@ -124,9 +139,20 @@ const ConfigProductDetailRatingDistributions = () => {
   return (
     <>
       <PageTitle title={PAGE_DETAILS.title} subtitle={PAGE_DETAILS.subtitle}>
-        <AppButton disabled={!isValid} onClick={clickHandler}>
-          Next
-        </AppButton>
+        <div className="space-x-6 flex">
+          <Link to={`/app/config/product/${product_id}/rating/attrs`}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              <ChevronLeftIcon className="h-5 w-5" />
+              Prev
+            </span>
+          </Link>
+          <Link to={`/app/config/product/${product_id}/rating/strategy`}>
+            <span className="flex items-center text-sm font-semibold text-primary-700 hover:text-accent-600 transition duration-300">
+              Next
+              <ChevronRightIcon className="h-5 w-5" />
+            </span>
+          </Link>
+        </div>
       </PageTitle>
       <div className="grid grid-cols-6 gap-x-6">
         <div className="col-span-2 flex flex-col space-y-6">
@@ -136,45 +162,21 @@ const ConfigProductDetailRatingDistributions = () => {
                 <HeartIcon className="h-6 w-6" aria-hidden="true" />
                 <span>Genders</span>
               </h3>
-              <fieldset className="px-4 pb-4" name="attr_set">
-                <legend className="sr-only">Gender</legend>
-                <div className="space-y-5">
-                  {genderDists.map((dist) => (
-                    <div
-                      key={dist.config_attr_distribution_set_id}
-                      className="relative flex items-start"
-                    >
-                      <div className="flex h-5 items-center">
-                        <input
-                          id={`${dist.config_attr_type_code}-${dist.config_attr_distribution_set_id}`}
-                          aria-describedby={`${dist.config_attr_distribution_set_id}-description`}
-                          name="gender_attr_set"
-                          type="radio"
-                          checked={
-                            dist.config_attr_distribution_set_id ===
-                            selection.gender_distribution_set_id
-                          }
-                          onChange={() =>
-                            setter(
-                              "gender_distribution_set_id",
-                              dist.config_attr_distribution_set_id
-                            )
-                          }
-                          className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label
-                          htmlFor={`${dist.config_attr_type_code}-${dist.config_attr_distribution_set_id}`}
-                          className="font-medium cursor-pointer"
-                        >
-                          {dist.config_attr_distribution_set_label}
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
+              <div className="px-4 pb-4">
+                <AppRadioSelect
+                  group="gender"
+                  items={genderDists}
+                  itemId="config_attr_distribution_set_id"
+                  itemLabel="config_attr_distribution_set_label"
+                  defaultValue={product?.gender_distribution_set_id}
+                  onClick={(item) =>
+                    setter(
+                      "gender_distribution_set_id",
+                      item.config_attr_distribution_set_id
+                    )
+                  }
+                />
+              </div>{" "}
             </>
           </AppPanel>
 
@@ -184,45 +186,21 @@ const ConfigProductDetailRatingDistributions = () => {
                 <MoonIcon className="h-6 w-6" aria-hidden="true" />
                 <span>Smoker Dispositions</span>
               </h3>
-              <fieldset className="px-4 pb-4" name="attr_set">
-                <legend className="sr-only">Smoker Dispositions</legend>
-                <div className="space-y-5">
-                  {smokerDists.map((dist) => (
-                    <div
-                      key={dist.config_attr_distribution_set_id}
-                      className="relative flex items-start"
-                    >
-                      <div className="flex h-5 items-center">
-                        <input
-                          id={`${dist.config_attr_type_code}-${dist.config_attr_distribution_set_id}`}
-                          aria-describedby={`${dist.config_attr_distribution_set_id}-description`}
-                          name="smoker_status_attr_set"
-                          type="radio"
-                          checked={
-                            dist.config_attr_distribution_set_id ===
-                            selection.smoker_status_distribution_set_id
-                          }
-                          onChange={() =>
-                            setter(
-                              "gender_distribution_set_id",
-                              dist.config_attr_distribution_set_id
-                            )
-                          }
-                          className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label
-                          htmlFor={`${dist.config_attr_type_code}-${dist.config_attr_distribution_set_id}`}
-                          className="font-medium cursor-pointer"
-                        >
-                          {dist.config_attr_distribution_set_label}
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
+              <div className="px-4 pb-4">
+                <AppRadioSelect
+                  group="smoker"
+                  items={smokerDists}
+                  itemId="config_attr_distribution_set_id"
+                  itemLabel="config_attr_distribution_set_label"
+                  defaultValue={product?.smoker_status_distribution_set_id}
+                  onClick={(item) =>
+                    setter(
+                      "smoker_status_distribution_set_id",
+                      item.config_attr_distribution_set_id
+                    )
+                  }
+                />
+              </div>
             </>
           </AppPanel>
         </div>
@@ -233,50 +211,33 @@ const ConfigProductDetailRatingDistributions = () => {
                 <CalendarIcon className="h-6 w-6" aria-hidden="true" />
                 <span>Age</span>
               </h3>
-              <fieldset className="px-4 pb-4" name="attr_set">
-                <legend className="sr-only">Age</legend>
-                <div className="space-y-5">
-                  {ageDists.map((dist) => (
-                    <div
-                      key={dist.config_age_distribution_set_id}
-                      className="relative flex items-start"
-                    >
-                      <div className="flex h-5 items-center">
-                        <input
-                          id={`$age-${dist.config_age_distribution_set_id}`}
-                          aria-describedby={`${dist.config_age_distribution_set_id}-description`}
-                          name="age_set"
-                          type="radio"
-                          checked={
-                            dist.config_age_distribution_set_id ===
-                            selection.age_distribution_set_id
-                          }
-                          onChange={() =>
-                            setter(
-                              "age_distribution_set_id",
-                              dist.config_age_distribution_set_id
-                            )
-                          }
-                          className="h-4 w-4 border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label
-                          htmlFor={`age-${dist.config_age_distribution_set_id}`}
-                          className="font-medium cursor-pointer"
-                        >
-                          {dist.config_age_distribution_set_label}
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
+              <div className="px-4 pb-4">
+                <AppRadioSelect
+                  group="age"
+                  items={ageDists}
+                  itemId="config_age_distribution_set_id"
+                  itemLabel="config_age_distribution_set_label"
+                  defaultValue={product?.age_distribution_set_id}
+                  onClick={(item) =>
+                    setter(
+                      "age_distribution_set_id",
+                      item.config_age_distribution_set_id
+                    )
+                  }
+                />
+              </div>
             </>
           </AppPanel>
         </div>
-        <div className="col-span-2 flex flex-col items-end">
+        <div className="col-span-2 flex flex-col items-end space-y-6">
           <Breadcrumb step="distributions" />
+          <AppButton
+            disabled={!isValid || !isDirty}
+            isLoading={isSaving}
+            onClick={clickHandler}
+          >
+            Save
+          </AppButton>
         </div>
       </div>
     </>
