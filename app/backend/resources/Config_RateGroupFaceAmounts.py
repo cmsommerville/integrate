@@ -9,7 +9,7 @@ def face_amount_handler(data: dict, *args, **kwargs) -> dict:
 
     face_amounts = data.get('face_amounts')
     if face_amounts is None: 
-        return {"status": "error", "message": "Please send `face_amounts` property in the payload"}
+        return {"status": "error", "msg": "Please send `face_amounts` property in the payload"}
 
     df_face_amounts = pd.DataFrame(face_amounts)
 
@@ -51,4 +51,4 @@ class CRUD_ConfigRateGroupFaceAmounts_List(BaseCRUDResourceList):
             Model_ConfigRateGroupFaceAmounts.save_all_to_db(face_amounts)
             return schema.dump(face_amounts), 201
         except Exception as e: 
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400

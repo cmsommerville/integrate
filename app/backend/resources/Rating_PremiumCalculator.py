@@ -48,16 +48,16 @@ class Resource_RatingPremiumCalculator(Resource):
     def post(cls, plan_id: int):
         data = request.get_json()
         if data is None:
-            return {"status": "error", "message": "Please provide a body to thee POST request that contains `premium_frequency`"}
+            return {"status": "error", "msg": "Please provide a body to thee POST request that contains `premium_frequency`"}
 
         # get modal premium frequency
         freq_obj = data.get('premium_frequency', {})
         freq = freq_obj.get('ref_attr_value', None)
         freq_id = freq_obj.get('ref_id', None)
         if freq is None:
-            return {"status": "error", "message": "Please provide the `premium_frequency` as part of the POST request payload"}
+            return {"status": "error", "msg": "Please provide the `premium_frequency` as part of the POST request payload"}
         if freq <= 0:
-            return {"status": "error", "message": "Please provide a positive `premium_frequency`"}
+            return {"status": "error", "msg": "Please provide a positive `premium_frequency`"}
 
         # get rounding method function
         rounding_strategy = data.get('rounding_strategy', 'rate_group')

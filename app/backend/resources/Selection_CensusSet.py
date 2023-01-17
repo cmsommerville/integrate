@@ -48,7 +48,7 @@ class SelectionCensusSet_UploadFile(Resource):
             uploaded_file = args['file']
             df = file_reader(uploaded_file)
         except Exception as e:
-            return {"status": "error", "message": "Could not read file"}
+            return {"status": "error", "msg": "Could not read file"}
 
         # process the census
         try: 
@@ -56,7 +56,7 @@ class SelectionCensusSet_UploadFile(Resource):
             census.process()
             census_data = census.to_census_set_dict()
         except Exception as e: 
-            return {"status": "error", "message": str(e)}
+            return {"status": "error", "msg": str(e)}
         
         _schema = Schema_SelectionCensusSet()
         _schema_detail_list = Schema_SelectionCensusDetail(many=True)
@@ -95,7 +95,7 @@ class SelectionCensusSet_CensusBuilder(Resource):
             census_builder = CensusBuilder(gender_dist, smoker_status_dist, age_dist)
             _census_details = census_builder.generate_census_detail()
         except Exception as e:
-            return {'status': "error", 'message': str(e)}, 400
+            return {'status': "error", "msg": str(e)}, 400
 
         try: 
             _schema = Schema_SelectionCensusSet()
@@ -113,7 +113,7 @@ class SelectionCensusSet_CensusBuilder(Resource):
             Model_SelectionCensusDetail.bulk_save_all_to_db(census_details)
 
         except Exception as e:
-            return {'status': "error", 'message': str(e)}, 400
+            return {'status': "error", "msg": str(e)}, 400
 
         # set census set id on plan record
         requests.patch(f'{HOSTNAME}/api/crud/selection/plan/{plan_id}', json={

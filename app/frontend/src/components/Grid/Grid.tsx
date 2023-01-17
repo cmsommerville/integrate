@@ -3,10 +3,11 @@ import { GridOptions } from "ag-grid-community";
 
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
+import "./Grid.scss";
 
 const Grid = ({ defaultColDef, ...props }: GridOptions) => {
   return (
-    <div className="ag-theme-alpine h-full w-full">
+    <div className="ag-theme-alpine ag-theme-integrate h-full w-full">
       <AgGridReact
         defaultColDef={{
           filter: true,
@@ -15,6 +16,7 @@ const Grid = ({ defaultColDef, ...props }: GridOptions) => {
           ...defaultColDef,
         }}
         {...props}
+        className="h-full w-full"
       ></AgGridReact>
     </div>
   );

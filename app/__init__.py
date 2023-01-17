@@ -40,5 +40,7 @@ def create_app(config):
         subscription.subscribe()
 
     import app.auth as auth
+    
+    app.register_blueprint(auth.auth)
 
     return app

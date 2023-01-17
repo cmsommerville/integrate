@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.ag-theme-integrate {
+    --ag-border-radius: 0.5rem;
+    --ag-header-background-color: theme('colors.gray.50');
+    --ag-odd-row-background-color: theme('colors.white');
+    --ag-foreground-color: theme('colors.gray.500');
+    --ag-header-foreground-color: theme('colors.gray.900');
+    --ag-row-hover-color: theme('colors.primary.50');
+    --ag-range-selection-border-color: theme('colors.primary.400');
+
+
+    .ag-root-wrapper {
+        border-radius: var(--ag-border-radius);
+        @apply font-normal;
+    }
+    .ag-header-row {
+        @apply font-semibold text-sm;
+    }
+}

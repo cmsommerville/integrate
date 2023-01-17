@@ -30,7 +30,7 @@ class Resource_SelectionPlan_ConfigProduct(Resource):
             product  = Model_ConfigProduct.find_one(plan.config_product_id)
             return schema.dump(product)
         except Exception as e: 
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
 
 class Resource_SelectionPlan_GenderProductMapper(Resource):
@@ -46,7 +46,7 @@ class Resource_SelectionPlan_GenderProductMapper(Resource):
             mapper  = Model_ConfigProductMapperSet_Gender.find_by_product(plan.config_product_id)
             return schema.dump(mapper)
         except Exception as e: 
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
 
 class Resource_SelectionPlan_SmokerStatusProductMapper(Resource):
@@ -62,4 +62,4 @@ class Resource_SelectionPlan_SmokerStatusProductMapper(Resource):
             mapper  = Model_ConfigProductMapperSet_SmokerStatus.find_by_product(plan.config_product_id)
             return schema.dump(mapper)
         except Exception as e: 
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400

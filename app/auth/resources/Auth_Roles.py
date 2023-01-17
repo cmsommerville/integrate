@@ -16,4 +16,4 @@ class Resource_AuthRoles(Resource):
             Model_AuthRole.save_all_to_db(roles)
             return _schema_list.dump(roles), 201
         except:
-            return {"status": "error", "message": "Cannot save roles"}, 400
+            return {"status": "error", "msg": "Cannot save roles"}, 400

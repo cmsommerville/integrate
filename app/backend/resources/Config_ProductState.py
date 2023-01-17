@@ -20,7 +20,7 @@ class CRUD_ConfigProductState_List(BaseCRUDResourceList):
             if _observable:
                 _observable.notify('get', objs, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             if objs: 

@@ -27,12 +27,12 @@ class Resource_AdminDropTables(Resource):
                     tbl.drop_system_versioning(db)
 
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             db.drop_all()
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         else:
-            return {"message": "Success"}, 200
+            return {"msg": "Success"}, 200
 

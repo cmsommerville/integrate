@@ -16,7 +16,7 @@ class BaseCRUDResource(Resource):
         super().__init__()
 
     @classmethod
-    @authorize
+    @authorize()
     def get(cls, id, *args, **kwargs):
         try: 
             obj = cls.model.find_one(id, **cls.model_args)
@@ -28,7 +28,7 @@ class BaseCRUDResource(Resource):
             if _observable:
                 _observable.notify('get', obj, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         return cls.schema.dump(obj), 200
   
@@ -38,24 +38,24 @@ class BaseCRUDResource(Resource):
             req = request.get_json()
             obj = cls.schema.load(req)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         
         try: 
             obj.save_to_db()
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('post', obj, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             return cls.schema.dump(obj), 201
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     def put(cls, *args, **kwargs): 
@@ -64,19 +64,19 @@ class BaseCRUDResource(Resource):
             obj = cls.schema.load(req)
             obj.save_to_db()
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('put', obj, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             return cls.schema.dump(obj), 201
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     def patch(cls, id, *args, **kwargs): 
@@ -89,39 +89,39 @@ class BaseCRUDResource(Resource):
             # save object to database 
             obj.save_to_db()
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('patch', obj, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try:
             return cls.schema.dump(obj), 201
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     def delete(cls, id, *args, **kwargs): 
         try: 
             obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('delete', obj, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             obj.delete()
             return {"status": "Deleted"}, 204
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
 
 class BaseCRUDResourceList(Resource):
@@ -129,12 +129,13 @@ class BaseCRUDResourceList(Resource):
     schema: BaseSchema
     observable: BaseObservable = None
     model_args: dict = {}
-    schema_args: dict = {}
+    permissions = ResourcePermissions()
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
+    @authorize()
     def get(cls, *args, **kwargs):
         try: 
             objs = cls.model.find_all(**cls.model_args)
@@ -142,7 +143,7 @@ class BaseCRUDResourceList(Resource):
             if _observable:
                 _observable.notify('get', objs, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             if objs: 
@@ -158,16 +159,16 @@ class BaseCRUDResourceList(Resource):
             objs = cls.schema.load(req)
             cls.model.save_all_to_db(objs)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
                 _observable.notify('post', objs, request)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         try:
             return cls.schema.dump(objs), 201
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400

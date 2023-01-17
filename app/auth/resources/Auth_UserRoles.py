@@ -16,15 +16,15 @@ class Resource_AuthManageUserRole(Resource):
             data = request.get_json()
             user_name = data.get('user_name')
             if user_name is None: 
-                return {"status": "error", "message": "Please send a user name"}, 400
+                return {"status": "error", "msg": "Please send a user name"}, 400
 
             _roles = data.get('roles')
             if _roles is None: 
-                return {"status": "error", "message": "Please send a list of roles"}, 400
+                return {"status": "error", "msg": "Please send a list of roles"}, 400
             try:
                 roles = Model_AuthRole.find_by_code(_roles)
             except:
-                return {"status": "error", "message": "Cannot find roles"}, 400
+                return {"status": "error", "msg": "Cannot find roles"}, 400
 
             try:
                 user = Model_AuthUser.find_by_user_name(user_name)
@@ -42,7 +42,7 @@ class Resource_AuthManageUserRole(Resource):
 
                 return _schema_list.dump(user_roles), 201
             except:
-                return {"status": "error", "message": "Cannot add roles to user"}, 401
+                return {"status": "error", "msg": "Cannot add roles to user"}, 401
 
         except:
-            return {"status": "error", "message": "Unknown add role error"}, 400
+            return {"status": "error", "msg": "Unknown add role error"}, 400

@@ -63,9 +63,11 @@ class Model_ConfigBenefit(BaseModel):
 
     durations = db.relationship("Model_ConfigBenefitDurationSet")
     ref_benefit = db.relationship("Model_RefBenefit",
-        primaryjoin="Model_ConfigBenefit.ref_benefit_id == Model_RefBenefit.ref_id")
+        primaryjoin="Model_ConfigBenefit.ref_benefit_id == Model_RefBenefit.ref_id", lazy='joined')
     coverage = db.relationship("Model_ConfigCoverage")
     rate_group = db.relationship("Model_ConfigRateGroup")
+    unit_type = db.relationship("Model_RefUnitCode",
+        primaryjoin="Model_ConfigBenefit.unit_type_id == Model_RefUnitCode.ref_id", lazy='joined')
     benefit_auth = db.relationship("Model_ConfigBenefitAuth", 
         order_by="desc(Model_ConfigBenefitAuth.priority)", 
         innerjoin=True, lazy='joined')

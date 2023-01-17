@@ -1,4 +1,5 @@
 import { Fragment, useState } from "react";
+import { NavLink, Outlet } from "react-router-dom";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   Bars3CenterLeftIcon,
@@ -22,29 +23,35 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+import AppButton from "@/components/AppButton";
 
 const navigation = [
-  { name: "Home", href: "#", icon: HomeIcon, current: true },
-  { name: "History", href: "#", icon: ClockIcon, current: false },
-  { name: "Balances", href: "#", icon: ScaleIcon, current: false },
-  { name: "Cards", href: "#", icon: CreditCardIcon, current: false },
-  { name: "Recipients", href: "#", icon: UserGroupIcon, current: false },
-  { name: "Reports", href: "#", icon: DocumentChartBarIcon, current: false },
+  { name: "Home", to: "/", icon: HomeIcon, current: true },
+  {
+    name: "Products",
+    to: "/app/config/products",
+    icon: ClockIcon,
+    current: false,
+  },
+  { name: "Balances", to: "#", icon: ScaleIcon, current: false },
+  { name: "Cards", to: "#", icon: CreditCardIcon, current: false },
+  { name: "Recipients", to: "#", icon: UserGroupIcon, current: false },
+  { name: "Reports", to: "#", icon: DocumentChartBarIcon, current: false },
 ];
 const secondaryNavigation = [
-  { name: "Settings", href: "#", icon: CogIcon },
-  { name: "Help", href: "#", icon: QuestionMarkCircleIcon },
-  { name: "Privacy", href: "#", icon: ShieldCheckIcon },
+  { name: "Settings", to: "#", icon: CogIcon },
+  { name: "Help", to: "#", icon: QuestionMarkCircleIcon },
+  { name: "Privacy", to: "#", icon: ShieldCheckIcon },
 ];
 const cards = [
-  { name: "Account balance", href: "#", icon: ScaleIcon, amount: "$30,659.45" },
+  { name: "Account balance", to: "#", icon: ScaleIcon, amount: "$30,659.45" },
   // More items...
 ];
 const transactions = [
   {
     id: 1,
     name: "Payment to Molly Sanders",
-    href: "#",
+    to: "#",
     amount: "$20,000",
     currency: "USD",
     status: "success" as keyof typeof statusStyles,
@@ -65,6 +72,19 @@ function classNames(...classes: any) {
 
 const MainLayout = (props: any) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const loginHandler = () => {
+    fetch(`/api/auth/login`, {
+      method: "POST",
+      body: JSON.stringify({
+        user_name: "superuser",
+        password: "hello_world",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  };
 
   return (
     <>
@@ -134,9 +154,9 @@ const MainLayout = (props: any) => {
                   >
                     <div className="space-y-1 px-2">
                       {navigation.map((item) => (
-                        <a
+                        <NavLink
                           key={item.name}
-                          href={item.href}
+                          to={item.to}
                           className={classNames(
                             item.current
                               ? "bg-primary-800 text-white"
@@ -150,15 +170,15 @@ const MainLayout = (props: any) => {
                             aria-hidden="true"
                           />
                           {item.name}
-                        </a>
+                        </NavLink>
                       ))}
                     </div>
                     <div className="mt-6 pt-6">
                       <div className="space-y-1 px-2">
                         {secondaryNavigation.map((item) => (
-                          <a
+                          <NavLink
                             key={item.name}
-                            href={item.href}
+                            to={item.to}
                             className="group flex items-center rounded-md px-2 py-2 text-base font-medium text-primary-100 hover:bg-primary-600 hover:text-white"
                           >
                             <item.icon
@@ -166,7 +186,7 @@ const MainLayout = (props: any) => {
                               aria-hidden="true"
                             />
                             {item.name}
-                          </a>
+                          </NavLink>
                         ))}
                       </div>
                     </div>
@@ -197,9 +217,9 @@ const MainLayout = (props: any) => {
             >
               <div className="space-y-1 px-2">
                 {navigation.map((item) => (
-                  <a
+                  <NavLink
                     key={item.name}
-                    href={item.href}
+                    to={item.to}
                     className={classNames(
                       item.current
                         ? "bg-primary-800 text-white"
@@ -213,15 +233,15 @@ const MainLayout = (props: any) => {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </NavLink>
                 ))}
               </div>
               <div className="mt-6 pt-6">
                 <div className="space-y-1 px-2">
                   {secondaryNavigation.map((item) => (
-                    <a
+                    <NavLink
                       key={item.name}
-                      href={item.href}
+                      to={item.to}
                       className="group flex items-center rounded-md px-2 py-2 text-sm font-medium leading-6 text-primary-100 hover:bg-primary-600 hover:text-white"
                     >
                       <item.icon
@@ -229,7 +249,7 @@ const MainLayout = (props: any) => {
                         aria-hidden="true"
                       />
                       {item.name}
-                    </a>
+                    </NavLink>
                   ))}
                 </div>
               </div>
@@ -314,41 +334,42 @@ const MainLayout = (props: any) => {
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <NavLink
+                            to="#"
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
                             Your Profile
-                          </a>
+                          </NavLink>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <NavLink
+                            to="#"
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
                             Settings
-                          </a>
+                          </NavLink>
                         )}
                       </Menu.Item>
                       <Menu.Item>
                         {({ active }) => (
-                          <a
-                            href="#"
+                          <NavLink
+                            to="#"
+                            onClick={loginHandler}
                             className={classNames(
                               active ? "bg-gray-100" : "",
                               "block px-4 py-2 text-sm text-gray-700"
                             )}
                           >
-                            Logout
-                          </a>
+                            Login
+                          </NavLink>
                         )}
                       </Menu.Item>
                     </Menu.Items>

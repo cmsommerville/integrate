@@ -15,7 +15,7 @@ class Resource_AdminInitRefData(Resource):
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
         load_refdata(hostname, headers=request.headers)
-        return {"status": "success", "message": "Reference tables successfully loaded"}
+        return {"status": "success", "msg": "Reference tables successfully loaded"}
 
 
 class Resource_AdminInitConfig(Resource):
@@ -26,7 +26,7 @@ class Resource_AdminInitConfig(Resource):
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
         load_config(hostname, headers=request.headers)
-        return {"status": "success", "message": "Config tables successfully loaded"}
+        return {"status": "success", "msg": "Config tables successfully loaded"}
 
 
 
@@ -38,5 +38,5 @@ class Resource_AdminInitRateTable(Resource):
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
         load_rate_table(hostname, headers=request.headers)
-        return {"status": "success", "message": "Rate tables successfully loaded"}
+        return {"status": "success", "msg": "Rate tables successfully loaded"}
 

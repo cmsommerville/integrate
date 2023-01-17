@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { RouterProvider } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import MainLayout from "./layouts/MainLayout";
-
-import { router } from "./routes";
+import AuthRefresh from "./services/AuthRefresh";
 
 const App = () => {
   return (
-    <MainLayout>
-      <RouterProvider router={router} />
-    </MainLayout>
+    <AuthRefresh>
+      <MainLayout>
+        <Outlet />
+      </MainLayout>
+    </AuthRefresh>
   );
 };
 

@@ -25,7 +25,7 @@ class Progress_ConfigProduct(Resource):
     def get(cls, id):
         product = Model_ConfigProduct.find_one(id)
         if product is None: 
-            return {"status": "error", "message": "Cannot find product ID"}
+            return {"status": "error", "msg": "Cannot find product ID"}
             
         prog_attrs = cls._progress_tracker(product, 
             ['gender_attr_set_id', 'smoker_status_attr_set_id', 'relationship_attr_set_id'])

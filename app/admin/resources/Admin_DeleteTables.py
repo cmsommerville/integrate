@@ -23,7 +23,7 @@ class Resource_AdminDeleteTables(Resource):
                     db.session.execute(table.delete())
 
             db.session.commit()
-            return {"status": "success", "message": "All table data has been deleted!"}
+            return {"status": "success", "msg": "All table data has been deleted!"}
         except Exception as e:
             db.session.rollback()
-            return {"status": "error", "message": "Could not delete from all tables", "traceback": str(e)}
+            return {"status": "error", "msg": "Could not delete from all tables", "traceback": str(e)}

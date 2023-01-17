@@ -2,7 +2,7 @@ from app.extensions import ma
 from app.shared import BaseSchema
 
 from ..models import Model_SelectionBenefit
-from .Config_Benefit import Schema_ConfigBenefit
+from .Config_Benefit import Schema_ConfigBenefit_Data
 
 class Schema_SelectionBenefit(BaseSchema):
     class Meta:
@@ -11,4 +11,4 @@ class Schema_SelectionBenefit(BaseSchema):
         include_relationships=True
         include_fk=True
 
-    config_benefit = ma.Nested(Schema_ConfigBenefit, dump_only=True)
+    config_benefit = ma.Nested(Schema_ConfigBenefit_Data, dump_only=True)

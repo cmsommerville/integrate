@@ -61,9 +61,9 @@ class CRUD_ConfigAttributeSet(BaseCRUDResource):
         resource = DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.get(**kwargs)
 
     @classmethod
@@ -71,9 +71,9 @@ class CRUD_ConfigAttributeSet(BaseCRUDResource):
         resource = DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.post(**kwargs)
 
     @classmethod
@@ -81,9 +81,9 @@ class CRUD_ConfigAttributeSet(BaseCRUDResource):
         resource = DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.patch(**kwargs)
 
     @classmethod
@@ -91,9 +91,9 @@ class CRUD_ConfigAttributeSet(BaseCRUDResource):
         resource = DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.put(**kwargs)
 
     @classmethod
@@ -101,9 +101,9 @@ class CRUD_ConfigAttributeSet(BaseCRUDResource):
         resource = DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.delete(**kwargs)
 
 
@@ -115,9 +115,9 @@ class CRUD_ConfigAttributeSet_List(BaseCRUDResource):
         resource = LIST_DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.get(**kwargs)
 
     @classmethod
@@ -125,7 +125,7 @@ class CRUD_ConfigAttributeSet_List(BaseCRUDResource):
         resource = LIST_DISCRIMINATOR.get(config_attr_type_code)
         if resource is None: 
             try: 
-                return {"status": "error", "message": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
+                return {"status": "error", "msg": f"Cannot find resource with config_attr_type_code: `${config_attr_type_code}`"}, 404
             except Exception as e: 
-                return {"status": "error", "message": str(e)}, 500
+                return {"status": "error", "msg": str(e)}, 500
         return resource.post(**kwargs)

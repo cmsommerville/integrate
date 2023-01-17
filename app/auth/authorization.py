@@ -47,31 +47,34 @@ class ResourcePermissions:
 
 
 
-def authorize(func):
-    @functools.wraps(func)
-    def wrapper_decorator(*args, **kwargs):
-        cls = args[0]
-        permissions = getattr(cls, 'permissions', None)
-        if permissions is None:
-            return func(*args, **kwargs)
-        if not isinstance(permissions, ResourcePermissions):
-            return {"status": "error", "message": "The permissions for this resource should be an instance of the `ResourcePermissions` class"}
+def authorize(**kw):
+    def outer(func): 
+        @functools.wraps(func)
+        def wrapper_decorator(*args, **kwargs):
+            verify_jwt_in_request(**kw)
 
-        permitted_roles = getattr(permissions, func.__name__, None)
-        if permitted_roles is None:
-            return {"status": "error", "message": f"Cannot find the permitted roles for the provided HTTP method, {func.__name__}"}
-        if not isinstance(permitted_roles, (list, tuple,)):
-            permitted_roles = [permitted_roles]
-        if '*' in permitted_roles: 
-            return func(*args, **kwargs)
-        
-        verify_jwt_in_request()
-        identity = get_jwt_identity()
-        user_roles = identity.get('roles')
+            cls = args[0]
+            permissions = getattr(cls, 'permissions', None)
+            if permissions is None:
+                return func(*args, **kwargs)
+            if not isinstance(permissions, ResourcePermissions):
+                return {"status": "error", "msg": "The permissions for this resource should be an instance of the `ResourcePermissions` class"}, 400
+            
+            permitted_roles = getattr(permissions, func.__name__, None)
+            if permitted_roles is None:
+                return {"status": "error", "msg": f"Cannot find the permitted roles for the provided HTTP method, {func.__name__}"}, 400
+            if not isinstance(permitted_roles, (list, tuple,)):
+                permitted_roles = [permitted_roles]
+            if '*' in permitted_roles: 
+                return func(*args, **kwargs)
+            
+            identity = get_jwt_identity()
+            user_roles = identity.get('roles')
 
-        user_permitted_roles = set(user_roles) & set(permitted_roles)
-        if len(user_permitted_roles) > 0:
-            return func(*args, **kwargs)
-        return {'status': 'error', 'message': 'User is not authorized'}, 403
-    return wrapper_decorator
+            user_permitted_roles = set(user_roles) & set(permitted_roles)
+            if len(user_permitted_roles) > 0:
+                return func(*args, **kwargs)
+            return {'status': 'error', "msg": 'User is not authorized'}, 403
+        return wrapper_decorator
+    return outer
     

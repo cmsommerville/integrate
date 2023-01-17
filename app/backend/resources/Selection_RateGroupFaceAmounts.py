@@ -16,6 +16,6 @@ class CRUD_SelectionRateGroupFaceAmounts_List(BaseCRUDResourceList):
     def delete(cls):
         plan_id = request.args.get('plan_id')
         if plan_id is None:
-            return {"status": "error", "message": "Please provide a query parameter `plan_id`"}, 400
+            return {"status": "error", "msg": "Please provide a query parameter `plan_id`"}, 400
         Model_SelectionRateGroupFaceAmounts.delete_by_plan(plan_id)
-        return {"status": "success", "message": "Deleted face amounts for provided plan id"}, 200
+        return {"status": "success", "msg": "Deleted face amounts for provided plan id"}, 200

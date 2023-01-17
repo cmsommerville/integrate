@@ -1,5 +1,6 @@
 import os
 import urllib
+import datetime
 from dotenv import load_dotenv
 from redis import Redis
 
@@ -16,7 +17,10 @@ params = urllib.parse.quote_plus(SQL_SERVER_CONNECTION_STRING)
 
 
 class BaseConfig():
+    JWT_ACCESS_TOKEN_EXPIRES=os.getenv('JWT_ACCESS_TOKEN_EXPIRES', datetime.timedelta(minutes=15))
+    JWT_REFRESH_TOKEN_EXPIRES=os.getenv('JWT_REFRESH_TOKEN_EXPIRES', datetime.timedelta(days=30))
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    JWT_TOKEN_LOCATION = os.getenv('JWT_TOKEN_LOCATION', 'cookies')
     PROPAGATE_EXCEPTIONS = True
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")

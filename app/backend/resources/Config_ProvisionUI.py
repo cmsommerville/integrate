@@ -24,13 +24,13 @@ class CRUD_ConfigProvisionUI(BaseCRUDResource):
         try: 
             model, schema = discriminator(data)
             if not model:  
-                return {"status": "error", "message": str(e)}, 400
+                return {"status": "error", "msg": str(e)}, 400
             _schema = schema()
             obj = _schema.load(data)
             res = model.save_to_db(obj)
             output = _schema.dump(res)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
         
         return output, 201
         
@@ -52,6 +52,6 @@ class CRUD_ConfigProvisionUI_List(BaseCRUDResourceList):
                 obj = _schema.load(item)
                 model.save_to_db(obj)
         except Exception as e:
-            return {"status": "error", "message": str(e)}, 400
+            return {"status": "error", "msg": str(e)}, 400
 
         return data, 201

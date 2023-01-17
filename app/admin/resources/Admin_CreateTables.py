@@ -31,5 +31,5 @@ class Resource_AdminCreateTables(Resource):
         except Exception as e:
             return str(e), 400
         else:
-            return {"message": "Success"}, 200
+            return {"msg": "Success"}, 200
 
