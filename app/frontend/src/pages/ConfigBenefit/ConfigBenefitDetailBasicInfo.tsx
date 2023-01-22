@@ -71,6 +71,7 @@ const ConfigBenefitDetailBasicInfo = ({
             <AppRadioSelect
               as="select"
               items={refBenefits}
+              defaultValue={benefit.ref_benefit.ref_id}
               label="Benefit"
               itemId="ref_id"
               itemLabel="ref_attr_label"
@@ -107,11 +108,12 @@ const ConfigBenefitDetailBasicInfo = ({
               rows={4}
               name="config_benefit_description"
               id="config_benefit_description"
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm placeholder:text-gray-400"
               defaultValue={benefit.config_benefit_description}
               onChange={(e) => {
                 onChange("config_benefit_description", e.target.value);
               }}
+              placeholder="Enter a user-friendly description of this benefit..."
             />
           </div>
         </div>

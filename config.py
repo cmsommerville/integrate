@@ -17,9 +17,12 @@ params = urllib.parse.quote_plus(SQL_SERVER_CONNECTION_STRING)
 
 
 class BaseConfig():
+    JWT_ALGORITHM = 'RS256'
+    JWT_PRIVATE_KEY = open('app/auth/rs256.pem').read()
+    JWT_PUBLIC_KEY = open('app/auth/rs256.pub').read()
     JWT_ACCESS_TOKEN_EXPIRES=os.getenv('JWT_ACCESS_TOKEN_EXPIRES', datetime.timedelta(minutes=15))
     JWT_REFRESH_TOKEN_EXPIRES=os.getenv('JWT_REFRESH_TOKEN_EXPIRES', datetime.timedelta(days=30))
-    JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
+    # JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_TOKEN_LOCATION = os.getenv('JWT_TOKEN_LOCATION', 'cookies')
     PROPAGATE_EXCEPTIONS = True
     PERMANENT_SESSION_LIFETIME = 3600
@@ -30,7 +33,6 @@ class BaseConfig():
     SESSION_COOKIE_SAMESITE = "None"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SUPPORT_TEMPORAL_TABLES = True
-
 
 class DevConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = "mssql+pyodbc:///?odbc_connect=%s" % params

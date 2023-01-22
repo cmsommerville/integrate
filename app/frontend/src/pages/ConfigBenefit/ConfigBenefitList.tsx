@@ -28,13 +28,6 @@ const ConfigBenefitList = () => {
     const controller = new AbortController();
     const signal = controller.signal;
 
-    // fetch(`/api/data/config/product/${product_id}/benefits`, { signal });
-    // .then((res) => {
-    //     if (!res.ok) {
-    //       throw new Error("Cannot get product data");
-    //     }
-    //     return res.json();
-    //   })
     axios
       .get(`/api/data/config/product/${product_id}/benefits`, { signal })
       .then((res) => {

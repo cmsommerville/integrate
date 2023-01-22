@@ -115,6 +115,7 @@ const ConfigBenefitDetailAddlInfo = ({
             <AppRadioSelect
               as="select"
               items={coverages}
+              defaultValue={benefit.config_coverage_id}
               label="Coverage"
               itemId="config_coverage_id"
               itemLabel="config_coverage_label"
@@ -145,6 +146,7 @@ const ConfigBenefitDetailAddlInfo = ({
               as="select"
               items={rateGroups}
               label="Rate Group"
+              defaultValue={benefit.config_rate_group_id}
               itemId="config_rate_group_id"
               itemLabel="config_rate_group_label"
               onClick={(item) => {
@@ -173,6 +175,7 @@ const ConfigBenefitDetailAddlInfo = ({
             <AppRadioSelect
               as="select"
               items={refUnitTypes}
+              defaultValue={benefit.unit_type_id}
               label="Unit Type"
               itemId="ref_id"
               itemLabel={(item) => {

@@ -55,5 +55,8 @@ coverage.xml
 *.log
 *.pot
 
+*.pem
+*.pub
+
 # Sphinx documentation
 docs/_build/

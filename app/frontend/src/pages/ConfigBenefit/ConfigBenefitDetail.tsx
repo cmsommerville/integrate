@@ -6,7 +6,8 @@ import { AppPanel } from "@/components/AppPanel";
 import AppSnackbar from "@/components/AppSnackbar";
 import AppButton from "@/components/AppButton";
 import ConfigBenefitDetailBasicInfo from "./ConfigBenefitDetailBasicInfo";
-import ConfigProductDetailAddlInfo from "./ConfigBenefitDetailAddlInfo";
+import ConfigBenefitDetailAddlInfo from "./ConfigBenefitDetailAddlInfo";
+import ConfigBenefitDetailValuesList from "./ConfigBenefitDetailValuesList";
 import { PageTitle } from "../ConfigProduct/Components";
 import { ConfigBenefit } from "./types";
 
@@ -113,8 +114,9 @@ const ConfigBenefitDetail = () => {
     const controller = new AbortController();
     const signal = controller.signal;
     if (!product_id) return;
+    if (!benefit_id) return;
 
-    fetch(`/api/config/product/${product_id}`, { signal })
+    fetch(`/api/config/product/${product_id}/benefit/${benefit_id}`, { signal })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Cannot get data for product");
@@ -136,7 +138,7 @@ const ConfigBenefitDetail = () => {
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [product_id, benefit_id]);
 
   return (
     <>
@@ -153,7 +155,7 @@ const ConfigBenefitDetail = () => {
         </div>
       </PageTitle>
       <div className="grid grid-cols-6 gap-x-6">
-        <div className="col-span-3 flex flex-col space-y-4">
+        <div className="col-span-4 flex flex-col space-y-4">
           <AppPanel className="pb-16 pt-2 h-fit">
             <>
               <div className="hidden sm:block mb-4">
@@ -232,6 +234,7 @@ function classNames(...classes: string[]) {
 const tabs = [
   { code: "basic", label: "Basic Info", icon: BriefcaseIcon },
   { code: "addl", label: "Additional Data", icon: PuzzlePieceIcon },
+  { code: "values", label: "Values", icon: PuzzlePieceIcon },
 ];
 
 const tabComponentPicker = (
@@ -254,7 +257,15 @@ const tabComponentPicker = (
       );
     case "addl":
       return (
-        <ConfigProductDetailAddlInfo
+        <ConfigBenefitDetailAddlInfo
+          product_id={product_id}
+          benefit={benefit}
+          onChange={setter}
+        />
+      );
+    case "values":
+      return (
+        <ConfigBenefitDetailValuesList
           product_id={product_id}
           benefit={benefit}
           onChange={setter}

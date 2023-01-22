@@ -27,6 +27,11 @@ class Model_AuthRole(db.Model):
 
 
     @classmethod
+    def find_all(cls, *args, **kwargs) -> db.Model:
+        qry = cls.query
+        return qry.all()
+
+    @classmethod
     def find_one(cls, id, *args, **kwargs) -> db.Model:
         qry = cls.query
         return qry.get(id)

@@ -9,5 +9,6 @@ export const STRING_MAX_LENGTH = (val: string, maxLength: number) => {
 }
 
 export const ALPHANUMERIC_UNDERSCORE_HYPHEN = (val: string) => {
+    if (val.match(/[^\w-_]/)) return false
     return true
 }

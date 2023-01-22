@@ -31,6 +31,9 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
+const getDescendantProp = (obj: any, path: string) =>
+  path.split(".").reduce((acc, part) => acc && acc[part], obj);
+
 const AppRadioSelect = ({
   group,
   as,
@@ -66,7 +69,7 @@ const AppRadioSelect = ({
     (item: Item) => {
       if (item._id) return item._id;
       if (!itemId) return item.id;
-      return item[itemId];
+      return getDescendantProp(item, itemId as string);
     },
     [itemId]
   );
@@ -80,15 +83,16 @@ const AppRadioSelect = ({
       // if itemLabel is a function, return the results of the function
       if (typeof itemLabel === "function") return itemLabel(item);
       // otherwise, return the itemLabel key
-
-      return item[itemLabel];
+      return getDescendantProp(item, itemLabel as string);
     },
     [itemLabel]
   );
 
   const selectionItem = useMemo(() => {
     if (!selection) return {};
-    return _items.find((item) => idGetter(item) === selection);
+    return _items.find((item) => {
+      return idGetter(item) === selection;
+    });
   }, [selection, idGetter, _items]);
 
   const _onClickRadio = useCallback(

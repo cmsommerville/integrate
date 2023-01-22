@@ -1,11 +1,10 @@
 import { useEffect } from "react";
-import { refreshAxiosInstance } from "@/services/axios";
+import { refreshAccessToken } from "@/services/axios";
 
 // User has switched back to the tab
 const onVisibilityChange = async () => {
   if (document.visibilityState === "visible") {
-    const data = await refreshAxiosInstance.post("/api/auth/refresh");
-    console.log(data.data);
+    const data = await refreshAccessToken();
   }
 };
 

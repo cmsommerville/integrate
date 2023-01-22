@@ -45,11 +45,12 @@ export type ConfigBenefitAuthACL = {
 export type ConfigBenefitAuth = {
     config_benefit_auth_id?: number | undefined | null;
     config_benefit_id?: number | undefined | null; 
-    priority: number; 
-    min_value: number; 
-    max_value: number; 
-    step_value: number; 
-    default_value: number; 
+    priority?: number; 
+    min_value?: number; 
+    max_value?: number; 
+    step_value?: number; 
+    default_value?: number; 
+    acl?: ConfigBenefitAuthACL[]
 }
 
 export type ConfigBenefit = {
@@ -57,10 +58,14 @@ export type ConfigBenefit = {
     config_product_id: number; 
     ref_benefit_id: number; 
     ref_benefit: RefBenefit;
-    config_coverage_id?: number | null | undefined;
-    config_rate_group_id?: number | null | undefined;
+    config_coverage_id?: number | undefined;
+    config_rate_group_id?: number | undefined;
     config_benefit_version_code: string;
-    unit_type_id?: number | null | undefined;
+    unit_type_id?: number | undefined;
     unit_type: RefUnitType; 
     config_benefit_description: string;
+}
+
+export type ConfigBenefitDetail = ConfigBenefit & {
+    benefit_auth: ConfigBenefitAuth[]
 }

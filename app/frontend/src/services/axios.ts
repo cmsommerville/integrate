@@ -16,10 +16,14 @@ export const getCookie = (cookie_name: string) => {
   return "";
 }
 
-const refreshAccessToken = () => {
-  return refreshAxiosInstance.post(`/api/auth/refresh`)
+export const refreshAccessToken = () => {
+  return authServerAxiosInstance.post(`/refresh`, undefined, {
+    headers: {
+      "Content-Type": "application/json",
+      'x-csrf-token': getCookie('csrf_refresh_token')
+    }
+  })
 }
-
 
 const axiosInstance = axios.create({
   baseURL: '/',
@@ -29,13 +33,14 @@ const axiosInstance = axios.create({
   withCredentials: true
 });
 
-export const refreshAxiosInstance = axios.create({
-  baseURL: '/',
+export const authServerAxiosInstance = axios.create({
+  baseURL: '/api/auth',
   headers: {
       "Content-Type": "application/json",
     },
   withCredentials: true
 });
+
 
 axiosInstance.interceptors.request.use(
   async config => {
@@ -58,17 +63,6 @@ axiosInstance.interceptors.response.use((response) => {
   }
   return Promise.reject(error);
 });
-
-
-
-refreshAxiosInstance.interceptors.request.use(
-  async config => {
-    (config.headers as AxiosHeaders).set("x-csrf-token", getCookie('csrf_refresh_token'));
-    return config;
-  },
-  error => {
-    Promise.reject(error)
-})
 
 
 

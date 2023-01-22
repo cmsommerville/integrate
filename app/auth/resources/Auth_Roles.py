@@ -9,7 +9,14 @@ _schema_list = Schema_AuthRole(many=True)
 class Resource_AuthRoles(Resource): 
     
     @classmethod
-    def post(cls):
+    def get(self):
+        try: 
+            roles = Model_AuthRole.find_all()
+            return _schema_list.dump(roles), 200
+        except:
+            return {"status": "error", "msg": "Cannot get roles"}, 400
+
+    def post(self):
         try: 
             data = request.get_json()
             roles = _schema_list.load(data)
