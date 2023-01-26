@@ -84,22 +84,24 @@ class BaseCRUDResource(Resource):
             req = request.get_json()
             # get existing data 
             obj = cls.model.find_one(id, **cls.model_args)
+            data = cls.schema.dump(obj)
             for attr, val in req.items(): 
-                setattr(obj, attr, val)
+                data[attr] = val
             # save object to database 
-            obj.save_to_db()
+            new = cls.schema.load(data)
+            new.save_to_db()
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
         
         try: 
             _observable = getattr(cls, 'observable', None)
             if _observable:
-                _observable.notify('patch', obj, request)
+                _observable.notify('patch', new, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
         try:
-            return cls.schema.dump(obj), 201
+            return cls.schema.dump(new), 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

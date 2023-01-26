@@ -46,7 +46,7 @@ const ConfigBenefitDetail = () => {
   const [isDirty, setIsDirty] = useState(false);
 
   const [selectedTab, setSelectedTab] = useState(0);
-  const [benefit, setBenefit] = useState<ConfigBenefit>(
+  const [benefit, setBenefit] = useState<Partial<ConfigBenefit>>(
     DEFAULT_CONFIG_BENEFIT(Number(product_id))
   );
 
@@ -240,7 +240,7 @@ const tabs = [
 const tabComponentPicker = (
   selectedTab: number,
   product_id: number | string,
-  benefit: ConfigBenefit,
+  benefit: Partial<ConfigBenefit>,
   setter: (
     key: keyof ConfigBenefit,
     val: number | string | null | undefined
@@ -258,14 +258,6 @@ const tabComponentPicker = (
     case "addl":
       return (
         <ConfigBenefitDetailAddlInfo
-          product_id={product_id}
-          benefit={benefit}
-          onChange={setter}
-        />
-      );
-    case "values":
-      return (
-        <ConfigBenefitDetailValuesList
           product_id={product_id}
           benefit={benefit}
           onChange={setter}

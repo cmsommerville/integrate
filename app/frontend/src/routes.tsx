@@ -13,7 +13,11 @@ import {
   ConfigProductDetailRatingStrategy,
   ConfigProductDetailCensus,
 } from "./pages/ConfigProduct";
-import { ConfigBenefitList, ConfigBenefitDetail } from "./pages/ConfigBenefit";
+import {
+  ConfigBenefitList,
+  ConfigBenefitDetail,
+  ConfigBenefitDetailValuesList,
+} from "./pages/ConfigBenefit";
 import { ConfigProductStateDetail } from "./pages/ConfigProductState";
 
 interface AppRouteObject extends RouteObject {
@@ -78,6 +82,10 @@ export const routes: AppRouteObject[] = [
       {
         path: "/app/config/product/:product_id/benefit/:benefit_id",
         element: <ConfigBenefitDetail />,
+      },
+      {
+        path: "/app/config/product/:product_id/benefit/:benefit_id/values",
+        element: <ConfigBenefitDetailValuesList />,
       },
     ],
   },

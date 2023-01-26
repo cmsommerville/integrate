@@ -1,36 +1,46 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { useParams, useNavigate } from "react-router";
 import {
-  ConfigBenefit,
   ConfigBenefitAuth,
   ConfigBenefitAuthACL,
   ConfigBenefitDetail,
 } from "./types";
 import { AuthRole } from "@/types/auth";
 import axios, { authServerAxiosInstance } from "@/services/axios";
-import { GridApi, ColumnApi, ColDef } from "ag-grid-community";
+import {
+  GridApi,
+  ColumnApi,
+  ColDef,
+  ICellRendererParams,
+  RowClickedEvent,
+  RowDragEndEvent,
+  RowDoubleClickedEvent,
+} from "ag-grid-community";
 import Grid from "@/components/Grid";
 import AppButton from "@/components/AppButton";
+import { PageTitle } from "../ConfigProduct/Components";
+import { AppPanel } from "@/components/AppPanel";
+import { Tabs, TabCode } from "./Components";
+import { PlusIcon } from "@heroicons/react/20/solid";
 
 import ConfigBenefitDetailValues from "./ConfigBenefitDetailValues";
-
-type Props = {
-  product_id: number | string;
-  benefit: ConfigBenefit;
-  onChange(key: string, val: any): void;
-};
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-const ConfigBenefitDetailValuesList = ({
-  product_id,
-  benefit,
-  onChange,
-  ...props
-}: Props) => {
+const ConfigBenefitDetailValuesList = () => {
+  const { product_id, benefit_id } = useParams();
+
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
   const [showBenefitPanel, toggleOpenBenefitPanel] = useState(false);
-  const [benefitDetail, setBenefitDetail] = useState<ConfigBenefitDetail>();
+  const [benefitAuths, setBenefitAuths] = useState<
+    Partial<ConfigBenefitAuth>[]
+  >([]);
+  const [benefit, setBenefit] = useState<Partial<ConfigBenefitDetail>>({});
+  const [selected, setSelected] = useState<Partial<ConfigBenefitAuth>>({});
   const [authRoles, setAuthRoles] = useState<AuthRole[]>([]);
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
@@ -39,15 +49,20 @@ const ConfigBenefitDetailValuesList = ({
     const controller = new AbortController();
     const signal = controller.signal;
 
-    if (!benefit) return;
-
     axios
-      .get(
-        `/api/config/product/${product_id}/benefit/${benefit.config_benefit_id}`,
-        { signal }
-      )
+      .get(`/api/config/product/${product_id}/benefit/${benefit_id}`, {
+        signal,
+      })
       .then((res) => {
-        setBenefitDetail(res.data);
+        const { benefit_auth, ...benefit } = res.data;
+        const b = [...benefit_auth] as ConfigBenefitAuth[];
+        b.sort((x, y) => {
+          if (x.priority == null) return 1;
+          if (y.priority == null) return -1;
+          return x.priority < y.priority ? -1 : 1;
+        });
+        setBenefitAuths(b);
+        setBenefit(benefit);
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
@@ -58,7 +73,7 @@ const ConfigBenefitDetailValuesList = ({
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [product_id, benefit_id]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -83,74 +98,205 @@ const ConfigBenefitDetailValuesList = ({
   useEffect(() => {
     if (!gridApi) return;
     if (!columnApi) return;
-    if (!benefitDetail) return;
+    if (!benefitAuths) return;
     if (!authRoles.length) return;
-    if (!benefitDetail.benefit_auth) return;
 
-    gridApi.setRowData(benefitDetail.benefit_auth);
-  }, [gridApi, columnApi, benefitDetail, authRoles]);
+    gridApi.setRowData(benefitAuths);
+  }, [gridApi, columnApi, benefitAuths, authRoles]);
 
   const onFirstDataRendered = () => {
     if (!columnApi) return;
     columnApi.autoSizeAllColumns();
   };
 
-  const onDataEdit = (bnft: ConfigBenefitAuth) => {
-    setBenefitDetail((prev) => {
-      if (!prev) return prev;
-      if (!prev.benefit_auth) {
-        prev.benefit_auth = [bnft];
-        console.log("here");
-      } else {
-        prev.benefit_auth = [...prev.benefit_auth, bnft];
-        console.log("Herreeee");
-      }
-      return { ...prev };
+  const isValid = useMemo(() => {
+    // return Object.entries(benefit).reduce((isValid, [k, v]) => {
+    //   return isValid && validator(k as keyof ConfigBenefit, v);
+    // }, true);
+    return true;
+  }, []);
+
+  const onTabClick = (selected: TabCode) => {
+    console.log(selected);
+  };
+
+  const onDataEdit = (bnft: Partial<ConfigBenefitAuth>) => {
+    if (!benefitAuths) return;
+    const bnfts = [
+      ...benefitAuths.filter((b) => {
+        return b.config_benefit_auth_id !== bnft.config_benefit_auth_id;
+      }),
+      { priority: 999, ...bnft },
+    ];
+    bnfts.sort((a, b) => {
+      if (!a.priority) return 1;
+      if (!b.priority) return -1;
+      return a.priority < b.priority ? -1 : 1;
     });
+
+    setBenefitAuths((prev) => {
+      return { ...prev, benefit_auth: bnfts };
+    });
+    setIsDirty(true);
+  };
+
+  const reprioritizeRows = (api: GridApi) => {
+    // loop through all the rows in the grid and set the priority based on display order
+    let data = [] as any[];
+    api.forEachNode((row, i) => {
+      const r = row.data;
+      r.priority = (i + 1) * 10;
+      data.push(r);
+    });
+    api.applyTransaction({
+      update: data,
+    })!;
+    setIsDirty(true);
+  };
+
+  const onRowClick = (event: RowClickedEvent) => {
+    setSelected(event.data);
+  };
+
+  const onRowDragEnd = (event: RowDragEndEvent) => {
+    // reset the priority as a data element whenever drag event ends
+    reprioritizeRows(event.api);
+    event.api.refreshCells();
+  };
+
+  const openBenefitAuthEditHandler = () => {
+    // make sure to set the priority before a new benefit auth is added
+    // also opens on double click
+    if (!gridApi) return;
+    reprioritizeRows(gridApi);
+    toggleOpenBenefitPanel(true);
+  };
+
+  const onCloseBenefitSidePanel = () => {
+    setSelected({});
+    toggleOpenBenefitPanel(false);
+  };
+
+  const onSave = () => {
+    axios
+      .patch(`/api/config/product/${product_id}/benefit/${benefit_id}`, {
+        benefit_auth: benefitAuths,
+      })
+      .then((res) => {
+        console.log(res);
+      });
   };
 
   return (
-    <div className="space-y-4">
-      <ConfigBenefitDetailValues
-        open={showBenefitPanel}
-        onSave={onDataEdit}
-        onClose={() => toggleOpenBenefitPanel(false)}
-      />
-      <div className="h-72">
-        <Grid
-          onGridReady={(params) => {
-            setGridApi(params.api);
-            setColumnApi(params.columnApi);
-          }}
-          defaultColDef={{
-            filter: true,
-            resizable: true,
-            sortable: true,
-          }}
-          rowDragManaged={true}
-          rowDragEntireRow={true}
-          animateRows={true}
-          onRowDragEnd={(params) => params.api.refreshCells()}
-          context={{
-            authRoles: authRoles,
-          }}
-          columnDefs={GRID_COLUMNS}
-          onFirstDataRendered={onFirstDataRendered}
-        />
-      </div>
+    <>
+      <PageTitle
+        title="Benefit Values"
+        subtitle="Set defaults, mins, and maxes, and which roles are authorized to use them..."
+      >
+        <div className="flex items-end">
+          <AppButton
+            disabled={!isValid || !isDirty}
+            isLoading={isSaving}
+            onClick={onSave}
+          >
+            Save
+          </AppButton>
+        </div>
+      </PageTitle>
+      <div className="grid grid-cols-6 gap-x-6">
+        <div className="col-span-4 flex flex-col space-y-4">
+          <AppPanel className="pb-16 pt-2 h-fit">
+            <>
+              <Tabs selected="values" onClick={onTabClick} />
+              <div className="space-y-4">
+                <ConfigBenefitDetailValues
+                  open={showBenefitPanel}
+                  benefit_auth={selected}
+                  benefit={benefit}
+                  onSave={onDataEdit}
+                  onClose={onCloseBenefitSidePanel}
+                />
+                <div className="h-72 relative">
+                  <Grid
+                    onGridReady={(params) => {
+                      setGridApi(params.api);
+                      setColumnApi(params.columnApi);
+                    }}
+                    defaultColDef={{
+                      filter: true,
+                      resizable: true,
+                      sortable: false,
+                    }}
+                    rowDragManaged={true}
+                    rowDragEntireRow={true}
+                    animateRows={true}
+                    onRowDragEnd={onRowDragEnd}
+                    onRowClicked={onRowClick}
+                    onRowDoubleClicked={openBenefitAuthEditHandler}
+                    context={{
+                      authRoles: authRoles,
+                      benefit: benefit,
+                    }}
+                    columnDefs={GRID_COLUMNS}
+                    onFirstDataRendered={onFirstDataRendered}
+                  />
 
-      <div className="flex justify-end">
-        <AppButton
-          transparent={true}
-          onClick={() => toggleOpenBenefitPanel(true)}
-        >
-          New
-        </AppButton>
+                  <button
+                    className="absolute -bottom-6 right-0 rounded-full p-4 bg-primary-600 text-white ring-offset-2 transition-all ease duration-300 hover:bg-primary-700 hover:ring-2 hover:ring-primary-700"
+                    onClick={openBenefitAuthEditHandler}
+                  >
+                    <PlusIcon className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex justify-end"></div>
+              </div>
+            </>
+          </AppPanel>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
+const BenefitAmountRenderer = (params: ICellRendererParams) => {
+  const unit_type = params.context.benefit.unit_type.ref_attr_symbol;
+  const val = params.value;
+  let symbol;
+  if (unit_type === "%") {
+    return (
+      <div className="w-full flex justify-space-between items-center space-x-1">
+        <div className="w-full">{val}</div>
+        <div className="text-gray-400 text-xs">%</div>
+      </div>
+    );
+  }
+  if (["$"].includes(unit_type)) {
+    return (
+      <div className="w-full flex justify-space-between items-center space-x-1">
+        <div className="text-gray-400 text-xs w-full flex">{unit_type}</div>
+        <div className="">{val}</div>
+      </div>
+    );
+  }
+  return;
+};
+
+const RangeRenderer = (params: ICellRendererParams) => {
+  const unit_type = params.context.benefit.unit_type.ref_attr_symbol;
+  let symbol;
+  if (unit_type === "%") {
+    return (
+      <div className="w-full flex justify-space-between items-center space-x-1">
+        <div className="w-full">
+          [{params.data.min_value} - {params.data.max_value}]
+        </div>
+        <div className="text-gray-400 text-xs">%</div>
+      </div>
+    );
+  }
+  return;
+};
 const GRID_COLUMNS = [
   {
     headerName: "Priority",
@@ -164,9 +310,14 @@ const GRID_COLUMNS = [
   {
     field: "default_value",
     headerName: "Default",
-    valueGetter: (params) => {
-      return `${params.data.default_value}%`;
-    },
+    cellClass: "text-right",
+    cellRenderer: BenefitAmountRenderer,
+  },
+  {
+    field: "min_value",
+    headerName: "Range",
+    cellClass: "text-right",
+    cellRenderer: RangeRenderer,
   },
   {
     headerName: "Roles",

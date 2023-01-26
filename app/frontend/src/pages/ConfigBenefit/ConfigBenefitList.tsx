@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "@/services/axios";
 import { PlusIcon } from "@heroicons/react/20/solid";
 
 import { AppPanel } from "@/components/AppPanel";
 import AppButton from "@/components/AppButton";
-import { ConfigBenefit, RefBenefit } from "./types";
+import { ConfigBenefit } from "./types";
 import Grid, { EditLinkComponent } from "@/components/Grid";
 import {
   GridApi,
@@ -22,7 +22,7 @@ const ConfigBenefitList = () => {
   const [gridApi, setGridApi] = useState<GridApi>();
   const [columnApi, setColumnApi] = useState<ColumnApi>();
 
-  const [benefits, setBenefits] = useState<ConfigBenefit[]>([]);
+  const [benefits, setBenefits] = useState<Partial<ConfigBenefit>[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();

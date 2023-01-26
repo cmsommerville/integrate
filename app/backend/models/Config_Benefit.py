@@ -25,9 +25,9 @@ class Model_ConfigBenefitAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
 
 class Model_ConfigBenefitAuth(BaseModel):
     __tablename__ = CONFIG_BENEFIT_AUTH
-    __table_args__ = (
-        db.UniqueConstraint('config_benefit_id', 'priority'), 
-    )
+    # __table_args__ = (
+    #     db.UniqueConstraint('config_benefit_id', 'priority'), 
+    # )
 
     config_benefit_auth_id = db.Column(db.Integer, primary_key=True)
     config_benefit_id = db.Column(db.ForeignKey(

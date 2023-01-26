@@ -5,7 +5,7 @@ import AppRadioSelect from "@/components/AppRadioSelect";
 
 type Props = {
   product_id: number | string;
-  benefit: ConfigBenefit;
+  benefit: Partial<ConfigBenefit>;
   onChange(key: string, val: any): void;
 };
 
@@ -15,7 +15,7 @@ const ConfigBenefitDetailBasicInfo = ({
   onChange,
   ...props
 }: Props) => {
-  const [refBenefits, setRefBenefits] = useState<RefBenefit[]>([]);
+  const [refBenefits, setRefBenefits] = useState<Partial<RefBenefit>[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -71,7 +71,7 @@ const ConfigBenefitDetailBasicInfo = ({
             <AppRadioSelect
               as="select"
               items={refBenefits}
-              defaultValue={benefit.ref_benefit.ref_id}
+              defaultValue={benefit.ref_benefit?.ref_id}
               label="Benefit"
               itemId="ref_id"
               itemLabel="ref_attr_label"

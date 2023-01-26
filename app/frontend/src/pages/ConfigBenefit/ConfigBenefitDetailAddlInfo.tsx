@@ -2,17 +2,15 @@ import { useState, useEffect } from "react";
 import { FolderPlusIcon } from "@heroicons/react/20/solid";
 import {
   ConfigBenefit,
-  RefBenefit,
   RefUnitType,
   ConfigCoverage,
   ConfigRateGroup,
 } from "./types";
 import AppRadioSelect from "@/components/AppRadioSelect";
-import AppButton from "@/components/AppButton";
 
 type Props = {
   product_id: number | string;
-  benefit: ConfigBenefit;
+  benefit: Partial<ConfigBenefit>;
   onChange(key: string, val: any): void;
 };
 
@@ -26,9 +24,9 @@ const ConfigBenefitDetailAddlInfo = ({
   onChange,
   ...props
 }: Props) => {
-  const [refUnitTypes, setRefUnitTypes] = useState<RefUnitType[]>([]);
-  const [coverages, setCoverages] = useState<ConfigCoverage[]>([]);
-  const [rateGroups, setRateGroups] = useState<ConfigRateGroup[]>([]);
+  const [refUnitTypes, setRefUnitTypes] = useState<Partial<RefUnitType>[]>([]);
+  const [coverages, setCoverages] = useState<Partial<ConfigCoverage>[]>([]);
+  const [rateGroups, setRateGroups] = useState<Partial<ConfigRateGroup>[]>([]);
 
   useEffect(() => {
     const controller = new AbortController();
