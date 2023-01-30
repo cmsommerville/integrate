@@ -13,11 +13,7 @@ import {
   ConfigProductDetailRatingStrategy,
   ConfigProductDetailCensus,
 } from "./pages/ConfigProduct";
-import {
-  ConfigBenefitList,
-  ConfigBenefitDetail,
-  ConfigBenefitDetailValuesList,
-} from "./pages/ConfigBenefit";
+import { routes as benefit_routes } from "./pages/ConfigBenefit/routes";
 import { ConfigProductStateDetail } from "./pages/ConfigProductState";
 
 interface AppRouteObject extends RouteObject {
@@ -72,21 +68,25 @@ export const routes: AppRouteObject[] = [
       },
 
       {
-        path: "/app/config/product/:product_id/benefits",
-        element: <ConfigBenefitList />,
+        path: "/app/config/product/:product_id",
+        children: [...benefit_routes],
       },
-      {
-        path: "/app/config/product/:product_id/benefit",
-        element: <ConfigBenefitDetail />,
-      },
-      {
-        path: "/app/config/product/:product_id/benefit/:benefit_id",
-        element: <ConfigBenefitDetail />,
-      },
-      {
-        path: "/app/config/product/:product_id/benefit/:benefit_id/values",
-        element: <ConfigBenefitDetailValuesList />,
-      },
+      // {
+      //   path: "/app/config/product/:product_id/benefits",
+      //   element: <ConfigBenefitList />,
+      // },
+      // {
+      //   path: "/app/config/product/:product_id/benefit",
+      //   element: <ConfigBenefitDetail />,
+      // },
+      // {
+      //   path: "/app/config/product/:product_id/benefit/:benefit_id",
+      //   element: <ConfigBenefitDetail />,
+      // },
+      // {
+      //   path: "/app/config/product/:product_id/benefit/:benefit_id/values",
+      //   element: <ConfigBenefitDetailValuesList />,
+      // },
     ],
   },
 ];

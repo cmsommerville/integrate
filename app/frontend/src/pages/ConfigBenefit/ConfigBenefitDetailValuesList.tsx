@@ -22,6 +22,11 @@ import { PageTitle } from "../ConfigProduct/Components";
 import { AppPanel } from "@/components/AppPanel";
 import { Tabs, TabCode } from "./Components";
 import { PlusIcon } from "@heroicons/react/20/solid";
+import {
+  ArrowsUpDownIcon,
+  PlusCircleIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 
 import ConfigBenefitDetailValues from "./ConfigBenefitDetailValues";
 
@@ -31,6 +36,7 @@ function classNames(...classes: string[]) {
 
 const ConfigBenefitDetailValuesList = () => {
   const { product_id, benefit_id } = useParams();
+  const navigate = useNavigate();
 
   const [isSaving, setIsSaving] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -117,7 +123,9 @@ const ConfigBenefitDetailValuesList = () => {
   }, []);
 
   const onTabClick = (selected: TabCode) => {
-    console.log(selected);
+    navigate(
+      `/app/config/product/${product_id}/benefit/${benefit_id}/${selected}`
+    );
   };
 
   const onDataEdit = (bnft: Partial<ConfigBenefitAuth>) => {
@@ -242,10 +250,10 @@ const ConfigBenefitDetailValuesList = () => {
                   />
 
                   <button
-                    className="absolute -bottom-6 right-0 rounded-full p-4 bg-primary-600 text-white ring-offset-2 transition-all ease duration-300 hover:bg-primary-700 hover:ring-2 hover:ring-primary-700"
+                    className="absolute -bottom-6 right-0 rounded-full p-3 bg-primary-600 text-white ring-offset-2 transition-all ease duration-300 hover:bg-primary-700 hover:ring-2 hover:ring-primary-700"
                     onClick={openBenefitAuthEditHandler}
                   >
-                    <PlusIcon className="w-5 h-5" />
+                    <PlusIcon className="w-6 h-6" />
                   </button>
                 </div>
 
@@ -253,6 +261,46 @@ const ConfigBenefitDetailValuesList = () => {
               </div>
             </>
           </AppPanel>
+        </div>
+        <div className="col-span-2 flex flex-col">
+          <aside className="text-primary-900/50 text-sm space-y-5">
+            <AppPanel>
+              <div className="flex space-x-4">
+                <div className="flex items-center">
+                  <PlusCircleIcon className="w-10 h-10" />
+                </div>
+                <p className="">
+                  Click the plus icon to add a new set of benefit values, or
+                  doubleclick a row to edit existing values.
+                </p>
+              </div>
+            </AppPanel>
+
+            <AppPanel>
+              <div className="flex space-x-4">
+                <div className="flex items-center">
+                  <UserIcon className="w-10 h-10" />
+                </div>
+                <p className="">
+                  A user will only be able to see a set of benefit values if she
+                  belongs to an authorized role. If the user is able to see
+                  multiple sets of benefit values, then the least restrictive
+                  set will be displayed.
+                </p>
+              </div>
+            </AppPanel>
+            <AppPanel>
+              <div className="flex space-x-4">
+                <div className="flex items-center">
+                  <ArrowsUpDownIcon className="w-10 h-10" />
+                </div>
+                <p className="">
+                  Rows should be arranged in order of most to least restrictive.
+                  Drag rows to change their priority.
+                </p>
+              </div>
+            </AppPanel>
+          </aside>
         </div>
       </div>
     </>

@@ -5,9 +5,21 @@ function classNames(...classes: string[]) {
 }
 
 const tabs = [
-  { code: "basic", label: "Basic Info", icon: BriefcaseIcon },
-  { code: "addl", label: "Additional Data", icon: PuzzlePieceIcon },
-  { code: "values", label: "Values", icon: PuzzlePieceIcon },
+  {
+    code: "basic",
+    label: "Basic Info",
+    icon: BriefcaseIcon,
+  },
+  {
+    code: "addl",
+    label: "Additional Data",
+    icon: PuzzlePieceIcon,
+  },
+  {
+    code: "values",
+    label: "Values",
+    icon: PuzzlePieceIcon,
+  },
 ] as const;
 
 export type TabCode = typeof tabs[number]["code"];
