@@ -16,9 +16,6 @@ class CRUD_ConfigProductState_List(BaseCRUDResourceList):
     def get(cls, product_id: int, *args, **kwargs):
         try: 
             objs = cls.model.find_by_product(product_id)
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('get', objs, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

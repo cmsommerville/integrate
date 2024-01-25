@@ -2,13 +2,11 @@ from flask import request
 from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
-from .BaseObservable import BaseObservable
 from app.auth import authorize, ResourcePermissions
 
 class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
-    observable: BaseObservable = None
     model_args: dict = {}
     permissions = ResourcePermissions()
 
@@ -22,13 +20,6 @@ class BaseCRUDResource(Resource):
             obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
             return {}, 200
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('get', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
 
         return cls.schema.dump(obj), 200
   
@@ -46,13 +37,6 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "msg": str(e)}, 400
 
         try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('post', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
             return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
@@ -63,13 +47,6 @@ class BaseCRUDResource(Resource):
             req = request.get_json()
             obj = cls.schema.load(req)
             obj.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('put', obj, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -93,13 +70,6 @@ class BaseCRUDResource(Resource):
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
         
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('patch', new, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
         try:
             return cls.schema.dump(new), 201
         except Exception as e:
@@ -113,13 +83,6 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "msg": str(e)}, 400
         
         try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('delete', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
             obj.delete()
             return {"status": "Deleted"}, 204
         except Exception as e:
@@ -129,7 +92,6 @@ class BaseCRUDResource(Resource):
 class BaseCRUDResourceList(Resource):
     model: BaseModel
     schema: BaseSchema
-    observable: BaseObservable = None
     model_args: dict = {}
     permissions = ResourcePermissions()
 
@@ -141,9 +103,6 @@ class BaseCRUDResourceList(Resource):
     def get(cls, *args, **kwargs):
         try: 
             objs = cls.model.find_all(**cls.model_args)
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('get', objs, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -160,13 +119,6 @@ class BaseCRUDResourceList(Resource):
             req = request.get_json()
             objs = cls.schema.load(req)
             cls.model.save_all_to_db(objs)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('post', objs, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

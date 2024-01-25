@@ -1,10 +1,6 @@
 import os
-import json
-from flask import request, current_app
-from flask_marshmallow import Schema
-from flask_restx import Resource, fields
-from app.extensions import db
-from app.shared import BaseTemporalTable
+from flask import request
+from flask_restx import Resource
 from app.backend.data import load_selection
 
 

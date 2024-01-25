@@ -1,5 +1,5 @@
 from flask_restx import Resource
-from app.shared import BaseCRUDResource, BaseCRUDResourceList, BaseObservable
+from app.shared import BaseCRUDResource, BaseCRUDResourceList
 from ..models import Model_ConfigAttributeSet_Gender, Model_ConfigAttributeSet_SmokerStatus, Model_ConfigAttributeSet_Relationship, Model_ConfigAttributeSet, Model_ConfigAttributeSet_NoJoin
 from ..schemas import Schema_ConfigAttributeSet_Gender, Schema_ConfigAttributeSet_SmokerStatus,  Schema_ConfigAttributeSet_Relationship, Schema_ConfigAttributeSet, Schema_ConfigAttributeSet_NoJoin
 

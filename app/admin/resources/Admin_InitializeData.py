@@ -1,9 +1,6 @@
 import os
-import json
-from flask import request, current_app
-from flask_marshmallow import Schema
-from flask_restx import Resource, fields
-from app.extensions import db
+from flask import request
+from flask_restx import Resource
 from app.backend.data import load_rate_table, load_refdata, load_config
 
 

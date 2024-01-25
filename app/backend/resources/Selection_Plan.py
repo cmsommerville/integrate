@@ -2,19 +2,19 @@ from flask_restx import Resource
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
 from ..models import Model_SelectionPlan, Model_ConfigProduct, \
     Model_ConfigProductMapperSet_Gender, Model_ConfigProductMapperSet_SmokerStatus
-from ..observables import Observable_SelectionPlan
+
 from ..schemas import Schema_SelectionPlan, Schema_ConfigProduct, \
     Schema_ConfigProductMapperSet_Gender, Schema_ConfigProductMapperSet_SmokerStatus
 
 class CRUD_SelectionPlan(BaseCRUDResource): 
     model = Model_SelectionPlan
     schema = Schema_SelectionPlan()
-    observable = Observable_SelectionPlan
+
 
 class CRUD_SelectionPlan_List(BaseCRUDResourceList): 
     model = Model_SelectionPlan
     schema = Schema_SelectionPlan(many=True)
-    observable = Observable_SelectionPlan
+
 
 
 class Resource_SelectionPlan_ConfigProduct(Resource):
