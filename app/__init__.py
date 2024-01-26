@@ -1,18 +1,14 @@
-import os
 from flask import Flask
 from flask_cors import CORS
-from flask_restx import Resource
-from dotenv import load_dotenv
-import logging
 from sqlalchemy import event
+from dotenv import load_dotenv
 
-# logging.basicConfig(filename='logs/info.log')
-# logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
-from app.extensions import db, ma, api, sess, jwt
+from app.extensions import db, ma, api, sess
 from app.shared import bind_namespaces
+from app.auth import set_db_user_id
 
-load_dotenv()        
+load_dotenv()
+
 
 def create_app(config):
     app = Flask(__name__)
@@ -24,23 +20,13 @@ def create_app(config):
     app.config["SESSION_SQLALCHEMY"] = db
 
     api.init_app(app)
-    jwt.init_app(app)
     sess.init_app(app)
-    
+
     # bind routes
     from .route_registration import NAMESPACES
-    bind_namespaces(api, NAMESPACES, '/api')
 
-    from work.test import Resource_TestSQLJSON
-    api.add_resource(Resource_TestSQLJSON, '/work/test')
+    bind_namespaces(api, NAMESPACES, "/api")
 
-    # bind subscribers
-    from .subscription_registration import SUBSCRIPTIONS
-    for subscription in SUBSCRIPTIONS:
-        subscription.subscribe()
-
-    import app.auth as auth
-    
-    app.register_blueprint(auth.auth)
+    event.listens_for(db.session, "after_begin")(set_db_user_id)
 
     return app

@@ -4,7 +4,8 @@ from app.shared import BaseSchema
 from ..models import Model_AuthUser
 from .AuthUserRole import Schema_AuthUserRole
 
-class Schema_AuthUser_JWT(BaseSchema):
+
+class Schema_AuthUser_Output(BaseSchema):
     auth_user_id = ma.Integer()
     user_name = ma.String()
     roles = ma.Function(lambda obj: [r.role.auth_role_code for r in obj.roles])
