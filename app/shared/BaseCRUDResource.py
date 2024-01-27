@@ -69,19 +69,12 @@ class BaseCRUDResource(Resource):
     def patch(cls, id, *args, **kwargs):
         try:
             req = request.get_json()
-            # get existing data
-            obj = cls.model.find_one(id, **cls.model_args)
-            data = cls.schema.dump(obj)
-            for attr, val in req.items():
-                data[attr] = val
-            # save object to database
-            new = cls.schema.load(data)
-            new.save_to_db()
+            obj = cls.model.update_one(id, req)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
         try:
-            return cls.schema.dump(new), 201
+            return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

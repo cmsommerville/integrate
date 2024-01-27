@@ -4,13 +4,11 @@ import pandas as pd
 from functools import reduce
 from flask import current_app
 from typing import List
-from sqlalchemy import text, event
+from sqlalchemy import text
 from sqlalchemy.sql import text as text_sql
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
-from sqlalchemy.orm import ORMExecuteState
 from app.extensions import db
-from app.auth.tables import SCHEMA_NAME
 
 
 class BaseModel(db.Model):
@@ -77,7 +75,7 @@ class BaseModel(db.Model):
         )
         qry = cls.query.filter(
             *[
-                getattr(cls, k).in_(v) if type(v) == list else getattr(cls, k) == v
+                getattr(cls, k).in_(v) if isinstance(v, list) else getattr(cls, k) == v
                 for k, v in attrs.items()
             ]
         )
@@ -100,8 +98,10 @@ class BaseModel(db.Model):
             qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
         if as_pandas:
             return pd.read_sql(
-                qry.statement, qry.session.bind, coerce_float=False
-            ).iloc[offset : (offset + limit)]
+                qry.slice(offset, offset + limit).statement,
+                qry.session.bind,
+                coerce_float=False,
+            )
         return qry.slice(offset, offset + limit).all()
 
     @classmethod
@@ -112,6 +112,14 @@ class BaseModel(db.Model):
         except Exception:
             db.session.rollback()
             raise
+
+    @classmethod
+    def update_one(cls, id: int, attrs: dict, *args, **kwargs) -> List[BaseModel]:
+        pk = inspect(cls.__class__).primary_key[0]
+        qry = cls.query.filter(pk == id).update(attrs, synchronize_session="fetch")
+        db.session.commit()
+
+        return qry.first()
 
     @classmethod
     def bulk_save_all_to_db(cls, data) -> None:

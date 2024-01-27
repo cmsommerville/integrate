@@ -1,5 +1,0 @@
-{
-  "/config/products/page": "app/config/products/page.js",
-  "/config/product/[id]/page": "app/config/product/[id]/page.js",
-  "/config/product/[id]/variations/page": "app/config/product/[id]/variations/page.js"
-}
