@@ -18,16 +18,8 @@ from .Config_AttributeDetail import (
     CRUD_ConfigAttributeDetail_List,
 )
 from .Config_AttributeSet import (
-    CRUD_ConfigAttributeSet_Gender,
-    CRUD_ConfigAttributeSet_SmokerStatus,
-    CRUD_ConfigAttributeSet_Relationship,
-    CRUD_ConfigAttributeSet_Gender_List,
-    CRUD_ConfigAttributeSet_SmokerStatus_List,
-    CRUD_ConfigAttributeSet_Relationship_List,
     CRUD_ConfigAttributeSet,
     CRUD_ConfigAttributeSet_List,
-    CRUD_ConfigAttributeSet_NoJoin,
-    CRUD_ConfigAttributeSet_NoJoin_List,
 )
 from .Config_Benefit import (
     CRUD_ConfigBenefit,
@@ -85,5 +77,17 @@ from .Config_ProvisionState import (
 from .Config_ProvisionUI import CRUD_ConfigProvisionUI, CRUD_ConfigProvisionUI_List
 from .Config_RateGroup import CRUD_ConfigRateGroup, CRUD_ConfigRateGroup_List
 from .Config_RateTable import CRUD_ConfigRateTable, CRUD_ConfigRateTable_List
+from .Config_RatingMapperCollection import (
+    CRUD_ConfigRatingMapperCollection,
+    CRUD_ConfigRatingMapperCollection_List,
+)
+from .Config_RatingMapperSet import (
+    CRUD_ConfigRatingMapperSet,
+    CRUD_ConfigRatingMapperSet_List,
+)
+from .Config_RatingMapperDetail import (
+    CRUD_ConfigRatingMapperDetail,
+    CRUD_ConfigRatingMapperDetail_List,
+)
 from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List

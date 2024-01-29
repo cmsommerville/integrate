@@ -19,3 +19,5 @@ class Model_ConfigRatingMapperCollection(BaseModel):
     default_config_rating_mapper_set_id = db.Column(db.Integer, nullable=True)
     is_selectable = db.Column(db.Boolean, default=False)
     can_override_distribution = db.Column(db.Boolean, default=False)
+
+    attribute_set = db.relationship("Model_ConfigAttributeSet")

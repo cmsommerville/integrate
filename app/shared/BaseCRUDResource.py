@@ -22,36 +22,57 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     @authorization_required(permissions.get("get"))
-    def get(cls, id, *args, **kwargs):
-        try:
-            obj = cls.model.find_one(id, **cls.model_args)
-        except Exception:
-            return {}, 200
-
-        return cls.schema.dump(obj), 200
+    def get(cls, *args, **kwargs):
+        return cls.retrieve(*args, **kwargs)
 
     @classmethod
     @authorization_required(permissions.get("post"))
     def post(cls, *args, **kwargs):
-        try:
-            req = request.get_json()
-            obj = cls.schema.load(req)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            obj.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        return cls.create(*args, **kwargs)
 
     @classmethod
     @authorization_required(permissions.get("put"))
     def put(cls, *args, **kwargs):
+        return cls.replace(*args, **kwargs)
+
+    @classmethod
+    @authorization_required(permissions.get("patch"))
+    def patch(cls, id, *args, **kwargs):
+        return cls.update(id, *args, **kwargs)
+
+    @classmethod
+    @authorization_required(permissions.get("delete"))
+    def delete(cls, id, *args, **kwargs):
+        return cls.destroy(id, *args, **kwargs)
+
+    @classmethod
+    def retrieve(cls, id, *args, **kwargs):
+        try:
+            obj = cls.model.find_one(id, **cls.model_args)
+        except Exception:
+            return {}, 200
+        return cls.schema.dump(obj), 200
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        try:
+            req = request.get_json()
+            obj = cls.schema.load(req)
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+        try:
+            obj.save_to_db()
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+        try:
+            return cls.schema.dump(obj), 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+    @classmethod
+    def replace(cls, *args, **kwargs):
         try:
             req = request.get_json()
             obj = cls.schema.load(req)
@@ -65,8 +86,7 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
-    @authorization_required(permissions.get("patch"))
-    def patch(cls, id, *args, **kwargs):
+    def update(cls, id, *args, **kwargs):
         try:
             req = request.get_json()
             obj = cls.model.update_one(id, req)
@@ -79,8 +99,7 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
-    @authorization_required(permissions.get("delete"))
-    def delete(cls, id, *args, **kwargs):
+    def destroy(cls, id, *args, **kwargs):
         try:
             obj = cls.model.find_one(id, **cls.model_args)
         except Exception as e:
@@ -108,6 +127,15 @@ class BaseCRUDResourceList(Resource):
     @classmethod
     @authorization_required(permissions.get("get"))
     def get(cls, *args, **kwargs):
+        return cls.list(*args, **kwargs)
+
+    @classmethod
+    @authorization_required(permissions.get("post"))
+    def post(cls, *args, **kwargs):
+        return cls.bulk_create(*args, **kwargs)
+
+    @classmethod
+    def list(cls, *args, **kwargs):
         try:
             objs = cls.model.find_all(**cls.model_args)
         except Exception as e:
@@ -121,8 +149,7 @@ class BaseCRUDResourceList(Resource):
             return [], 200
 
     @classmethod
-    @authorization_required(permissions.get("post"))
-    def post(cls, *args, **kwargs):
+    def bulk_create(cls, *args, **kwargs):
         try:
             req = request.get_json()
             objs = cls.schema.load(req)

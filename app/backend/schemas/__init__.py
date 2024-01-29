@@ -7,11 +7,7 @@ from .Config_AgeDistribution import Schema_ConfigAgeDistribution
 from .Config_AgeDistributionSet import Schema_ConfigAgeDistributionSet
 from .Config_AttributeDetail import Schema_ConfigAttributeDetail
 from .Config_AttributeSet import (
-    Schema_ConfigAttributeSet_Gender,
-    Schema_ConfigAttributeSet_SmokerStatus,
-    Schema_ConfigAttributeSet_Relationship,
     Schema_ConfigAttributeSet,
-    Schema_ConfigAttributeSet_NoJoin,
 )
 from .Config_Benefit import Schema_ConfigBenefit_Data, Schema_ConfigBenefit_CRUD
 from .Config_BenefitCovarianceDetail import Schema_ConfigBenefitCovarianceDetail

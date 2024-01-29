@@ -24,21 +24,40 @@ ns_crud.add_resource(
 )
 ns_crud.add_resource(res.CRUD_ConfigAgeDistributionSet_List, "/age-distribution/sets")
 ns_crud.add_resource(
-    res.CRUD_ConfigAttributeDetail, "/attribute/detail/<int:id>", "/attribute/detail"
+    res.CRUD_ConfigAttributeSet,
+    "/attribute/set/<int:id>",
+    "/attribute/set",
 )
-ns_crud.add_resource(res.CRUD_ConfigAttributeDetail_List, "/attribute/details")
+ns_crud.add_resource(res.CRUD_ConfigAttributeSet_List, "/attribute/sets")
+
 
 ns_crud.add_resource(
-    res.CRUD_ConfigAttributeSet,
-    "/attribute/set/<string:config_attr_type_code>/<int:id>",
-    "/attribute/set/<string:config_attr_type_code>",
+    res.CRUD_ConfigAttributeDetail,
+    "/attribute/set/<int:set_id>/detail/<int:id>",
+    "/attribute/set/<int:set_id>/detail",
 )
 ns_crud.add_resource(
-    res.CRUD_ConfigAttributeSet_List, "/attribute/sets/<string:config_attr_type_code>"
+    res.CRUD_ConfigAttributeDetail_List, "/attribute/set/<int:set_id>/details"
 )
+
+
 ns_crud.add_resource(res.CRUD_ConfigProduct, "/product/<int:id>", "/product")
 ns_crud.add_resource(res.CRUD_ConfigProduct_List, "/products")
+ns_crud.add_resource(
+    res.CRUD_ConfigRatingMapperCollection,
+    "/mappers/collection/<int:id>",
+    "/mappers/collection",
+)
+ns_crud.add_resource(res.CRUD_ConfigRatingMapperCollection_List, "/mappers/collections")
 
+ns_crud.add_resource(
+    res.CRUD_ConfigRatingMapperSet,
+    "/mappers/collection/<int:collection_id>/set/<int:id>",
+    "/mappers/collection/<int:collection_id>/set",
+)
+ns_crud.add_resource(
+    res.CRUD_ConfigRatingMapperSet_List, "/mappers/collection/<int:collection_id>/sets"
+)
 
 ns_crud_product = Namespace("crud-product", "Namespace of product CRUD endpoints")
 

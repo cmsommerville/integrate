@@ -115,8 +115,13 @@ class BaseModel(db.Model):
 
     @classmethod
     def update_one(cls, id: int, attrs: dict, *args, **kwargs) -> List[BaseModel]:
+        if attrs.get("updated_dts") is None:
+            raise ValueError("Must pass updated_dts when updating an existing record")
         pk = inspect(cls.__class__).primary_key[0]
-        qry = cls.query.filter(pk == id).update(attrs, synchronize_session="fetch")
+        updated_dts = attrs.pop("updated_dts")
+        qry = cls.query.filter(pk == id, cls.updated_dts == updated_dts).update(
+            attrs, synchronize_session="fetch"
+        )
         db.session.commit()
 
         return qry.first()

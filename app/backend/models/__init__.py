@@ -5,10 +5,6 @@ from .Config_AgeDistributionSet import Model_ConfigAgeDistributionSet
 from .Config_AttributeDetail import Model_ConfigAttributeDetail
 from .Config_AttributeSet import (
     Model_ConfigAttributeSet,
-    Model_ConfigAttributeSet_Gender,
-    Model_ConfigAttributeSet_SmokerStatus,
-    Model_ConfigAttributeSet_Relationship,
-    Model_ConfigAttributeSet_NoJoin,
 )
 from .Config_Benefit import (
     Model_ConfigBenefit,
