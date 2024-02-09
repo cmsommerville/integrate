@@ -16,4 +16,6 @@ class Model_ConfigAttributeSet(BaseModel):
     attributes = db.relationship(
         "Model_ConfigAttributeDetail",
         primaryjoin="Model_ConfigAttributeSet.config_attr_set_id == Model_ConfigAttributeDetail.config_attr_set_id",
+        backref="parent",
+        passive_deletes=True,
     )

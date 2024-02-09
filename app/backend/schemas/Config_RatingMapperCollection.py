@@ -3,6 +3,7 @@ from app.shared import BaseSchema
 
 from ..models import Model_ConfigRatingMapperCollection
 from .Config_AttributeSet import Schema_ConfigAttributeSet
+from .Config_RatingMapperSet import Schema_ConfigRatingMapperSet
 
 
 class Schema_ConfigRatingMapperCollection(BaseSchema):
@@ -13,3 +14,4 @@ class Schema_ConfigRatingMapperCollection(BaseSchema):
         include_fk = True
 
     attribute_set = ma.Nested(Schema_ConfigAttributeSet)
+    mapper_sets = ma.Nested(Schema_ConfigRatingMapperSet, many=True)

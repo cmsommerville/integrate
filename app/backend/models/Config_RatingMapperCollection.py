@@ -13,7 +13,9 @@ class Model_ConfigRatingMapperCollection(BaseModel):
 
     config_rating_mapper_collection_id = db.Column(db.Integer, primary_key=True)
     config_attribute_set_id = db.Column(
-        db.ForeignKey(f"{CONFIG_ATTRIBUTE_SET}.config_attr_set_id")
+        db.ForeignKey(
+            f"{CONFIG_ATTRIBUTE_SET}.config_attr_set_id", ondelete="NO ACTION"
+        )
     )
     config_rating_mapper_collection_label = db.Column(db.String(100))
     default_config_rating_mapper_set_id = db.Column(db.Integer, nullable=True)
@@ -21,3 +23,4 @@ class Model_ConfigRatingMapperCollection(BaseModel):
     can_override_distribution = db.Column(db.Boolean, default=False)
 
     attribute_set = db.relationship("Model_ConfigAttributeSet")
+    mapper_sets = db.relationship("Model_ConfigRatingMapperSet")

@@ -1,6 +1,7 @@
 from __future__ import annotations
 import os
 import pandas as pd
+from ulid import ULID
 from functools import reduce
 from flask import current_app
 from typing import List
@@ -9,10 +10,19 @@ from sqlalchemy.sql import text as text_sql
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
 from app.extensions import db
+from app.shared.errors import ExpiredRowVersionError
 
 
 class BaseModel(db.Model):
     __abstract__ = True
+
+    @declared_attr
+    def version_id(cls):
+        return db.Column(
+            db.String(26),
+            default=lambda: str(ULID()),
+            onupdate=lambda: str(ULID()),
+        )
 
     @declared_attr
     def created_dts(cls):
@@ -115,16 +125,56 @@ class BaseModel(db.Model):
 
     @classmethod
     def update_one(cls, id: int, attrs: dict, *args, **kwargs) -> List[BaseModel]:
-        if attrs.get("updated_dts") is None:
-            raise ValueError("Must pass updated_dts when updating an existing record")
-        pk = inspect(cls.__class__).primary_key[0]
-        updated_dts = attrs.pop("updated_dts")
-        qry = cls.query.filter(pk == id, cls.updated_dts == updated_dts).update(
+        if attrs.get("version_id") is None:
+            raise ValueError("Must pass version_id when updating an existing record")
+        pk = inspect(cls).primary_key[0]
+        _ = attrs.pop(pk.name, None)
+        version_id = attrs.pop("version_id")
+        rows_updated = cls.query.filter(pk == id, cls.version_id == version_id).update(
             attrs, synchronize_session="fetch"
         )
-        db.session.commit()
 
-        return qry.first()
+        if rows_updated == 1:
+            db.session.commit()
+            return cls.query.get(id)
+
+        db.session.rollback()
+
+        # check if key exists, but version has changed
+        id_exists = cls.query.filter(pk == id).count()
+        if id_exists > 0:
+            raise ExpiredRowVersionError(
+                "This record has already been changed. Please refresh your data and try your request again"
+            )
+
+        raise ValueError("Record does not exist")
+
+    @classmethod
+    def replace_one(cls, id: int, attrs: dict, *args, **kwargs) -> List[BaseModel]:
+        if attrs.get("version_id") is None:
+            raise ValueError("Must pass version_id when updating an existing record")
+        pk = inspect(cls).primary_key[0]
+        payload_id = attrs.pop(pk.name, None)
+        if payload_id != id:
+            raise ValueError("Id of request and id in payload do not equal.")
+
+        version_id = attrs.pop("version_id")
+        rows_updated = cls.query.filter(pk == id, cls.version_id == version_id).update(
+            attrs, synchronize_session="fetch"
+        )
+        if rows_updated == 1:
+            db.session.commit()
+            return cls.query.get(id)
+
+        db.session.rollback()
+        # check if key exists, but version has changed
+        id_exists = cls.query.filter(pk == id).count()
+        if id_exists > 0:
+            raise ExpiredRowVersionError(
+                "This record has already been changed. Please refresh your data and try your request again"
+            )
+
+        raise ValueError("Record does not exist")
 
     @classmethod
     def bulk_save_all_to_db(cls, data) -> None:

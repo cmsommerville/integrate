@@ -72,11 +72,10 @@ class BaseCRUDResource(Resource):
             return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
-    def replace(cls, *args, **kwargs):
+    def replace(cls, id, *args, **kwargs):
         try:
             req = request.get_json()
-            obj = cls.schema.load(req)
-            obj.save_to_db()
+            obj = cls.model.replace_one(id, req)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -107,7 +106,7 @@ class BaseCRUDResource(Resource):
 
         try:
             obj.delete()
-            return {"status": "Deleted"}, 204
+            return {"status": "Deleted"}, 200
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
