@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { RatingMapperCollectionFormSchema } from "../../schemas";
@@ -32,12 +33,13 @@ type NewCollectionFormProps = {
   dropdowns: ConfigAttributeSet[];
 };
 
+type ValidationSchemaType = NewRatingMapperCollectionType;
+
 export default function NewForm({
   collection,
   dropdowns,
 }: NewCollectionFormProps) {
-  type ValidationSchemaType = NewRatingMapperCollectionType;
-
+  const router = useRouter();
   const form = useForm<ValidationSchemaType>({
     resolver: zodResolver(RatingMapperCollectionFormSchema),
     defaultValues: {
@@ -46,7 +48,13 @@ export default function NewForm({
   });
 
   function onSubmit(values: ValidationSchemaType) {
-    createNewRatingMapperCollection(values);
+    try {
+      createNewRatingMapperCollection(values);
+      router.push(`/config/mappers/collections`);
+      router.refresh();
+    } catch (err) {
+      console.log("Uh oh...");
+    }
   }
   return (
     <Form {...form}>

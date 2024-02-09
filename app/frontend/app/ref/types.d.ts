@@ -4,6 +4,7 @@ export type NewConfigAttributeSet = {
 };
 export type ConfigAttributeSet = {
   config_attr_set_id: number;
+  version_id: string;
 } & NewConfigAttributeSet;
 
 export type NewConfigAttributeDetail = {
@@ -13,4 +14,5 @@ export type NewConfigAttributeDetail = {
 };
 export type ConfigAttributeDetail = {
   config_attr_detail_id: number;
-} & NewConfigAttributeSet;
+  version_id: string;
+} & NewConfigAttributeDetail;

@@ -4,18 +4,18 @@ import { getRatingMapperSets } from "./data";
 export default async function RatingMapperSets({
   params,
 }: {
-  params: { id: string };
+  params: { collection_id: string };
 }) {
-  const row_data = await getRatingMapperSets(params.id);
+  const row_data = await getRatingMapperSets(params.collection_id);
 
   const editHandler = async (row: any) => {
     "use server";
-    return `/config/mappers/collection/${params.id}/set/${row.config_product_mapper_set_id}/`;
+    return `/config/mappers/collection/${params.collection_id}/set/${row.config_product_mapper_set_id}/`;
   };
 
   const newHandler = async () => {
     "use server";
-    return `/config/mappers/collection/${params.id}/set`;
+    return `/config/mappers/collection/${params.collection_id}/set`;
   };
 
   return (

@@ -38,4 +38,20 @@ export type NewRatingMapperCollectionType = {
 
 export type RatingMapperCollectionType = {
   config_rating_mapper_collection_id: number;
+  version_id: string;
 } & NewRatingMapperCollectionType;
+
+export type RatingMapperCollectionTypeWithSetList = {
+  mapper_sets: RatingMapperSetType[];
+} & RatingMapperCollectionType;
+
+export type NewRatingMapperSetType = {
+  config_rating_mapper_set_label: string;
+  config_rating_mapper_collection_id: number;
+  is_composite: boolean;
+  is_employer_paid: boolean;
+};
+
+export type RatingMapperSetType = {
+  config_rating_mapper_set_id: number;
+} & NewRatingMapperSetType;

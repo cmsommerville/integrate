@@ -3,10 +3,11 @@ import { getRatingMapperCollections } from "./data";
 
 export default async function RatingMapperCollection() {
   const row_data = await getRatingMapperCollections();
+  console.log(row_data);
 
   const onEditHandler = async (row: any) => {
     "use server";
-    return `/config/mappers/collection/${row.config_product_id}/`;
+    return `/config/mappers/collection/${row.config_rating_mapper_collection_id}/`;
   };
 
   const newProductHandler = async () => {

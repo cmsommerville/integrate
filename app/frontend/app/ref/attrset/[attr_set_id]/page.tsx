@@ -7,6 +7,7 @@ export default async function ConfigAttributeSetLandingPage({
   params: { attr_set_id: string };
 }) {
   const row_data = await getConfigAttributeDetails(params.attr_set_id);
+  console.log(row_data);
 
   const editHandler = async (row: any) => {
     "use server";

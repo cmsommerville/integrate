@@ -23,7 +23,7 @@ export default function RootLayout({
       {modal}
       <body className={inter.className}>
         <AppSidebar />
-        <div className="bg-zinc-100 h-screen ml-72">
+        <div className="bg-slate-100 min-h-screen ml-72">
           <main className="p-4 sm:p-6 lg:p-8">{children}</main>
         </div>
       </body>

@@ -14,4 +14,5 @@ export const RatingMapperSetFormSchema = z.object({
   config_rating_mapper_set_label: z.string().min(2).max(255).trim(),
   is_composite: z.boolean().default(false),
   is_employer_paid: z.boolean().default(false),
+  version_id: z.string().min(26).max(26).trim(),
 });

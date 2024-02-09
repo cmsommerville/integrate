@@ -4,8 +4,11 @@ import SetTablePage, {
   SetTablePageProps,
 } from "@/components/page/SetTablePage";
 import { ColDef } from "ag-grid-community";
+import DeleteRecord from "@/components/grid/DeleteRecord";
+import { deleteConfigAttributeDetail } from "./data";
+import { ConfigAttributeDetail } from "@/ref/types";
 
-export const COL_DEFS: ColDef[] = [
+const COL_DEFS: ColDef[] = [
   {
     field: "config_attr_detail_code",
     headerName: "Attr Code",
@@ -13,6 +16,14 @@ export const COL_DEFS: ColDef[] = [
   {
     field: "config_attr_detail_label",
     headerName: "Attr Label",
+  },
+  {
+    cellRenderer: DeleteRecord,
+    cellRendererParams: {
+      onDelete: async (data: ConfigAttributeDetail) => {
+        return await deleteConfigAttributeDetail(data);
+      },
+    },
   },
 ];
 
@@ -22,13 +33,13 @@ export default function ClientGrid<T>(
   return (
     <SetTablePage
       className="max-w-4xl"
-      title="Attribute Set"
+      title="Attributes"
       rowData={props.rowData}
       columnDefs={COL_DEFS}
       routes={props.routes}
     >
       <SetTablePageSubtitle>
-        Select an attribute to edit or create a new one from scratch!
+        Select an attribute to edit or add a new one!
       </SetTablePageSubtitle>
     </SetTablePage>
   );
