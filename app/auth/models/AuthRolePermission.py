@@ -2,37 +2,39 @@ from app.extensions import db
 
 from ..tables import TBL_NAMES, SCHEMA_NAME
 
+AUTH_PERMISSION = TBL_NAMES["AUTH_PERMISSION"]
 AUTH_ROLE = TBL_NAMES["AUTH_ROLE"]
-AUTH_USER = TBL_NAMES["AUTH_USER"]
-AUTH_USER_ROLE = TBL_NAMES["AUTH_USER_ROLE"]
+AUTH_ROLE_PERMISSION = TBL_NAMES["AUTH_ROLE_PERMISSION"]
 
 
-class Model_AuthUserRole(db.Model):
-    __tablename__ = AUTH_USER_ROLE
+class Model_AuthRolePermission(db.Model):
+    __tablename__ = AUTH_ROLE_PERMISSION
     __table_args__ = (
-        db.UniqueConstraint("auth_user_id", "auth_role_id"),
+        db.UniqueConstraint("auth_permission_id", "auth_role_id"),
         {"schema": SCHEMA_NAME},
     )
 
-    auth_user_role_id = db.Column(db.Integer, primary_key=True)
-    auth_user_id = db.Column(db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_USER}.auth_user_id"))
+    auth_role_permission_id = db.Column(db.Integer, primary_key=True)
     auth_role_id = db.Column(db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_ROLE}.auth_role_id"))
+    auth_permission_id = db.Column(
+        db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_PERMISSION}.auth_permission_id")
+    )
 
-    role = db.relationship("Model_AuthRole", lazy="joined")
+    permission = db.relationship("Model_AuthPermission", lazy="joined")
 
     def __repr__(self):
         """
         Print instance as <[Model Name]: [Row SK]>
         """
-        return f"<Model_AuthUserRole: {self.auth_user_role_id}>"
+        return f"<Model_AuthRolePermission: {self.auth_role_permission_id}>"
 
     @classmethod
     def find_one(cls, id, *args, **kwargs):
         return cls.query.get(id)
 
     @classmethod
-    def find_by_user_id(cls, user_id, *args, **kwargs):
-        return cls.query.filter(cls.auth_user_id == user_id).all()
+    def find_by_role_id(cls, role_id, *args, **kwargs):
+        return cls.query.filter(cls.auth_role_id == role_id).all()
 
     def save_to_db(self) -> None:
         try:
@@ -43,7 +45,7 @@ class Model_AuthUserRole(db.Model):
             raise
 
     @classmethod
-    def save_all_to_db(self, objs):
+    def save_all_to_db(self, objs) -> None:
         try:
             db.session.add_all(objs)
             db.session.commit()

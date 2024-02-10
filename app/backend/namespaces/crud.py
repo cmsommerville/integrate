@@ -89,7 +89,8 @@ ns_crud_product.add_resource(
     "/variation/<int:product_variation_id>/state",
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigProductVariationState_List, "/variation/states"
+    res.CRUD_ConfigProductVariationState_List,
+    "/variation/<int:product_variation_id>/states",
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigProvision,

@@ -19,3 +19,5 @@ class Model_ConfigRatingMapperSet(BaseModel):
     )
     is_composite = db.Column(db.Boolean, default=False)
     is_employer_paid = db.Column(db.Boolean, default=False)
+
+    mapper_details = db.relationship("Model_ConfigRatingMapperDetail")

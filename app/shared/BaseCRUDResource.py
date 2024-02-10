@@ -21,27 +21,27 @@ class BaseCRUDResource(Resource):
         super().__init__()
 
     @classmethod
-    @authorization_required(permissions.get("get"))
+    @authorization_required
     def get(cls, *args, **kwargs):
         return cls.retrieve(*args, **kwargs)
 
     @classmethod
-    @authorization_required(permissions.get("post"))
+    @authorization_required
     def post(cls, *args, **kwargs):
         return cls.create(*args, **kwargs)
 
     @classmethod
-    @authorization_required(permissions.get("put"))
+    @authorization_required
     def put(cls, *args, **kwargs):
         return cls.replace(*args, **kwargs)
 
     @classmethod
-    @authorization_required(permissions.get("patch"))
+    @authorization_required
     def patch(cls, id, *args, **kwargs):
         return cls.update(id, *args, **kwargs)
 
     @classmethod
-    @authorization_required(permissions.get("delete"))
+    @authorization_required
     def delete(cls, id, *args, **kwargs):
         return cls.destroy(id, *args, **kwargs)
 
@@ -124,12 +124,12 @@ class BaseCRUDResourceList(Resource):
         super().__init__()
 
     @classmethod
-    @authorization_required(permissions.get("get"))
+    @authorization_required
     def get(cls, *args, **kwargs):
         return cls.list(*args, **kwargs)
 
     @classmethod
-    @authorization_required(permissions.get("post"))
+    @authorization_required
     def post(cls, *args, **kwargs):
         return cls.bulk_create(*args, **kwargs)
 

@@ -25,7 +25,7 @@ class BaseConfig:
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
     SESSION_TYPE = os.getenv("SESSION_TYPE")
-    SESSION_REDIS = Redis(host="localhost", port=6379, db=0)
+    SESSION_REDIS = Redis(host="127.0.0.1", port=6379, db=0)
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "None"
     SQLALCHEMY_TRACK_MODIFICATIONS = False

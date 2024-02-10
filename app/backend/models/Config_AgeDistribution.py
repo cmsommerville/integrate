@@ -22,4 +22,5 @@ class Model_ConfigAgeDistribution(BaseModel):
         )
     )
     age_value = db.Column(db.Integer, nullable=False)
+    rate_table_age_value = db.Column(db.Integer, nullable=False)
     weight = db.Column(db.Numeric(12, 5), nullable=False)

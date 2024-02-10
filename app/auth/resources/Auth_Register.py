@@ -35,7 +35,8 @@ class Resource_AuthRegister(Resource):
             )
 
             user.save_to_db()
-            login_user(user)
+            user_data = _schema.dump(user)
+            login_user(user_data)
             if is_authenticated() is True:
                 return {"status": "success", "msg": "Successfully registered"}, 200
 

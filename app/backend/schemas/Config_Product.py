@@ -11,5 +11,9 @@ class Schema_ConfigProduct(BaseSchema):
         load_instance = True
         include_relationships = True
         include_fk = True
+        exclude = (
+            "states",
+            "config_rate_groups",
+        )
 
     age_rating_strategy = ma.Nested(Schema_RefRatingStrategy)

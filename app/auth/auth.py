@@ -1,16 +1,18 @@
 import functools
 from flask import session
+from sqlalchemy.sql import text
 from datetime import datetime, timezone
 
 
 def validate_user(user):
-    if user.get("user_id") is None:
-        raise ValueError("User must have user_id key")
+    if user.get("auth_user_id") is None:
+        raise ValueError("User must have auth_user_id key")
     if not isinstance(user.get("roles"), list):
         raise ValueError("User must have roles key")
     return {
-        "user_id": user.get("user_id"),
+        "auth_user_id": user.get("auth_user_id"),
         "roles": user.get("roles"),
+        "permissions": user.get("permissions"),
     }
 
 
@@ -18,7 +20,7 @@ def login_user(user):
     try:
         user_data = validate_user(user)
         session["user"] = {
-            "user": user_data,
+            **user_data,
             "is_authenticated": True,
             "timestamp": datetime.now(timezone.utc).timestamp() * 1000,
         }
@@ -39,7 +41,7 @@ def get_permissions(**kwargs):
 
 
 def get_user_roles(**kwargs):
-    return session.get("user", {}).get("user", {}).get("roles", [])
+    return session.get("user", {}).get("roles", [])
 
 
 def login_required(**kw):
@@ -55,25 +57,32 @@ def login_required(**kw):
     return outer
 
 
-def authorization_required(permissions: list, **kw):
-    def outer(func):
-        @functools.wraps(func)
-        def wrapper_decorator(*args, **kwargs):
+def authorization_required(func):
+    @functools.wraps(func)
+    def wrapper_decorator(cls, *args, **kwargs):
+        try:
+            if cls.permissions.get(func.__name__, None) is None:
+                return {
+                    "status": "error",
+                    "msg": f"Permissions for method `{func.__name__}` not defined for this endpoint",
+                }, 500
+
+            permissions = cls.permissions.get(func.__name__)
             if "*" in permissions:
-                return func(*args, **kwargs)
+                return func(cls, *args, **kwargs)
 
             if not is_authenticated():
                 return {"status": "error", "msg": "User is not authenticated"}, 401
 
             user_permissions = get_permissions()
             if any([p in user_permissions for p in permissions]):
-                return func(*args, **kwargs)
+                return func(cls, *args, **kwargs)
 
             return {"status": "error", "msg": "User is not authorized"}, 403
+        except Exception:
+            return {"status": "error", "msg": "Invalid permission configuration"}, 500
 
-        return wrapper_decorator
-
-    return outer
+    return wrapper_decorator
 
 
 def set_db_user_id(session, transaction, connection, *args, **kwargs):
@@ -83,6 +92,6 @@ def set_db_user_id(session, transaction, connection, *args, **kwargs):
 
         roles = ";".join(get_user_roles())
         stmt = f"EXEC sp_set_session_context 'user_roles', N'{roles}'"
-        connection.execute(stmt)
+        connection.execute(text(stmt))
     except Exception:
         pass

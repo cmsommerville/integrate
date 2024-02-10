@@ -21,7 +21,8 @@ class Resource_AuthLogin(Resource):
                 bytes(password, "utf-8"), user.hashed_password
             )
             if is_valid_password:
-                login_user(user)
+                user_data = _schema.dump(user)
+                login_user(user_data)
 
             if is_authenticated():
                 return {"status": "success", "msg": "Successfully logged in"}, 200
