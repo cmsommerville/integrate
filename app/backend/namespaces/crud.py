@@ -72,7 +72,9 @@ ns_crud_product.add_resource(
 ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitProvision_List, "/benefit-provisions"
 )
-ns_crud_product.add_resource(res.CRUD_ConfigBenefitState_List, "/benefit/states")
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitState_List, "/benefit/<int:benefit_id>/states"
+)
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage, "/coverage/<int:id>", "/coverage")
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage_List, "/coverages")
 ns_crud_product.add_resource(res.CRUD_ConfigFactor_List, "/provision/factors")
@@ -113,6 +115,24 @@ ns_crud_product.add_resource(
 )
 ns_crud_product.add_resource(res.CRUD_ConfigRateTable_List, "/rate-tables")
 
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitDurationDetail,
+    "/benefit/<int:benefit_id>/duration-set/<int:set_id>/detail/<int:id>",
+    "/benefit/<int:benefit_id>/duration-set/<int:set_id>/detail",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitDurationDetail_List,
+    "/benefit/<int:benefit_id>/duration-set/<int:set_id>/details",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitDurationSet,
+    "/benefit/<int:benefit_id>/duration-set/<int:id>",
+    "/benefit/<int:benefit_id>/duration-set",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitDurationSet_List, "/benefit/<int:benefit_id>/duration-sets"
+)
+
 
 ns_crud_provision = Namespace("crud-provision", "Namespace of provision CRUD endpoints")
 
@@ -144,18 +164,6 @@ ns_crud_benefit.add_resource(
 ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitCovarianceSet, "/covariance/set/<int:id>", "/covariance/set"
 )
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitDurationDetail,
-    "/duration/detail/<int:id>",
-    "/duration/detail",
-)
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitDurationDetail_List, "/duration/details"
-)
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitDurationSet, "/duration/set/<int:id>", "/duration/set"
-)
-ns_crud_benefit.add_resource(res.CRUD_ConfigBenefitDurationSet_List, "/duration/sets")
 ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitProductVariation, "/variation/<int:id>", "/variation"
 )

@@ -197,6 +197,36 @@ def DATA_BENEFIT(product_id):
             ).ref_id,
             "config_benefit_description": "",
         },
+        {
+            "config_product_id": product_id,
+            "config_benefit_code": "skin_cancer",
+            "config_benefit_label": "Skin Cancer",
+            "config_rate_group_id": Model_ConfigRateGroup.find_one_by_attr(
+                {"config_rate_group_code": "FLAT"}
+            ).config_rate_group_id,
+            "benefit_auth": [
+                {
+                    "priority": 10,
+                    "min_value": 0,
+                    "max_value": 500,
+                    "step_value": 250,
+                    "default_value": 500,
+                    "acl": [{"auth_role_code": "uw900"}],
+                },
+                {
+                    "priority": 20,
+                    "min_value": 0,
+                    "max_value": 1000,
+                    "step_value": 50,
+                    "default_value": 500,
+                    "acl": [{"auth_role_code": "uw1000"}],
+                },
+            ],
+            "unit_type_id": Model_RefUnitCode.find_one_by_attr(
+                {"ref_attr_code": "dollars"}
+            ).ref_id,
+            "config_benefit_description": "",
+        },
     ]
 
 
