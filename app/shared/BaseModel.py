@@ -217,28 +217,34 @@ class BaseRuleModel(BaseModel):
 
 
 class BaseRowLevelSecurityTable:
+    RLS_RESTRICTED_ROLE = "rls_restricted"
+    RLS_SCHEMA = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", "rls")
+    FN_NAME = "fn_rls__standard"
+
     def __init__(self, *args, **kwargs):
         pass
 
     @classmethod
-    def add_rls(cls, model):
-        rls_schema = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", "rls")
-        table_schema = model.__table__.schema
-        _schema = "dbo" if table_schema is None else f"{table_schema}"
-        _tablename = model.__tablename__
-        _fn_name = f"fn_rls__{_schema}_{_tablename}"
-        _policy_name = f"policy_rls__{_schema}_{_tablename}"
+    def create_standard_policy(cls):
+        sql = f"""
+            SELECT COUNT(1)
+            FROM   sys.objects
+            WHERE  object_id = OBJECT_ID(N'{cls.RLS_SCHEMA}.{cls.FN_NAME}')
+            AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' )
+        """
 
-        DB_USER_NAME = current_app.config.get("DB_USER_NAME", "")
+        rls_function_exists = db.session.execute(text_sql(sql)).fetchone()[0]
+        if rls_function_exists != 0:
+            return
 
         sql = f"""
-            CREATE FUNCTION {rls_schema}.{_fn_name}(@user_role VARCHAR(30))
+            CREATE FUNCTION {cls.RLS_SCHEMA}.{cls.FN_NAME}(@user_role VARCHAR(30))
                 RETURNS TABLE
             WITH SCHEMABINDING
             AS
-            RETURN SELECT 1 AS {_fn_name}_output
+            RETURN SELECT 1 AS {cls.FN_NAME}_output
             WHERE 
-                SUSER_NAME() <> '{DB_USER_NAME}' OR (
+                COALESCE(IS_MEMBER('{cls.RLS_RESTRICTED_ROLE}'), 1) = 0 OR (
                     @user_role IN (
                         SELECT value AS user_role 
                         FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
@@ -248,13 +254,22 @@ class BaseRowLevelSecurityTable:
                         FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
                     )
                 )
-            """
+        """
         db.session.execute(text_sql(sql))
         db.session.commit()
 
+    @classmethod
+    def add_rls(cls, model):
+        table_schema = model.__table__.schema
+        _schema = "dbo" if table_schema is None else f"{table_schema}"
+        _tablename = model.__tablename__
+        _policy_name = f"policy_rls__{_schema}_{_tablename}"
+
+        cls.create_standard_policy()
+
         sql = f"""
-            CREATE SECURITY POLICY {rls_schema}.{_policy_name}
-            ADD FILTER PREDICATE {rls_schema}.{_fn_name}(auth_role_code) ON {_schema}.{_tablename}
+            CREATE SECURITY POLICY {cls.RLS_SCHEMA}.{_policy_name}
+            ADD FILTER PREDICATE {cls.RLS_SCHEMA}.{cls.FN_NAME}(auth_role_code) ON {_schema}.{_tablename}
             WITH (STATE = ON)
         """
         db.session.execute(text_sql(sql))
@@ -262,15 +277,13 @@ class BaseRowLevelSecurityTable:
 
     @classmethod
     def drop_rls(cls, model):
-        rls_schema = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", "rls")
         table_schema = model.__table__.schema
         _schema = "dbo" if table_schema is None else f"{table_schema}"
         _tablename = model.__tablename__
-        _fn_name = f"fn_rls__{_schema}_{_tablename}"
         _policy_name = f"policy_rls__{_schema}_{_tablename}"
 
         sql = f"""
-            DROP SECURITY POLICY {rls_schema}.{_policy_name};
+            DROP SECURITY POLICY {cls.RLS_SCHEMA}.{_policy_name};
         """
         try:
             db.session.execute(text_sql(sql))
@@ -278,7 +291,7 @@ class BaseRowLevelSecurityTable:
             pass
 
         sql = f"""
-            DROP FUNCTION {rls_schema}.{_fn_name};
+            DROP FUNCTION {cls.RLS_SCHEMA}.{cls.FN_NAME};
         """
         try:
             db.session.execute(text_sql(sql))
