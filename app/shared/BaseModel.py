@@ -287,6 +287,7 @@ class BaseRowLevelSecurityTable:
         """
         try:
             db.session.execute(text_sql(sql))
+            db.session.commit()
         except Exception:
             pass
 
