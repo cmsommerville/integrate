@@ -17,7 +17,12 @@ class Model_ConfigProductVariation(BaseModel):
 
     config_product_variation_id = db.Column(db.Integer, primary_key=True)
     config_product_id = db.Column(
-        db.ForeignKey(f"{CONFIG_PRODUCT}.config_product_id"), index=True
+        db.ForeignKey(
+            f"{CONFIG_PRODUCT}.config_product_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
+        index=True,
     )
     config_product_variation_code = db.Column(db.String(30), nullable=False)
     config_product_variation_label = db.Column(db.String(100), nullable=False)

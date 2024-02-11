@@ -32,6 +32,7 @@ from .Config_ProvisionUI import (
     Schema_ConfigProvisionUI_Checkbox,
 )
 from .Config_Provision import (
+    Schema_ConfigProvision,
     Schema_ConfigProvision_Product,
     Schema_ConfigProvision_RateTable,
 )

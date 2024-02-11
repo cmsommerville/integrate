@@ -69,7 +69,11 @@ def load_generic(hostname: str, *args, **kwargs):
     # Config_RateGroup.load(hostname, **kwargs)
     # Config_Benefit.load(hostname, **kwargs)
     # Config_BenefitState.load(hostname, **kwargs)
-    Config_BenefitDuration.load(hostname, **kwargs)
+    # Config_BenefitDuration.load(hostname, **kwargs)
+    # Config_Provision.load(hostname, **kwargs)
+    # Config_ProvisionState.load(hostname, **kwargs)
+    # Config_Factor.load(hostname, **kwargs)
+    Config_BenefitProvision.load(hostname, **kwargs)
 
 
 def load_config(hostname: str, *args, **kwargs):

@@ -21,7 +21,12 @@ class Model_ConfigBenefitState(BaseModel):
 
     config_benefit_state_id = db.Column(db.Integer, primary_key=True)
     config_benefit_id = db.Column(
-        db.ForeignKey(f"{CONFIG_BENEFIT}.config_benefit_id"), nullable=False
+        db.ForeignKey(
+            f"{CONFIG_BENEFIT}.config_benefit_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
     )
     state_id = db.Column(db.ForeignKey(f"{REF_STATES}.state_id"), nullable=False)
     config_benefit_state_effective_date = db.Column(db.Date, nullable=False)

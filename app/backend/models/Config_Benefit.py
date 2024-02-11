@@ -18,7 +18,11 @@ class Model_ConfigBenefitAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
 
     config_benefit_auth_acl_id = db.Column(db.Integer, primary_key=True)
     config_benefit_auth_id = db.Column(
-        db.ForeignKey(f"{CONFIG_BENEFIT_AUTH}.config_benefit_auth_id")
+        db.ForeignKey(
+            f"{CONFIG_BENEFIT_AUTH}.config_benefit_auth_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        )
     )
     auth_role_code = db.Column(db.String(30), nullable=False)
 
@@ -30,7 +34,13 @@ class Model_ConfigBenefitAuth(BaseModel):
     # )
 
     config_benefit_auth_id = db.Column(db.Integer, primary_key=True)
-    config_benefit_id = db.Column(db.ForeignKey(f"{CONFIG_BENEFIT}.config_benefit_id"))
+    config_benefit_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_BENEFIT}.config_benefit_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        )
+    )
     priority = db.Column(db.Integer, nullable=False)
     min_value = db.Column(db.Numeric(12, 2))
     max_value = db.Column(db.Numeric(12, 2))
@@ -46,7 +56,12 @@ class Model_ConfigBenefit(BaseModel):
 
     config_benefit_id = db.Column(db.Integer, primary_key=True)
     config_product_id = db.Column(
-        db.ForeignKey(f"{CONFIG_PRODUCT}.config_product_id"), nullable=False
+        db.ForeignKey(
+            f"{CONFIG_PRODUCT}.config_product_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
     )
     config_benefit_code = db.Column(db.String(30), nullable=False)
     config_benefit_label = db.Column(db.String(100), nullable=False)

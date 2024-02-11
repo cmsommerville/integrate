@@ -96,13 +96,39 @@ ns_crud_product.add_resource(
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigProvision,
-    "/provision/<string:provision_type>/<int:id>",
-    "/provision/<string:provision_type>",
+    "/provision/<int:id>",
+    "/provision",
+)
+ns_crud_product.add_resource(res.CRUD_ConfigProvision_List, "/provisions")
+
+ns_crud_product.add_resource(
+    res.CRUD_ConfigProvisionState,
+    "/provision/<int:provision_id>/state/<int:id>",
+    "/provision/<int:provision_id>/state",
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigProvision_List, "/provisions/<string:provision_type>"
+    res.CRUD_ConfigProvisionState_List, "/provision/<int:provision_id>/states"
 )
-ns_crud_product.add_resource(res.CRUD_ConfigProvisionState_List, "/provision/states")
+ns_crud_product.add_resource(
+    res.CRUD_ConfigFactor,
+    "/provision/<int:provision_id>/factor/<int:id>",
+    "/provision/<int:provision_id>/factor",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigFactor_List,
+    "/provision/<int:provision_id>/factors",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigFactorRule,
+    "/provision/<int:provision_id>/factor/<int:factor_id>/rule/<int:id>",
+    "/provision/<int:provision_id>/factor/<int:factor_id>/rule",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigFactorRule_List,
+    "/provision/<int:provision_id>/factor/<int:factor_id>/rules",
+)
+
+
 ns_crud_product.add_resource(
     res.CRUD_ConfigProvisionUI_List, "/provision/ui-components"
 )
@@ -136,19 +162,7 @@ ns_crud_product.add_resource(
 
 ns_crud_provision = Namespace("crud-provision", "Namespace of provision CRUD endpoints")
 
-ns_crud_provision.add_resource(
-    res.CRUD_ConfigProvisionState, "/state/<int:id>", "/state"
-)
 ns_crud_provision.add_resource(res.CRUD_ConfigProvisionUI, "/ui/<int:id>", "/ui")
-ns_crud_provision.add_resource(res.CRUD_ConfigFactor, "/factor/<int:id>", "/factor")
-ns_crud_provision.add_resource(
-    res.CRUD_ConfigFactorRule,
-    "/factor/<int:factor_id>/rule/<int:id>",
-    "/factor/<int:factor_id>/rule",
-)
-ns_crud_provision.add_resource(
-    res.CRUD_ConfigFactorRule_List, "/factor/<int:factor_id>/rules"
-)
 
 
 ns_crud_benefit = Namespace("crud-benefit", "Namespace of benefit CRUD endpoints")

@@ -26,7 +26,11 @@ class Model_ConfigProductVariationState(BaseModel):
 
     config_product_variation_state_id = db.Column(db.Integer, primary_key=True)
     config_product_variation_id = db.Column(
-        db.ForeignKey(f"{CONFIG_PRODUCT_VARIATION}.config_product_variation_id")
+        db.ForeignKey(
+            f"{CONFIG_PRODUCT_VARIATION}.config_product_variation_id",
+            onupdate="CASCADE",
+            ondelete="CASCADE",
+        )
     )
     state_id = db.Column(db.ForeignKey(f"{REF_STATES}.state_id"))
 
