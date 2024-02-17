@@ -47,6 +47,6 @@ def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(
         hostname, f"api/config/product/{product.config_product_id}/provisions"
     )
-    res = requests.post(url, json=DATA(product))
+    res = requests.post(url, json=DATA(product), **kwargs)
     if not res.ok:
         raise Exception(res.text)

@@ -40,9 +40,6 @@ def DATA():
             "master_product_code": "CI",
             "form_code": "21000",
             "age_rating_strategy_id": get_rating_strategy("rating"),
-            "attr1_rating_strategy_id": get_rating_strategy("rating"),
-            "attr2_rating_strategy_id": get_rating_strategy("uw"),
-            "attr3_rating_strategy_id": get_rating_strategy("rating"),
             "age_distribution_set_id": get_age_distribution_set(
                 "Normal(45,15) Age Distribution"
             ),
@@ -64,6 +61,6 @@ def DATA():
 
 def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, "api/config/products")
-    res = requests.post(url, json=DATA())
+    res = requests.post(url, json=DATA(), **kwargs)
     if not res.ok:
         raise Exception(res.text)

@@ -62,7 +62,7 @@ def load(hostname: str, *args, **kwargs) -> None:
         hostname,
         f"api/config/product/{product.config_product_id}/variation/{variation.config_product_variation_id}/states",
     )
-    res = requests.post(url, json=data)
+    res = requests.post(url, json=data, **kwargs)
     if not res.ok:
         raise Exception(res.text)
 
@@ -72,6 +72,6 @@ def load(hostname: str, *args, **kwargs) -> None:
         hostname,
         f"api/config/product/{product.config_product_id}/variation/{variation.config_product_variation_id}/states",
     )
-    res = requests.post(url, json=data)
+    res = requests.post(url, json=data, **kwargs)
     if not res.ok:
         raise Exception(res.text)

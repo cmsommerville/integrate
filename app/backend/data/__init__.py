@@ -18,12 +18,9 @@ from . import (
     Config_ProductVariationState,
     Config_Provision,
     Config_ProvisionState,
-    Config_ProvisionUI,
     Config_RateGroup,
-    Config_RateGroupFaceAmounts,
     Config_RateTable,
     Config_RatingMapper,
-    Config_RelationshipMapper,
     Ref_AttrMapperType,
     Ref_Benefit,
     Ref_CensusStrategy,
@@ -34,6 +31,7 @@ from . import (
     Ref_PremiumFrequency,
     Ref_ProductVariation,
     Ref_Provision,
+    Ref_RateFrequency,
     Ref_RatingStrategy,
     Ref_States,
     Ref_UnitType,
@@ -51,6 +49,7 @@ def load_refdata(hostname: str, *args, **kwargs):
     Ref_PremiumFrequency.load(hostname, **kwargs)
     Ref_ProductVariation.load(hostname, **kwargs)
     Ref_Provision.load(hostname, **kwargs)
+    Ref_RateFrequency.load(hostname, **kwargs)
     Ref_RatingStrategy.load(hostname, **kwargs)
     Ref_States.load(hostname, **kwargs)
     Ref_UnitType.load(hostname, **kwargs)
@@ -58,21 +57,21 @@ def load_refdata(hostname: str, *args, **kwargs):
 
 def load_generic(hostname: str, *args, **kwargs):
     pass
-    # Config_AgeBand.load(hostname, **kwargs)
-    # Config_AttributeSet.load(hostname, **kwargs)
-    # Config_RatingMapper.load(hostname, **kwargs)
-    # Config_AgeDistribution.load(hostname, **kwargs)
-    # Config_Product.load(hostname, **kwargs)
-    # Config_ProductState.load(hostname, **kwargs)
-    # Config_ProductVariation.load(hostname, **kwargs)
-    # Config_ProductVariationState.load(hostname, **kwargs)
-    # Config_RateGroup.load(hostname, **kwargs)
-    # Config_Benefit.load(hostname, **kwargs)
-    # Config_BenefitState.load(hostname, **kwargs)
-    # Config_BenefitDuration.load(hostname, **kwargs)
-    # Config_Provision.load(hostname, **kwargs)
-    # Config_ProvisionState.load(hostname, **kwargs)
-    # Config_Factor.load(hostname, **kwargs)
+    Config_AgeBand.load(hostname, **kwargs)
+    Config_AttributeSet.load(hostname, **kwargs)
+    Config_RatingMapper.load(hostname, **kwargs)
+    Config_AgeDistribution.load(hostname, **kwargs)
+    Config_Product.load(hostname, **kwargs)
+    Config_ProductState.load(hostname, **kwargs)
+    Config_ProductVariation.load(hostname, **kwargs)
+    Config_ProductVariationState.load(hostname, **kwargs)
+    Config_RateGroup.load(hostname, **kwargs)
+    Config_Benefit.load(hostname, **kwargs)
+    Config_BenefitState.load(hostname, **kwargs)
+    Config_BenefitDuration.load(hostname, **kwargs)
+    Config_Provision.load(hostname, **kwargs)
+    Config_ProvisionState.load(hostname, **kwargs)
+    Config_Factor.load(hostname, **kwargs)
     Config_BenefitProvision.load(hostname, **kwargs)
 
 

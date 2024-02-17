@@ -1,12 +1,14 @@
 from flask_restx import Resource
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
-from ..models import Model_ConfigBenefitProductVariation
-from ..schemas import Schema_ConfigBenefitProductVariation
+from ..models import Model_ConfigBenefitVariation
+from ..schemas import Schema_ConfigBenefitVariation
 
-class CRUD_ConfigBenefitProductVariation(BaseCRUDResource): 
-    model = Model_ConfigBenefitProductVariation
-    schema = Schema_ConfigBenefitProductVariation()
 
-class CRUD_ConfigBenefitProductVariation_List(BaseCRUDResourceList): 
-    model = Model_ConfigBenefitProductVariation
-    schema = Schema_ConfigBenefitProductVariation(many=True)
+class CRUD_ConfigBenefitVariation(BaseCRUDResource):
+    model = Model_ConfigBenefitVariation
+    schema = Schema_ConfigBenefitVariation()
+
+
+class CRUD_ConfigBenefitVariation_List(BaseCRUDResourceList):
+    model = Model_ConfigBenefitVariation
+    schema = Schema_ConfigBenefitVariation(many=True)

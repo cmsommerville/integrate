@@ -50,6 +50,6 @@ def load(hostname: str, *args, **kwargs) -> None:
             hostname,
             f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/states",
         )
-        res = requests.post(url, json=DATA(product, benefit))
+        res = requests.post(url, json=DATA(product, benefit), **kwargs)
         if not res.ok:
             raise Exception(res.text)

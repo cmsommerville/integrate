@@ -53,6 +53,6 @@ def DATA_PRODUCT_STATES(product_id: int):
 def load(hostname: str, *args, **kwargs) -> None:
     product_id = PRODUCT_ID("CI21000")
     url = urljoin(hostname, f"api/config/product/{product_id}/states")
-    res = requests.post(url, json=DATA_PRODUCT_STATES(product_id))
+    res = requests.post(url, json=DATA_PRODUCT_STATES(product_id), **kwargs)
     if not res.ok:
         raise Exception(res.text)

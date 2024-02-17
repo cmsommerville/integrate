@@ -67,7 +67,7 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitCovarianceSet_List, "/benefit-covariance/sets"
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitProductVariation_List, "/benefit-variations"
+    res.CRUD_ConfigBenefitVariation_List, "/benefit-variations"
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitProvision_List, "/benefit-provisions"
@@ -127,6 +127,10 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigFactorRule_List,
     "/provision/<int:provision_id>/factor/<int:factor_id>/rules",
 )
+ns_crud_product.add_resource(
+    res.RateTableCohortsResource,
+    "/cohorts",
+)
 
 
 ns_crud_product.add_resource(
@@ -179,7 +183,7 @@ ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitCovarianceSet, "/covariance/set/<int:id>", "/covariance/set"
 )
 ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitProductVariation, "/variation/<int:id>", "/variation"
+    res.CRUD_ConfigBenefitVariation, "/variation/<int:id>", "/variation"
 )
 ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitProvision, "/provision/<int:id>", "/provision"
@@ -228,6 +232,10 @@ ns_ref.add_resource(
 ns_ref.add_resource(res.CRUD_RefProductVariation_List, "/product-variations")
 ns_ref.add_resource(res.CRUD_RefProvision, "/provision/<int:id>", "/provision")
 ns_ref.add_resource(res.CRUD_RefProvision_List, "/provisions")
+ns_ref.add_resource(
+    res.CRUD_RefRateFrequency, "/rate-frequency/<int:id>", "/rate-frequency"
+)
+ns_ref.add_resource(res.CRUD_RefRateFrequency_List, "/rate-frequencies")
 ns_ref.add_resource(
     res.CRUD_RefRatingStrategy, "/rating-strategy/<int:id>", "/rating-strategy"
 )

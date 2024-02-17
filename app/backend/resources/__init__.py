@@ -44,8 +44,8 @@ from .Config_BenefitDurationSet import (
     CRUD_ConfigBenefitDurationSet_List,
 )
 from .Config_BenefitProductVariation import (
-    CRUD_ConfigBenefitProductVariation,
-    CRUD_ConfigBenefitProductVariation_List,
+    CRUD_ConfigBenefitVariation,
+    CRUD_ConfigBenefitVariation_List,
 )
 from .Config_BenefitProvision import (
     CRUD_ConfigBenefitProvision,
@@ -76,7 +76,11 @@ from .Config_ProvisionState import (
 )
 from .Config_ProvisionUI import CRUD_ConfigProvisionUI, CRUD_ConfigProvisionUI_List
 from .Config_RateGroup import CRUD_ConfigRateGroup, CRUD_ConfigRateGroup_List
-from .Config_RateTable import CRUD_ConfigRateTable, CRUD_ConfigRateTable_List
+from .Config_RateTable import (
+    CRUD_ConfigRateTable,
+    CRUD_ConfigRateTable_List,
+    RateTableCohortsResource,
+)
 from .Config_RatingMapperCollection import (
     CRUD_ConfigRatingMapperCollection,
     CRUD_ConfigRatingMapperCollection_List,

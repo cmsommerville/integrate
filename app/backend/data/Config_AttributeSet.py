@@ -70,6 +70,6 @@ DATA = [
 
 def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, "api/config/attribute/sets")
-    res = requests.post(url, json=DATA)
+    res = requests.post(url, json=DATA, **kwargs)
     if not res.ok:
         raise Exception(res.text)

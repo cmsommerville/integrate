@@ -33,30 +33,6 @@ class Model_ConfigProduct(BaseModel):
         db.ForeignKey(f"{REF_MASTER}.ref_id"),
         comment="Indicates whether age is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
     )
-    attr1_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr1 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
-    attr2_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr2 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
-    attr3_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr3 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
-    attr4_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr4 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
-    attr5_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr5 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
-    attr6_rating_strategy_id = db.Column(
-        db.ForeignKey(f"{REF_MASTER}.ref_id"),
-        comment="Indicates whether attr6 is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
-    )
 
     age_distribution_set_id = db.Column(
         db.ForeignKey(f"{CONFIG_AGE_DISTRIBUTION_SET}.config_age_distribution_set_id"),
@@ -122,30 +98,6 @@ class Model_ConfigProduct(BaseModel):
     age_rating_strategy = db.relationship(
         "Model_RefRatingStrategy",
         primaryjoin="Model_ConfigProduct.age_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr1_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr1_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr2_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr2_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr3_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr3_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr4_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr4_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr5_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr5_rating_strategy_id == Model_RefRatingStrategy.ref_id",
-    )
-    attr6_rating_strategy = db.relationship(
-        "Model_RefRatingStrategy",
-        primaryjoin="Model_ConfigProduct.attr6_rating_strategy_id == Model_RefRatingStrategy.ref_id",
     )
 
     rating_mapper_collection1 = db.relationship(

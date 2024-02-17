@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
+from app.auth import get_user
 
 
 class BaseModel(db.Model):
@@ -38,7 +39,11 @@ class BaseModel(db.Model):
 
     @declared_attr
     def updated_by(cls):
-        return db.Column(db.String(50))
+        return db.Column(
+            db.String(50),
+            default=lambda x: get_user().get("user_name", "UNKNOWN"),
+            onupdate=lambda x: get_user().get("user_name", "UNKNOWN"),
+        )
 
     def __repr__(self):
         """

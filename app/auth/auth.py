@@ -7,13 +7,20 @@ from datetime import datetime, timezone
 def validate_user(user):
     if user.get("auth_user_id") is None:
         raise ValueError("User must have auth_user_id key")
+    if user.get("user_name") is None:
+        raise ValueError("User must have user_name key")
     if not isinstance(user.get("roles"), list):
         raise ValueError("User must have roles key")
     return {
         "auth_user_id": user.get("auth_user_id"),
+        "user_name": user.get("user_name"),
         "roles": user.get("roles"),
         "permissions": user.get("permissions"),
     }
+
+
+def get_user():
+    return session.get("user", "UNKNOWN")
 
 
 def login_user(user):
@@ -79,8 +86,8 @@ def authorization_required(func):
                 return func(cls, *args, **kwargs)
 
             return {"status": "error", "msg": "User is not authorized"}, 403
-        except Exception:
-            return {"status": "error", "msg": "Invalid permission configuration"}, 500
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 500
 
     return wrapper_decorator
 

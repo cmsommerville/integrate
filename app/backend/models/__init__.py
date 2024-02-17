@@ -21,7 +21,7 @@ from .Config_BenefitDurationDetail import (
     Model_ConfigBenefitDurationDetailAuth_ACL,
 )
 from .Config_BenefitDurationSet import Model_ConfigBenefitDurationSet
-from .Config_BenefitProductVariation import Model_ConfigBenefitProductVariation
+from .Config_BenefitVariation import Model_ConfigBenefitVariation
 from .Config_BenefitProvision import Model_ConfigBenefitProvision
 from .Config_BenefitState import Model_ConfigBenefitState
 from .Config_Coverage import Model_ConfigCoverage

@@ -2,7 +2,7 @@ import numpy as np
 import requests
 from requests.compat import urljoin
 from itertools import product
-from ..models import Model_ConfigProduct, Model_ConfigBenefitProductVariation
+from ..models import Model_ConfigProduct, Model_ConfigBenefitVariation
 
 
 def PRODUCT_ID():
@@ -30,7 +30,7 @@ def PRODUCT_ID():
 
 
 def BENEFIT_VARIATIONS():
-    return Model_ConfigBenefitProductVariation.find_all()
+    return Model_ConfigBenefitVariation.find_all()
 
 
 def DATA_RATE_TABLE():
@@ -65,6 +65,6 @@ def DATA_RATE_TABLE():
 def load(hostname: str, *args, **kwargs) -> None:
     product_id = PRODUCT_ID()
     url = urljoin(hostname, f"api/config/product/{product_id}/rate-tables")
-    res = requests.post(url, json=DATA_RATE_TABLE())
+    res = requests.post(url, json=DATA_RATE_TABLE(), **kwargs)
     if not res.ok:
         raise Exception(res.text)
