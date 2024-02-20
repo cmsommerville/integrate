@@ -14,13 +14,19 @@ from .Config_BenefitCovarianceDetail import Schema_ConfigBenefitCovarianceDetail
 from .Config_BenefitCovarianceSet import Schema_ConfigBenefitCovarianceSet
 from .Config_BenefitDurationDetail import Schema_ConfigBenefitDurationDetail
 from .Config_BenefitDurationSet import Schema_ConfigBenefitDurationSet
-from .Config_BenefitProductVariation import Schema_ConfigBenefitVariation
+from .Config_BenefitVariation import Schema_ConfigBenefitVariation
 from .Config_BenefitProvision import Schema_ConfigBenefitProvision
-from .Config_BenefitState import Schema_ConfigBenefitState
+from .Config_BenefitVariationState import (
+    Schema_ConfigBenefitVariationState,
+    Schema_ConfigBenefitVariationStateRatesetUpdate,
+)
 from .Config_Coverage import Schema_ConfigCoverage
 from .Config_Factor import Schema_ConfigFactor
 from .Config_FactorRule import Schema_ConfigFactorRule
-from .Config_Product import Schema_ConfigProduct
+from .Config_Product import (
+    Schema_ConfigProduct,
+    Schema_ConfigProduct_RatingMapperCollections,
+)
 from .Config_ProductState import Schema_ConfigProductState
 from .Config_ProductVariation import Schema_ConfigProductVariation
 from .Config_ProductVariationState import Schema_ConfigProductVariationState
@@ -38,7 +44,12 @@ from .Config_Provision import (
 )
 from .Config_ProvisionState import Schema_ConfigProvisionState
 from .Config_RateGroup import Schema_ConfigRateGroup
-from .Config_RateTable import Schema_ConfigRateTable
+from .Config_RateTable import Schema_ConfigRateTable, Schema_ConfigRateTableSet
 from .Config_RatingMapperSet import Schema_ConfigRatingMapperSet
 from .Config_RatingMapperDetail import Schema_ConfigRatingMapperDetail
 from .Config_RatingMapperCollection import Schema_ConfigRatingMapperCollection
+
+from .Selection_Benefit import Schema_SelectionBenefit
+from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
+from .Selection_Plan import Schema_SelectionPlan
+from .Selection_Provision import Schema_SelectionProvision

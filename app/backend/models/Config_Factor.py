@@ -23,5 +23,5 @@ class Model_ConfigFactor(BaseModel, BaseRuleset):
 
     factor_rules = db.relationship("Model_ConfigFactorRule")
 
-    def apply_ruleset(self, obj: BaseModel):
-        return all([rule.apply_rule(obj) for rule in self.factor_rules])
+    def apply_ruleset(self, selection_provision: BaseModel):
+        return all([rule.apply_rule(selection_provision) for rule in self.factor_rules])

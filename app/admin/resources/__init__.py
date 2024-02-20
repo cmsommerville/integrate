@@ -8,7 +8,6 @@ from .Admin_EditUserRole import (
 from .Admin_HealthCheck import Resource_AdminHealthCheck
 from .Admin_InitializeData import (
     Resource_AdminInitRefData,
-    Resource_AdminInitRateTable,
     Resource_AdminInitConfig,
     Resource_AdminLoadData,
 )

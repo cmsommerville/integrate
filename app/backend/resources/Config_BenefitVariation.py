@@ -1,4 +1,3 @@
-from flask_restx import Resource
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
 from ..models import Model_ConfigBenefitVariation
 from ..schemas import Schema_ConfigBenefitVariation

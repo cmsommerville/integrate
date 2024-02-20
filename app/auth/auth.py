@@ -3,6 +3,15 @@ from flask import session
 from sqlalchemy.sql import text
 from datetime import datetime, timezone
 
+UNKNOWN_USER = {
+    "auth_user_id": None,
+    "user_name": "UNKNOWN",
+    "roles": [],
+    "permissions": [],
+    "is_authenticated": False,
+    "timestamp": datetime.now(timezone.utc).timestamp() * 1000,
+}
+
 
 def validate_user(user):
     if user.get("auth_user_id") is None:
@@ -20,7 +29,9 @@ def validate_user(user):
 
 
 def get_user():
-    return session.get("user", "UNKNOWN")
+    if session.get("user", None) is None:
+        return UNKNOWN_USER
+    return session.get("user", None)
 
 
 def login_user(user):

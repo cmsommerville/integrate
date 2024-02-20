@@ -273,6 +273,16 @@ class BaseRowLevelSecurityTable:
         cls.create_standard_policy()
 
         sql = f"""
+            SELECT COUNT(1)
+            FROM   sys.objects
+            WHERE  object_id = OBJECT_ID(N'{cls.RLS_SCHEMA}.{_policy_name}')
+        """
+
+        security_policy_exists = db.session.execute(text_sql(sql)).fetchone()[0]
+        if security_policy_exists != 0:
+            return
+
+        sql = f"""
             CREATE SECURITY POLICY {cls.RLS_SCHEMA}.{_policy_name}
             ADD FILTER PREDICATE {cls.RLS_SCHEMA}.{cls.FN_NAME}(auth_role_code) ON {_schema}.{_tablename}
             WITH (STATE = ON)

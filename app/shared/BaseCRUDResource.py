@@ -3,6 +3,7 @@ from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
 from app.auth import authorization_required
+from app.extensions import api
 
 
 class BaseCRUDResource(Resource):

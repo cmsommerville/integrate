@@ -5,10 +5,10 @@ from . import (
     Config_AttributeSet,
     Config_Benefit,
     Config_BenefitDuration,
-    Config_BenefitProductVariation,
     Config_BenefitProvision,
     Config_BenefitCovariance,
-    Config_BenefitState,
+    Config_BenefitVariation,
+    Config_BenefitVariationState,
     Config_Coverage,
     Config_Factor,
     Config_Product,
@@ -28,6 +28,7 @@ from . import (
     Ref_DataTypes,
     Ref_InputType,
     Ref_Optionality,
+    Ref_PlanStatus,
     Ref_PremiumFrequency,
     Ref_ProductVariation,
     Ref_Provision,
@@ -35,6 +36,10 @@ from . import (
     Ref_RatingStrategy,
     Ref_States,
     Ref_UnitType,
+    Selection_Benefit,
+    Selection_BenefitDuration,
+    Selection_Plan,
+    Selection_Provision,
 )
 
 
@@ -46,6 +51,7 @@ def load_refdata(hostname: str, *args, **kwargs):
     Ref_DataTypes.load(hostname, **kwargs)
     Ref_InputType.load(hostname, **kwargs)
     Ref_Optionality.load(hostname, **kwargs)
+    Ref_PlanStatus.load(hostname, **kwargs)
     Ref_PremiumFrequency.load(hostname, **kwargs)
     Ref_ProductVariation.load(hostname, **kwargs)
     Ref_Provision.load(hostname, **kwargs)
@@ -55,7 +61,7 @@ def load_refdata(hostname: str, *args, **kwargs):
     Ref_UnitType.load(hostname, **kwargs)
 
 
-def load_generic(hostname: str, *args, **kwargs):
+def load_config(hostname: str, *args, **kwargs):
     pass
     Config_AgeBand.load(hostname, **kwargs)
     Config_AttributeSet.load(hostname, **kwargs)
@@ -67,45 +73,16 @@ def load_generic(hostname: str, *args, **kwargs):
     Config_ProductVariationState.load(hostname, **kwargs)
     Config_RateGroup.load(hostname, **kwargs)
     Config_Benefit.load(hostname, **kwargs)
-    Config_BenefitState.load(hostname, **kwargs)
     Config_BenefitDuration.load(hostname, **kwargs)
     Config_Provision.load(hostname, **kwargs)
     Config_ProvisionState.load(hostname, **kwargs)
     Config_Factor.load(hostname, **kwargs)
     Config_BenefitProvision.load(hostname, **kwargs)
-
-
-def load_config(hostname: str, *args, **kwargs):
-    pass
-    # Config_AgeBand.load(hostname, **kwargs)
-    # Config_AgeDistribution.load(hostname, **kwargs)
-    # Config_AttributeSet.load(hostname, **kwargs)
-
-    # Config_Product.load(hostname, **kwargs)
-    # Config_Coverage.load(hostname, **kwargs)
-    # Config_RateGroup.load(hostname, **kwargs)
-    # Config_RateGroupFaceAmounts.load(hostname, **kwargs)
-    # Config_AgeMapper.load(hostname, **kwargs)
-    # Config_ProductMapper.load(hostname, **kwargs)
-    # Config_RelationshipMapper.load(hostname, **kwargs)
-    # Config_ProductState.load(hostname, **kwargs)
-
-    # Config_ProductVariation.load(hostname, **kwargs)
-    # Config_ProductVariationState.load(hostname, **kwargs)
-
-    # Config_Benefit.load(hostname, **kwargs)
-    # Config_BenefitDuration.load(hostname, **kwargs)
-    # Config_BenefitState.load(hostname, **kwargs)
-
-    # Config_Provision.load(hostname, **kwargs)
-    # Config_ProvisionState.load(hostname, **kwargs)
-    # Config_ProvisionUI.load(hostname, **kwargs)
-    # Config_Factor.load(hostname, **kwargs)
-
-    # Config_BenefitProductVariation.load(hostname, **kwargs)
-    # Config_BenefitProvision.load(hostname, **kwargs)
-    # Config_BenefitCovariance.load(hostname, **kwargs)
-
-
-def load_rate_table(hostname: str, *args, **kwargs):
+    Config_BenefitVariation.load(hostname, **kwargs)
+    Config_BenefitVariationState.load(hostname, **kwargs)
     Config_RateTable.load(hostname, **kwargs)
+
+
+def load_generic(hostname, *args, **kwargs):
+    # Selection_Plan.load(hostname, **kwargs)
+    Selection_Benefit.load(hostname, **kwargs)

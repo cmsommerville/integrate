@@ -29,3 +29,8 @@ class Model_ConfigRatingMapperCollection(BaseModel):
     attribute_set = db.relationship("Model_ConfigAttributeSet")
     mapper_sets = db.relationship("Model_ConfigRatingMapperSet")
     rating_strategy = db.relationship("Model_RefRatingStrategy")
+    default_mapper_set = db.relationship(
+        "Model_ConfigRatingMapperSet",
+        foreign_keys=[default_config_rating_mapper_set_id],
+        primaryjoin="Model_ConfigRatingMapperCollection.default_config_rating_mapper_set_id == Model_ConfigRatingMapperSet.config_rating_mapper_set_id",
+    )

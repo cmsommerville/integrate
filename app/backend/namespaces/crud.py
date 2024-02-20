@@ -2,6 +2,9 @@ from flask_restx import Namespace
 from app.backend import resources as res
 
 ns_crud = Namespace("crud", "Namespace containing standard CRUD endpoints")
+ns_selection = Namespace(
+    "selection", "Namespace containing standard selection endpoints"
+)
 
 ns_crud.add_resource(
     res.CRUD_ConfigAgeBandDetail, "/age-band/detail/<int:id>", "/age-band/detail"
@@ -67,13 +70,7 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitCovarianceSet_List, "/benefit-covariance/sets"
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitVariation_List, "/benefit-variations"
-)
-ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitProvision_List, "/benefit-provisions"
-)
-ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitState_List, "/benefit/<int:benefit_id>/states"
 )
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage, "/coverage/<int:id>", "/coverage")
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage_List, "/coverages")
@@ -140,10 +137,6 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigRateGroup, "/rate-group/<int:id>", "/rate-group"
 )
 ns_crud_product.add_resource(res.CRUD_ConfigRateGroup_List, "/rate-groups")
-ns_crud_product.add_resource(
-    res.CRUD_ConfigRateTable, "/rate-table/<int:id>", "/rate-table"
-)
-ns_crud_product.add_resource(res.CRUD_ConfigRateTable_List, "/rate-tables")
 
 ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitDurationDetail,
@@ -161,6 +154,36 @@ ns_crud_product.add_resource(
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitDurationSet_List, "/benefit/<int:benefit_id>/duration-sets"
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitVariation,
+    "/benefit/<int:benefit_id>/variation/<int:id>",
+    "/benefit/<int:benefit_id>/variation",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitVariation_List, "/benefit/<int:benefit_id>/variations"
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitVariationState,
+    "/benefit-variation/<int:benefit_variation_id>/state/<int:id>",
+    "/benefit-variation/<int:benefit_variation_id>/state",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigBenefitVariationState_List,
+    "/benefit-variation/<int:benefit_variation_id>/states",
+)
+
+ns_crud_product.add_resource(
+    res.ConfigBenefitVariationStateRateset,
+    "/benefit-variation/<int:benefit_variation_id>:update-rateset",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigRateTableSet,
+    "/benefit/<int:benefit_id>/rateset/<int:id>",
+    "/benefit/<int:benefit_id>/rateset",
+)
+ns_crud_product.add_resource(
+    res.CRUD_ConfigRateTableSet_List, "/benefit/<int:benefit_id>/rateset"
 )
 
 
@@ -183,14 +206,8 @@ ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitCovarianceSet, "/covariance/set/<int:id>", "/covariance/set"
 )
 ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitVariation, "/variation/<int:id>", "/variation"
-)
-ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitProvision, "/provision/<int:id>", "/provision"
 )
-ns_crud_benefit.add_resource(res.CRUD_ConfigBenefitState, "/state/<int:id>", "/state")
-
-
 ns_ref = Namespace("crud-ref", "Namespace of reference data CRUD endpoints")
 
 
@@ -222,6 +239,8 @@ ns_ref.add_resource(res.CRUD_RefInputTypes, "/input-type/<int:id>", "/input-type
 ns_ref.add_resource(res.CRUD_RefInputTypes_List, "/input-types")
 ns_ref.add_resource(res.CRUD_RefOptionality, "/optionality/<int:id>", "/optionality")
 ns_ref.add_resource(res.CRUD_RefOptionality_List, "/optionalities")
+ns_ref.add_resource(res.CRUD_RefOptionality, "/plan-status/<int:id>", "/plan-status")
+ns_ref.add_resource(res.CRUD_RefOptionality_List, "/plan-statuses")
 ns_ref.add_resource(
     res.CRUD_RefPremiumFrequency, "/premium-frequency/<int:id>", "/premium-frequency"
 )
@@ -244,3 +263,35 @@ ns_ref.add_resource(res.CRUD_RefStates, "/state/<int:id>", "/state")
 ns_ref.add_resource(res.CRUD_RefStates_List, "/states")
 ns_ref.add_resource(res.CRUD_RefUnitCode, "/unit-type/<int:id>", "/unit-type")
 ns_ref.add_resource(res.CRUD_RefUnitCode_List, "/unit-types")
+
+
+ns_selection.add_resource(res.CRUD_SelectionPlan, "/plan/<int:id>", "/plan")
+ns_selection.add_resource(res.CRUD_SelectionPlan_List, "/plans")
+ns_selection.add_resource(
+    res.CRUD_SelectionBenefit,
+    "/plan/<int:plan_id>/benefit/<int:id>",
+    "/plan/<int:plan_id>/benefit",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionBenefit_List,
+    "/plan/<int:plan_id>/benefits",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionProvision,
+    "/plan/<int:plan_id>/provision/<int:id>",
+    "/plan/<int:plan_id>/provision",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionProvision_List,
+    "/plan/<int:plan_id>/provisions",
+)
+
+ns_selection.add_resource(
+    res.CRUD_SelectionBenefitDuration,
+    "/plan/<int:plan_id>/benefit/<int:benefit_id>/duration/<int:id>",
+    "/plan/<int:plan_id>/benefit<int:benefit_id>/duration",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionBenefitDuration_List,
+    "/plan/<int:plan_id>/benefit<int:benefit_id>/durations",
+)

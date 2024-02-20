@@ -8,9 +8,9 @@ from ..models import (
 )
 
 
-def PRODUCT_ID():
+def PRODUCT_ID(code: str):
     return Model_ConfigProduct.find_one_by_attr(
-        {"config_product_code": "CI21000"}
+        {"config_product_code": code}
     ).config_product_id
 
 
@@ -22,24 +22,31 @@ def BENEFITS(product_id: int):
     return Model_ConfigBenefit.find_by_product(product_id)
 
 
-def DATA_BENEFIT_VARIATIONS(product_id):
+def DATA_BENEFIT_VARIATIONS(product_id, benefit_id):
     data = []
     variations = VARIATIONS(product_id)
-    bnfts = BENEFITS(product_id)
-    for pv, bnft in product(variations, bnfts):
+    for pv in variations:
         data.append(
             {
-                "config_benefit_id": bnft.config_benefit_id,
+                "config_benefit_id": benefit_id,
                 "config_product_variation_id": pv.config_product_variation_id,
-                "is_enabled": True,
             }
         )
     return data
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    product_id = PRODUCT_ID()
-    url = urljoin(hostname, f"api/config/product/{product_id}/benefit-variations")
-    res = requests.post(url, json=DATA_BENEFIT_VARIATIONS(product_id), **kwargs)
-    if not res.ok:
-        raise Exception(res.text)
+    product_id = PRODUCT_ID("CI21000")
+    benefits = BENEFITS(product_id)
+    for bnft in benefits:
+        url = urljoin(
+            hostname,
+            f"api/config/product/{product_id}/benefit/{bnft.config_benefit_id}/variations",
+        )
+        res = requests.post(
+            url,
+            json=DATA_BENEFIT_VARIATIONS(product_id, bnft.config_benefit_id),
+            **kwargs,
+        )
+        if not res.ok:
+            raise Exception(res.text)

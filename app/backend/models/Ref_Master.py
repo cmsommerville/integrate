@@ -65,6 +65,10 @@ class Model_RefOptionality(Model_RefMaster):
     __mapper_args__ = {"polymorphic_identity": "optionality"}
 
 
+class Model_RefPlanStatus(Model_RefMaster):
+    __mapper_args__ = {"polymorphic_identity": "plan_status"}
+
+
 class Model_RefPremiumFrequency(Model_RefMaster):
     __mapper_args__ = {"polymorphic_identity": "premium_frequency"}
 

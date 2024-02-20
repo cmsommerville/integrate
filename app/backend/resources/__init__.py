@@ -43,7 +43,7 @@ from .Config_BenefitDurationSet import (
     CRUD_ConfigBenefitDurationSet,
     CRUD_ConfigBenefitDurationSet_List,
 )
-from .Config_BenefitProductVariation import (
+from .Config_BenefitVariation import (
     CRUD_ConfigBenefitVariation,
     CRUD_ConfigBenefitVariation_List,
 )
@@ -51,7 +51,11 @@ from .Config_BenefitProvision import (
     CRUD_ConfigBenefitProvision,
     CRUD_ConfigBenefitProvision_List,
 )
-from .Config_BenefitState import CRUD_ConfigBenefitState, CRUD_ConfigBenefitState_List
+from .Config_BenefitVariationState import (
+    CRUD_ConfigBenefitVariationState,
+    CRUD_ConfigBenefitVariationState_List,
+    ConfigBenefitVariationStateRateset,
+)
 from .Config_Coverage import CRUD_ConfigCoverage, CRUD_ConfigCoverage_List
 from .Config_Factor import CRUD_ConfigFactor, CRUD_ConfigFactor_List
 from .Config_FactorRule import CRUD_ConfigFactorRule, CRUD_ConfigFactorRule_List
@@ -79,6 +83,8 @@ from .Config_RateGroup import CRUD_ConfigRateGroup, CRUD_ConfigRateGroup_List
 from .Config_RateTable import (
     CRUD_ConfigRateTable,
     CRUD_ConfigRateTable_List,
+    CRUD_ConfigRateTableSet,
+    CRUD_ConfigRateTableSet_List,
     RateTableCohortsResource,
 )
 from .Config_RatingMapperCollection import (
@@ -95,3 +101,11 @@ from .Config_RatingMapperDetail import (
 )
 from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List
+
+from .Selection_Benefit import CRUD_SelectionBenefit, CRUD_SelectionBenefit_List
+from .Selection_BenefitDuration import (
+    CRUD_SelectionBenefitDuration,
+    CRUD_SelectionBenefitDuration_List,
+)
+from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
+from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List

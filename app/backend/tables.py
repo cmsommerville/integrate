@@ -44,6 +44,7 @@ TBL_NAMES = {
     "SELECTION_CENSUS_SET": "selection_census_set",
     "SELECTION_FACE_AMOUNTS": "selection_face_amounts",
     "SELECTION_PLAN": "selection_plan",
+    "SELECTION_PLAN_ACL": "selection_plan_acl",
     "SELECTION_PROVISION": "selection_provision",
     "SELECTION_RATE_GROUP_SUMMARY": "selection_rate_group_summary",
     "SELECTION_RATE_GROUP_FACE_AMOUNTS": "selection_rate_group_face_amounts",

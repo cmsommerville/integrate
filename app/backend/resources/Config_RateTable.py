@@ -1,16 +1,18 @@
 import pandas as pd
-from app.extensions import db
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
 from ..classes.RateTableCohorts import RateTableCohorts
-from ..models import (
-    Model_ConfigAgeDistribution,
-    Model_ConfigRateTable,
-    Model_ConfigProduct,
-    Model_ConfigRatingMapperDetail,
-    Model_ConfigRatingMapperSet,
-)
-from ..schemas import Schema_ConfigRateTable
-from ..schemas.Config_RateTable import DFSchema_RateTableCohorts
+from ..models import Model_ConfigRateTable, Model_ConfigRateTableSet
+from ..schemas import Schema_ConfigRateTable, Schema_ConfigRateTableSet
+
+
+class CRUD_ConfigRateTableSet(BaseCRUDResource):
+    model = Model_ConfigRateTableSet
+    schema = Schema_ConfigRateTableSet()
+
+
+class CRUD_ConfigRateTableSet_List(BaseCRUDResourceList):
+    model = Model_ConfigRateTableSet
+    schema = Schema_ConfigRateTableSet(many=True)
 
 
 class CRUD_ConfigRateTable(BaseCRUDResource):

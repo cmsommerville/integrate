@@ -32,6 +32,9 @@ class Model_ConfigProvision(BaseModel):
         lazy="joined",
         primaryjoin="Model_ConfigProvision.config_provision_data_type_id == Model_RefDataTypes.ref_id",
     )
+    factors = db.relationship(
+        "Model_ConfigFactor", order_by="Model_ConfigFactor.factor_priority"
+    )
 
     __mapper_args__ = {
         "polymorphic_on": config_provision_type_code,
@@ -46,10 +49,6 @@ class Model_ConfigProvision(BaseModel):
 class Model_ConfigProvision_Product(Model_ConfigProvision):
     __mapper_args__ = {"polymorphic_identity": "product"}
 
-    factors = db.relationship("Model_ConfigFactor")
-
 
 class Model_ConfigProvision_RateTable(Model_ConfigProvision):
     __mapper_args__ = {"polymorphic_identity": "rate_table"}
-
-    factors = db.relationship("Model_ConfigFactor")

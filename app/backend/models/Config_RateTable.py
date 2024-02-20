@@ -3,10 +3,12 @@ from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
+CONFIG_AGE_DISTRIBUTION_SET = TBL_NAMES["CONFIG_AGE_DISTRIBUTION_SET"]
 CONFIG_ATTRIBUTE_DETAIL = TBL_NAMES["CONFIG_ATTRIBUTE_DETAIL"]
 CONFIG_BENEFIT = TBL_NAMES["CONFIG_BENEFIT"]
 CONFIG_RATE_TABLE = TBL_NAMES["CONFIG_RATE_TABLE"]
 CONFIG_RATE_TABLE_SET = TBL_NAMES["CONFIG_RATE_TABLE_SET"]
+CONFIG_RATING_MAPPER_COLLECTION = TBL_NAMES["CONFIG_RATING_MAPPER_COLLECTION"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 
@@ -24,6 +26,55 @@ class Model_ConfigRateTableSet(BaseModel):
     )
     config_rate_table_set_label = db.Column(db.String(100), nullable=False)
 
+    age_distribution_set_id = db.Column(
+        db.ForeignKey(f"{CONFIG_AGE_DISTRIBUTION_SET}.config_age_distribution_set_id"),
+        comment="Default distribution of ages at issue",
+    )
+    rating_mapper_collection_id1 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+    rating_mapper_collection_id2 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+    rating_mapper_collection_id3 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+    rating_mapper_collection_id4 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+    rating_mapper_collection_id5 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+    rating_mapper_collection_id6 = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_RATING_MAPPER_COLLECTION}.config_rating_mapper_collection_id"
+        ),
+        comment="Indicates which rating mapper sets can be used with this product. Also specifies distributions.",
+        nullable=True,
+    )
+
+    rates = db.relationship("Model_ConfigRateTable")
+
 
 class Model_ConfigRateTable(BaseModel):
     __tablename__ = CONFIG_RATE_TABLE
@@ -35,7 +86,7 @@ class Model_ConfigRateTable(BaseModel):
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
-        nullable=False,
+        nullable=True,
     )
     rating_age = db.Column(db.Integer, nullable=False)
 
@@ -83,7 +134,7 @@ class Model_ConfigRateTable(BaseModel):
     )
 
     rate_per_unit = db.Column(db.Numeric(12, 5), nullable=False)
-    rate_frequency = db.Column(db.ForeignKey(f"{REF_MASTER}.ref_id"), nullable=False)
+    rate_frequency_id = db.Column(db.ForeignKey(f"{REF_MASTER}.ref_id"), nullable=False)
     rate_unit_value = db.Column(db.Numeric(12, 2), nullable=False)
 
     rating_attr1 = db.relationship(

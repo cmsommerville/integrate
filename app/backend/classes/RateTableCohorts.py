@@ -6,10 +6,19 @@ from ..models import (
     Model_ConfigRatingMapperDetail,
     Model_ConfigRatingMapperSet,
 )
-from ..schemas.Config_RateTable import DFSchema_RateTableCohorts
+from ..schemas.Config_RateTable import (
+    DFSchema_RateTableCohorts,
+    Schema_RateTableCohorts,
+)
 
 
 class RateTableCohorts:
+    def __init__(self, product_id):
+        self.product_id = product_id
+        self.df_cohorts = None
+        self.rating_mapper_collections = {}
+        self.age_distribution_set_id = None
+
     @classmethod
     def get_rating_mappers(cls, rating_mapper_collections):
         """
@@ -90,13 +99,13 @@ class RateTableCohorts:
 
         return df.pipe(DFSchema_RateTableCohorts)
 
-    @classmethod
-    def create_cohorts(cls, product_id: int, *args, **kwargs):
-        product = Model_ConfigProduct.find_one(product_id)
+    def create_cohorts(self, *args, **kwargs):
+        product = Model_ConfigProduct.find_one(self.product_id)
         if not product:
             return None
 
-        rating_mapper_collections = {
+        self.age_distribution_set_id = product.age_distribution_set_id
+        self.rating_mapper_collections = {
             "1": product.rating_mapper_collection_id1,
             "2": product.rating_mapper_collection_id2,
             "3": product.rating_mapper_collection_id3,
@@ -105,10 +114,19 @@ class RateTableCohorts:
             "6": product.rating_mapper_collection_id6,
         }
 
-        df_attributes = cls.get_rating_mappers(rating_mapper_collections)
-        df_age_dist = cls.get_age_distribution(product.age_distribution_set_id)
-        df = cls.cross_join_age_attrs(
-            rating_mapper_collections, df_attributes, df_age_dist
+        df_attributes = self.get_rating_mappers(self.rating_mapper_collections)
+        df_age_dist = self.get_age_distribution(self.age_distribution_set_id)
+        self.df_cohorts = self.cross_join_age_attrs(
+            self.rating_mapper_collections, df_attributes, df_age_dist
         )
 
-        return df
+        return self.df_cohorts
+
+    def cohorts_for_rate_table(self, *args, **kwargs):
+        df = self.create_cohorts()
+        if df.shape[0] == 0:
+            return []
+
+        cohorts = df.to_dict("records")
+        schema = Schema_RateTableCohorts(many=True)
+        return schema.load(cohorts)

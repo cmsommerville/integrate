@@ -47,7 +47,7 @@ class Model_ConfigFactorRule(BaseModel, BaseRule):
     )
 
     @hybrid_property
-    def comparison_attribute_value(self):
+    def rule_value(self):
         data_type_obj = getattr(self, "data_type", None)
         data_type = getattr(data_type_obj, "ref_attr_code", None)
         if data_type in ["number", "int", "float"]:
@@ -56,26 +56,16 @@ class Model_ConfigFactorRule(BaseModel, BaseRule):
             return self.comparison_attr_value.upper() == "TRUE"
         return self.comparison_attr_value
 
-    def convert_data_type(self, val):
-        if self.data_type.ref_attr_code == "number":
-            return float(val)
-        if self.data_type.ref_attr_code == "boolean":
-            return val.upper() == "TRUE"
-        return val
-
-    def apply_rule(self, obj: BaseModel):
+    def apply_rule(self, selection_provision: BaseModel):
         """
         Applies the rule
         """
         # get the operator code -- i.e. __eq__, __lt__, etc.
-        _operator = self.comparison_operator.ref_attr_code
+        operator = self.comparison_operator.ref_attr_code
         # get the attribute being compared
-        _comparison_attr = self.nested_getattr(obj, self.comparison_attr_name)
-        # get type of _comparison_attr
-        convert_to_type = type(_comparison_attr)
+        actual_value = self.nested_getattr(
+            selection_provision, self.comparison_attr_name
+        )
         # create a comparison function using the operator code
-        _comparison_function = getattr(_comparison_attr, _operator)
-        # convert data type of comparison value
-        _comparison_value = convert_to_type(self.comparison_attribute_value)
-
-        return _comparison_function(_comparison_value)
+        comparison_function = getattr(actual_value, operator)
+        return comparison_function(self.rule_value)

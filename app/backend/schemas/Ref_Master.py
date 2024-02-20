@@ -112,6 +112,18 @@ class Schema_RefOptionality(BaseSchema):
     ref_attr_description = ma.String()
 
 
+class Schema_RefPlanStatus(BaseSchema):
+    class Meta:
+        model = models.Model_RefPlanStatus
+        load_instance = True
+
+    ref_entity_code = ma.Constant("plan_status")
+    ref_id = ma.Integer()
+    ref_attr_code = ma.String()
+    ref_attr_label = ma.String()
+    ref_attr_description = ma.String()
+
+
 class Schema_RefPremiumFrequency(BaseSchema):
     class Meta:
         model = models.Model_RefPremiumFrequency
