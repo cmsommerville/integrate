@@ -26,10 +26,9 @@ def DATA_GROUP_SIZE(provision: Model_ConfigProvision):
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 1,
-            "factor_value": 1.0,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": "<"}
                     ).ref_id,
@@ -39,14 +38,14 @@ def DATA_GROUP_SIZE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
             ],
+            "factor_values": [{"factor_value": 1}],
         },
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 2,
-            "factor_value": 0.9,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": "<"}
                     ).ref_id,
@@ -56,7 +55,7 @@ def DATA_GROUP_SIZE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": ">="}
                     ).ref_id,
@@ -66,14 +65,14 @@ def DATA_GROUP_SIZE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
             ],
+            "factor_values": [{"factor_value": 0.9}],
         },
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 3,
-            "factor_value": 0.8,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": ">="}
                     ).ref_id,
@@ -83,6 +82,7 @@ def DATA_GROUP_SIZE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
             ],
+            "factor_values": [{"factor_value": 0.8}],
         },
     ]
 
@@ -92,10 +92,9 @@ def DATA_SIC_CODE(provision: Model_ConfigProvision):
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 1,
-            "factor_value": 0.82,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": "<"}
                     ).ref_id,
@@ -105,14 +104,14 @@ def DATA_SIC_CODE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
             ],
+            "factor_values": [{"factor_value": 0.82}],
         },
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 2,
-            "factor_value": 1.07,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": ">="}
                     ).ref_id,
@@ -122,6 +121,7 @@ def DATA_SIC_CODE(provision: Model_ConfigProvision):
                     ).ref_id,
                 },
             ],
+            "factor_values": [{"factor_value": 1.07}],
         },
     ]
 
@@ -131,54 +131,31 @@ def DATA_RED70(provision: Model_ConfigProvision):
         {
             "config_provision_id": provision.config_provision_id,
             "factor_priority": 1,
-            "factor_value": 0.8,
+            "vary_by_rating_age": True,
             "factor_rules": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
+                    "comparison_attr_name": "selection_value",
                     "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
                         {"ref_attr_symbol": "="}
                     ).ref_id,
                     "comparison_attr_value": "true",
                     "comparison_attr_data_type_id": Model_RefDataTypes.find_one_by_attr(
                         {"ref_attr_code": "boolean"}
-                    ).ref_id,
-                },
-                {
-                    "comparison_attr_name": "rate_table.age_value",
-                    "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
-                        {"ref_attr_symbol": ">="}
-                    ).ref_id,
-                    "comparison_attr_value": "65",
-                    "comparison_attr_data_type_id": Model_RefDataTypes.find_one_by_attr(
-                        {"ref_attr_code": "number"}
                     ).ref_id,
                 },
             ],
-        },
-        {
-            "config_provision_id": provision.config_provision_id,
-            "factor_priority": 2,
-            "factor_value": 0.92,
-            "factor_rules": [
+            "factor_values": [
                 {
-                    "comparison_attr_name": "provision.selection_value",
-                    "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
-                        {"ref_attr_symbol": "="}
-                    ).ref_id,
-                    "comparison_attr_value": "true",
-                    "comparison_attr_data_type_id": Model_RefDataTypes.find_one_by_attr(
-                        {"ref_attr_code": "boolean"}
-                    ).ref_id,
+                    "rate_table_age_value": 67,
+                    "factor_value": 0.8,
                 },
                 {
-                    "comparison_attr_name": "rate_table.age_value",
-                    "comparison_operator_id": Model_RefComparisonOperator.find_one_by_attr(
-                        {"ref_attr_symbol": ">="}
-                    ).ref_id,
-                    "comparison_attr_value": "60",
-                    "comparison_attr_data_type_id": Model_RefDataTypes.find_one_by_attr(
-                        {"ref_attr_code": "number"}
-                    ).ref_id,
+                    "rate_table_age_value": 62,
+                    "factor_value": 0.92,
+                },
+                {
+                    "rate_table_age_value": 57,
+                    "factor_value": 0.985,
                 },
             ],
         },

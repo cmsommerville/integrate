@@ -3,6 +3,7 @@ from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
+CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
 CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
 SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
 SELECTION_PROVISION = TBL_NAMES["SELECTION_PROVISION"]
@@ -28,11 +29,14 @@ class Model_SelectionProvision(BaseModel):
         ),
         nullable=False,
     )
-    config_provision_type_code = db.Column(db.String(30), nullable=False)
+    config_factor_set_id = db.Column(
+        db.ForeignKey(f"{CONFIG_FACTOR_SET}.config_factor_set_id"),
+        nullable=True,
+    )
     selection_value = db.Column(db.String(100), nullable=False)
-    selection_factor = db.Column(db.Numeric(8, 5), nullable=True)
 
     config_provision = db.relationship("Model_ConfigProvision")
+    factors = db.relationship("Model_SelectionFactor")
 
     def get_product_factor(self):
         """

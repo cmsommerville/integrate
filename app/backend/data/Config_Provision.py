@@ -1,6 +1,6 @@
 import requests
 from requests.compat import urljoin
-from ..models import Model_ConfigProduct, Model_RefProvision, Model_RefDataTypes
+from ..models import Model_ConfigProduct, Model_RefDataTypes
 
 
 def PRODUCT(product_code: str):
@@ -13,7 +13,6 @@ def DATA(product: Model_ConfigProduct):
             "config_product_id": product.config_product_id,
             "config_provision_code": "group_size",
             "config_provision_label": "Group Size",
-            "config_provision_type_code": "product",
             "config_provision_data_type_id": Model_RefDataTypes.find_one_by_attr(
                 {"ref_attr_code": "number"}
             ).ref_id,
@@ -23,7 +22,6 @@ def DATA(product: Model_ConfigProduct):
             "config_product_id": product.config_product_id,
             "config_provision_code": "sic_code",
             "config_provision_label": "SIC",
-            "config_provision_type_code": "product",
             "config_provision_data_type_id": Model_RefDataTypes.find_one_by_attr(
                 {"ref_attr_code": "string"}
             ).ref_id,
@@ -33,7 +31,6 @@ def DATA(product: Model_ConfigProduct):
             "config_product_id": product.config_product_id,
             "config_provision_code": "reduction_at_70",
             "config_provision_label": "50% Benefit Reduction @ Age 70",
-            "config_provision_type_code": "rate_table",
             "config_provision_data_type_id": Model_RefDataTypes.find_one_by_attr(
                 {"ref_attr_code": "boolean"}
             ).ref_id,

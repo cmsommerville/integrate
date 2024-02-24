@@ -21,7 +21,7 @@ from .Config_BenefitVariationState import (
     Schema_ConfigBenefitVariationStateRatesetUpdate,
 )
 from .Config_Coverage import Schema_ConfigCoverage
-from .Config_Factor import Schema_ConfigFactor
+from .Config_Factor import Schema_ConfigFactor, Schema_ConfigFactorSet
 from .Config_FactorRule import Schema_ConfigFactorRule
 from .Config_Product import (
     Schema_ConfigProduct,
@@ -39,8 +39,6 @@ from .Config_ProvisionUI import (
 )
 from .Config_Provision import (
     Schema_ConfigProvision,
-    Schema_ConfigProvision_Product,
-    Schema_ConfigProvision_RateTable,
 )
 from .Config_ProvisionState import Schema_ConfigProvisionState
 from .Config_RateGroup import Schema_ConfigRateGroup
@@ -51,5 +49,13 @@ from .Config_RatingMapperCollection import Schema_ConfigRatingMapperCollection
 
 from .Selection_Benefit import Schema_SelectionBenefit
 from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
+from .Selection_Factor import (
+    Schema_SelectionFactor,
+    Schema_SelectionFactorFromConfigFactor,
+)
 from .Selection_Plan import Schema_SelectionPlan
-from .Selection_Provision import Schema_SelectionProvision
+from .Selection_Provision import (
+    Schema_SelectionProvision,
+    Schema_SelectionProvision_CreatePayloadValidator,
+    Schema_SelectionProvision_UpdatePayloadValidator,
+)

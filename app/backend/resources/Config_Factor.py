@@ -1,12 +1,13 @@
-from flask_restx import Resource
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
-from ..models import Model_ConfigFactor
-from ..schemas import Schema_ConfigFactor
+from ..models import Model_ConfigFactorSet
+from ..schemas import Schema_ConfigFactorSet
 
-class CRUD_ConfigFactor(BaseCRUDResource): 
-    model = Model_ConfigFactor
-    schema = Schema_ConfigFactor()
 
-class CRUD_ConfigFactor_List(BaseCRUDResourceList): 
-    model = Model_ConfigFactor
-    schema = Schema_ConfigFactor(many=True)
+class CRUD_ConfigFactorSet(BaseCRUDResource):
+    model = Model_ConfigFactorSet
+    schema = Schema_ConfigFactorSet()
+
+
+class CRUD_ConfigFactorSet_List(BaseCRUDResourceList):
+    model = Model_ConfigFactorSet
+    schema = Schema_ConfigFactorSet(many=True)

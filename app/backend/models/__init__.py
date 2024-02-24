@@ -25,7 +25,7 @@ from .Config_BenefitVariation import Model_ConfigBenefitVariation
 from .Config_BenefitVariationState import Model_ConfigBenefitVariationState
 from .Config_BenefitProvision import Model_ConfigBenefitProvision
 from .Config_Coverage import Model_ConfigCoverage
-from .Config_Factor import Model_ConfigFactor
+from .Config_Factor import Model_ConfigFactorSet, Model_ConfigFactor
 from .Config_FactorRule import Model_ConfigFactorRule
 from .Config_Product import Model_ConfigProduct
 from .Config_ProductState import Model_ConfigProductState
@@ -33,8 +33,6 @@ from .Config_ProductVariation import Model_ConfigProductVariation
 from .Config_ProductVariationState import Model_ConfigProductVariationState
 from .Config_Provision import (
     Model_ConfigProvision,
-    Model_ConfigProvision_Product,
-    Model_ConfigProvision_RateTable,
 )
 from .Config_ProvisionState import Model_ConfigProvisionState
 from .Config_ProvisionUI import (
@@ -56,5 +54,6 @@ from .Ref_States import Model_RefStates
 
 from .Selection_Benefit import Model_SelectionBenefit
 from .Selection_BenefitDuration import Model_SelectionBenefitDuration
+from .Selection_Factor import Model_SelectionFactor
 from .Selection_Plan import Model_SelectionPlan, Model_SelectionPlan_ACL
 from .Selection_Provision import Model_SelectionProvision

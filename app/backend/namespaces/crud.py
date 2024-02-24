@@ -74,7 +74,6 @@ ns_crud_product.add_resource(
 )
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage, "/coverage/<int:id>", "/coverage")
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage_List, "/coverages")
-ns_crud_product.add_resource(res.CRUD_ConfigFactor_List, "/provision/factors")
 
 ns_crud_product.add_resource(res.CRUD_ConfigProductState, "/state/<int:id>", "/state")
 ns_crud_product.add_resource(res.CRUD_ConfigProductState_List, "/states")
@@ -107,12 +106,12 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigProvisionState_List, "/provision/<int:provision_id>/states"
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigFactor,
+    res.CRUD_ConfigFactorSet,
     "/provision/<int:provision_id>/factor/<int:id>",
     "/provision/<int:provision_id>/factor",
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigFactor_List,
+    res.CRUD_ConfigFactorSet_List,
     "/provision/<int:provision_id>/factors",
 )
 ns_crud_product.add_resource(
@@ -289,9 +288,9 @@ ns_selection.add_resource(
 ns_selection.add_resource(
     res.CRUD_SelectionBenefitDuration,
     "/plan/<int:plan_id>/benefit/<int:benefit_id>/duration/<int:id>",
-    "/plan/<int:plan_id>/benefit<int:benefit_id>/duration",
+    "/plan/<int:plan_id>/benefit/<int:benefit_id>/duration",
 )
 ns_selection.add_resource(
     res.CRUD_SelectionBenefitDuration_List,
-    "/plan/<int:plan_id>/benefit<int:benefit_id>/durations",
+    "/plan/<int:plan_id>/benefit/<int:benefit_id>/durations",
 )

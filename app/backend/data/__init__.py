@@ -85,4 +85,6 @@ def load_config(hostname: str, *args, **kwargs):
 
 def load_generic(hostname, *args, **kwargs):
     # Selection_Plan.load(hostname, **kwargs)
-    Selection_Benefit.load(hostname, **kwargs)
+    # Selection_Benefit.load(hostname, **kwargs)
+    # Selection_BenefitDuration.load(hostname, **kwargs)
+    Selection_Provision.load(hostname, **kwargs)

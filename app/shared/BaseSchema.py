@@ -6,6 +6,11 @@ from app.extensions import ma
 class BaseSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         load_instance = True
+        dump_only = (
+            "version_id",
+            "created_dts",
+            "updated_dts",
+        )
 
     @post_dump(pass_many=True)
     def formatDecimal(self, data, many, **kwargs):

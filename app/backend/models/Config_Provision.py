@@ -20,7 +20,6 @@ class Model_ConfigProvision(BaseModel):
     )
     config_provision_code = db.Column(db.String(30), nullable=False)
     config_provision_label = db.Column(db.String(100), nullable=False)
-    config_provision_type_code = db.Column(db.String(30), nullable=False)
     config_provision_data_type_id = db.Column(
         db.ForeignKey(f"{REF_MASTER}.ref_id"), nullable=False
     )
@@ -33,22 +32,9 @@ class Model_ConfigProvision(BaseModel):
         primaryjoin="Model_ConfigProvision.config_provision_data_type_id == Model_RefDataTypes.ref_id",
     )
     factors = db.relationship(
-        "Model_ConfigFactor", order_by="Model_ConfigFactor.factor_priority"
+        "Model_ConfigFactorSet", order_by="Model_ConfigFactorSet.factor_priority"
     )
-
-    __mapper_args__ = {
-        "polymorphic_on": config_provision_type_code,
-        "polymorphic_identity": "__default__",
-    }
 
     @classmethod
     def find_by_product(cls, id: int):
         return cls.query.filter(cls.config_product_id == id).all()
-
-
-class Model_ConfigProvision_Product(Model_ConfigProvision):
-    __mapper_args__ = {"polymorphic_identity": "product"}
-
-
-class Model_ConfigProvision_RateTable(Model_ConfigProvision):
-    __mapper_args__ = {"polymorphic_identity": "rate_table"}
