@@ -2,126 +2,112 @@ from flask import request
 from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
-from .BaseObservable import BaseObservable
-from app.auth import authorize, ResourcePermissions
+from app.auth import authorization_required
+from app.extensions import api
+
 
 class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
-    observable: BaseObservable = None
     model_args: dict = {}
-    permissions = ResourcePermissions()
+    permissions: dict = {
+        "get": ["*"],
+        "post": ["*"],
+        "patch": ["*"],
+        "put": ["*"],
+        "delete": ["*"],
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
-    @authorize()
-    def get(cls, id, *args, **kwargs):
-        try: 
-            obj = cls.model.find_one(id, **cls.model_args)
-        except Exception as e:
-            return {}, 200
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('get', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+    @authorization_required
+    def get(cls, *args, **kwargs):
+        return cls.retrieve(*args, **kwargs)
 
-        return cls.schema.dump(obj), 200
-  
-    @classmethod  
+    @classmethod
+    @authorization_required
     def post(cls, *args, **kwargs):
-        try: 
-            req = request.get_json()
-            obj = cls.schema.load(req)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-        
-        try: 
-            obj.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('post', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        return cls.create(*args, **kwargs)
 
     @classmethod
-    def put(cls, *args, **kwargs): 
-        try: 
-            req = request.get_json()
-            obj = cls.schema.load(req)
-            obj.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('put', obj, request)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+    @authorization_required
+    def put(cls, *args, **kwargs):
+        return cls.replace(*args, **kwargs)
 
     @classmethod
-    def patch(cls, id, *args, **kwargs): 
-        try: 
-            req = request.get_json()
-            # get existing data 
+    @authorization_required
+    def patch(cls, id, *args, **kwargs):
+        return cls.update(id, *args, **kwargs)
+
+    @classmethod
+    @authorization_required
+    def delete(cls, id, *args, **kwargs):
+        return cls.destroy(id, *args, **kwargs)
+
+    @classmethod
+    def retrieve(cls, id, *args, **kwargs):
+        try:
             obj = cls.model.find_one(id, **cls.model_args)
-            data = cls.schema.dump(obj)
-            for attr, val in req.items(): 
-                data[attr] = val
-            # save object to database 
-            new = cls.schema.load(data)
-            new.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('patch', new, request)
+        except Exception:
+            return {}, 200
+        return cls.schema.dump(obj), 200
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        try:
+            req = request.get_json()
+            obj = cls.schema.load(req)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
         try:
-            return cls.schema.dump(new), 201
+            obj.save_to_db()
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+        try:
+            return cls.schema.dump(obj), 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
-    def delete(cls, id, *args, **kwargs): 
-        try: 
-            obj = cls.model.find_one(id, **cls.model_args)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-        
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('delete', obj, request)
+    def replace(cls, id, *args, **kwargs):
+        try:
+            req = request.get_json()
+            obj = cls.model.replace_one(id, req)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
-        try: 
+        try:
+            return cls.schema.dump(obj), 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+    @classmethod
+    def update(cls, id, *args, **kwargs):
+        try:
+            req = request.get_json()
+            obj = cls.model.update_one(id, req)
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+        try:
+            return cls.schema.dump(obj), 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+    @classmethod
+    def destroy(cls, id, *args, **kwargs):
+        try:
+            obj = cls.model.find_one(id, **cls.model_args)
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+        try:
             obj.delete()
-            return {"status": "Deleted"}, 204
+            return {"status": "Deleted"}, 200
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -129,44 +115,45 @@ class BaseCRUDResource(Resource):
 class BaseCRUDResourceList(Resource):
     model: BaseModel
     schema: BaseSchema
-    observable: BaseObservable = None
     model_args: dict = {}
-    permissions = ResourcePermissions()
+    permissions: dict = {
+        "get": ["*"],
+        "post": ["*"],
+    }
 
     def __init__(self, *args, **kwargs):
         super().__init__()
 
     @classmethod
-    @authorize()
+    @authorization_required
     def get(cls, *args, **kwargs):
-        try: 
+        return cls.list(*args, **kwargs)
+
+    @classmethod
+    @authorization_required
+    def post(cls, *args, **kwargs):
+        return cls.bulk_create(*args, **kwargs)
+
+    @classmethod
+    def list(cls, *args, **kwargs):
+        try:
             objs = cls.model.find_all(**cls.model_args)
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('get', objs, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
-        try: 
-            if objs: 
+        try:
+            if objs:
                 return cls.schema.dump(objs), 200
             raise Exception("No data found")
-        except Exception as e:
+        except Exception:
             return [], 200
-  
-    @classmethod  
-    def post(cls, *args, **kwargs):
-        try: 
+
+    @classmethod
+    def bulk_create(cls, *args, **kwargs):
+        try:
             req = request.get_json()
             objs = cls.schema.load(req)
             cls.model.save_all_to_db(objs)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try: 
-            _observable = getattr(cls, 'observable', None)
-            if _observable:
-                _observable.notify('post', objs, request)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

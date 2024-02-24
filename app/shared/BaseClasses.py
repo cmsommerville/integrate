@@ -1,13 +1,12 @@
 from functools import reduce
 
-class BaseRuleset():
 
+class BaseRuleset:
     def apply_ruleset(self):
         pass
 
 
-class BaseRule():
-
+class BaseRule:
     def apply_rule(self):
         pass
 
@@ -15,10 +14,8 @@ class BaseRule():
         """
         Returns a deeply nested relationship expressed as a string with dot notation.
 
-        An example, `plan.group.group_label`, will return the group_label attribute from the 
+        An example, `plan.group.group_label`, will return the group_label attribute from the
         group class from the plan class.
         """
-        _attrs = nested_attr.split('.')
-        return reduce(lambda o, next_attr: getattr(o, next_attr, None), _attrs, obj)
-
-
+        attrs = nested_attr.split(".")
+        return reduce(lambda o, next_attr: getattr(o, next_attr, None), attrs, obj)

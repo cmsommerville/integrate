@@ -1,41 +1,55 @@
-import datetime
-from typing import List
 from app.extensions import db
 from app.shared import BaseModel
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..tables import TBL_NAMES
 
-CONFIG_BENEFIT_PROVISION = TBL_NAMES['CONFIG_BENEFIT_PROVISION']
-CONFIG_PROVISION = TBL_NAMES['CONFIG_PROVISION']
-SELECTION_PROVISION = TBL_NAMES['SELECTION_PROVISION']
-SELECTION_PLAN = TBL_NAMES['SELECTION_PLAN']
+CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
+CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
+SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
+SELECTION_PROVISION = TBL_NAMES["SELECTION_PROVISION"]
+
 
 class Model_SelectionProvision(BaseModel):
     __tablename__ = SELECTION_PROVISION
-    __table_args__ = (
-        db.UniqueConstraint('selection_plan_id', 'config_provision_id', ), 
-    )
+    __table_args__ = (db.UniqueConstraint("selection_plan_id", "config_provision_id"),)
 
     selection_provision_id = db.Column(db.Integer, primary_key=True)
-    selection_plan_id = db.Column(db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"), nullable=False)
-    config_provision_id = db.Column(db.ForeignKey(f"{CONFIG_PROVISION}.config_provision_id"), nullable=False)
-    selection_provision_value = db.Column(db.String(255), nullable=False)
-    selection_factor_value = db.Column(db.Numeric(8,5), nullable=True)
+    selection_plan_id = db.Column(
+        db.ForeignKey(
+            f"{SELECTION_PLAN}.selection_plan_id",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+    )
+    config_provision_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_PROVISION}.config_provision_id",
+            ondelete="NO ACTION",
+            onupdate="NO ACTION",
+        ),
+        nullable=False,
+    )
+    config_factor_set_id = db.Column(
+        db.ForeignKey(f"{CONFIG_FACTOR_SET}.config_factor_set_id"),
+        nullable=True,
+    )
+    selection_value = db.Column(db.String(100), nullable=False)
 
-    config_provision = db.relationship("Model_ConfigProvision", lazy='joined')
+    config_provision = db.relationship("Model_ConfigProvision")
+    factors = db.relationship("Model_SelectionFactor")
 
-    @hybrid_property
-    def selection_value(self): 
-        prov = getattr(self, 'config_provision', None)
-        data_type_obj = getattr(prov, 'data_type', None)
-        data_type = getattr(data_type_obj, 'ref_attr_code', None)
-        if data_type in ['number', 'int', 'float']:
-            return float(self.selection_provision_value)
-        if data_type in ['bool', 'boolean']: 
-            return self.selection_provision_value.upper() == 'TRUE'
-        return self.selection_provision_value
-        
-    @hybrid_property
-    def is_product_factor(self):
-        return self.config_provision.config_provision_type_code == 'product'
+    def get_product_factor(self):
+        """
+        Passes the selection provision object into the apply_ruleset function
+        to find the ruleset that is True for this object
+        """
+        if self.config_provision_type_code != "product":
+            return None
+
+        factor_sets = self.config_provision.factors
+        first_valid_ruleset = next(
+            (ruleset for ruleset in factor_sets if ruleset.apply_ruleset(self)), None
+        )
+        if first_valid_ruleset is None:
+            return 1
+        return first_valid_ruleset.factor_value

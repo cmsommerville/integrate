@@ -1,58 +1,54 @@
 import requests
 from requests.compat import urljoin
-from  ..models import Model_ConfigProduct, Model_ConfigProvision, \
-    Model_RefStates, Model_RefProvision
+from ..models import Model_ConfigProduct, Model_ConfigProvision
 
 
-def _PRODUCT():
-    return Model_ConfigProduct.find_one_by_attr({
-        "config_product_code": "CI21000"
-    })
-
-def PROVISIONS(product: Model_ConfigProduct):
-    return {
-        "group_size": [state for state in product.states], 
-        "sic_code": [state for state in product.states if state.config_product_state_id % 4 != 1], 
-    }
+PROVISION_CODES = ["group_size", "sic_code", "reduction_at_70"]
 
 
-def DATA_PROVISION_STATES(product: Model_ConfigProduct): 
+def PRODUCT(product_code: str):
+    return Model_ConfigProduct.find_one_by_attr({"config_product_code": product_code})
+
+
+def PROVISION(provision_code: str):
+    return Model_ConfigProvision.find_one_by_attr(
+        {"config_provision_code": provision_code}
+    )
+
+
+def PROVISION_STATES(product: Model_ConfigProduct):
+    return {code: [state for state in product.states] for code in PROVISION_CODES}
+
+
+def DATA_PROVISION_STATES(
+    product: Model_ConfigProduct, provision: Model_ConfigProvision
+):
+    provision_states = PROVISION_STATES(product)[provision.config_provision_code]
     return [
-    *[{
-        'config_provision_id': Model_ConfigProvision.find_one_by_attr({
-            "ref_provision_id": Model_RefProvision.find_one_by_attr({
-                "ref_attr_code": "group_size"
-            }).ref_id
-        }).config_provision_id, 
-        'config_product_id': product.config_product_id, 
-        "ref_provision_id": Model_RefProvision.find_one_by_attr({
-            "ref_attr_code": "group_size"
-        }).ref_id, 
-        'state_id': state.state_id, 
-        'config_provision_state_effective_date': str(state.config_product_state_effective_date), 
-        'config_provision_state_expiration_date': str(state.config_product_state_expiration_date), 
-    } for state in PROVISIONS(product)['group_size']], 
-    
-    *[{
-        'config_provision_id': Model_ConfigProvision.find_one_by_attr({
-            "ref_provision_id": Model_RefProvision.find_one_by_attr({
-                "ref_attr_code": "sic_code"
-            }).ref_id
-        }).config_provision_id, 
-        'config_product_id': product.config_product_id, 
-        "ref_provision_id": Model_RefProvision.find_one_by_attr({
-            "ref_attr_code": "sic_code"
-        }).ref_id, 
-        'state_id': state.state_id, 
-        'config_provision_state_effective_date': str(state.config_product_state_effective_date), 
-        'config_provision_state_expiration_date': str(state.config_product_state_expiration_date), 
-    } for state in PROVISIONS(product)['sic_code']], 
-]
+        {
+            "config_provision_id": provision.config_provision_id,
+            "state_id": state.state_id,
+            "config_provision_state_effective_date": str(
+                product.config_product_effective_date
+            ),
+            "config_provision_state_expiration_date": str(
+                product.config_product_expiration_date
+            ),
+        }
+        for state in provision_states
+    ]
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    product = _PRODUCT()
-    url = urljoin(hostname, f'api/config/product/{product.config_product_id}/provision/states')
-    res = requests.post(url, json=DATA_PROVISION_STATES(product))
-    if not res.ok: 
-        raise Exception(res.text)
+    product = PRODUCT("CI21000")
+    for prov_code in PROVISION_CODES:
+        provision = PROVISION(prov_code)
+        url = urljoin(
+            hostname,
+            f"api/config/product/{product.config_product_id}/provision/{provision.config_provision_id}/states",
+        )
+        res = requests.post(
+            url, json=DATA_PROVISION_STATES(product, provision), **kwargs
+        )
+        if not res.ok:
+            raise Exception(res.text)

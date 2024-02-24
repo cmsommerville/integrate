@@ -1,10 +1,7 @@
-import bcrypt
-from flask import request, jsonify
+from flask import request
 from flask_restx import Resource
-from flask_jwt_extended import create_access_token
 from ..models import Model_AuthUser, Model_AuthRole, Model_AuthUserRole
 from ..schemas import Schema_AuthUserRole
-from ..constants import BCRYPT_ROUNDS_WORK_FACTOR
 
 _schema_list = Schema_AuthUserRole(many=True)
 

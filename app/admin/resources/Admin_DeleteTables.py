@@ -1,7 +1,6 @@
-from flask import request, current_app
+from flask import request
 from flask_restx import Resource
 from app.extensions import db
-from app.shared import BaseModel, BaseTemporalTable, BaseRowLevelSecurityTable
 
 
 class Resource_AdminDeleteTables(Resource):

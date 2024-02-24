@@ -1,16 +1,28 @@
-from app.extensions import ma
-from app.shared import BaseSchema, PrimitiveField
+from marshmallow import Schema, fields, EXCLUDE
+from app.shared import BaseSchema
 
 from ..models import Model_SelectionProvision
-from .Config_Provision import Schema_ConfigProvision
 
 
 class Schema_SelectionProvision(BaseSchema):
     class Meta:
         model = Model_SelectionProvision
         load_instance = True
-        include_relationships=True
-        include_fk=True
+        include_relationships = True
+        include_fk = True
 
-    config_provision = ma.Nested(Schema_ConfigProvision)
-    is_product_factor = ma.Boolean(dump_only=True)
+
+class Schema_SelectionProvision_UpdatePayloadValidator(Schema):
+    selection_value = fields.Str()
+
+    class Meta:
+        unknown = EXCLUDE
+
+
+class Schema_SelectionProvision_CreatePayloadValidator(Schema):
+    selection_plan_id = fields.Int()
+    config_provision_id = fields.Int()
+    selection_value = fields.Str()
+
+    class Meta:
+        unknown = EXCLUDE

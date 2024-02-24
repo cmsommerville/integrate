@@ -24,6 +24,10 @@ class Model_AuthUser(db.Model):
         return f'<Model_AuthUser: {self.auth_user_id}>'
 
     @classmethod
+    def get_id(cls): 
+        return str(cls.auth_user_id)
+    
+    @classmethod
     def find_one(cls, id, *args, **kwargs) -> db.Model:
         qry = cls.query
         return qry.get(id)

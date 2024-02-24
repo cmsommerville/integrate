@@ -1,4 +1,4 @@
-from flask import request, current_app
+from flask import current_app
 from flask_restx import Resource
 from app.extensions import db
 from app.shared import BaseTemporalTable, BaseRowLevelSecurityTable
