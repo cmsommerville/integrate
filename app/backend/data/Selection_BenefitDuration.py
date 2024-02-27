@@ -19,7 +19,9 @@ def get_benefits(plan: Model_SelectionPlan):
 
 
 def DATA(benefit: Model_SelectionBenefit):
-    duration_sets = benefit.config_benefit.durations
+    duration_sets = (
+        benefit.config_benefit_variation_state.benefit_variation.benefit.durations
+    )
     return [
         {
             "selection_benefit_id": benefit.selection_benefit_id,

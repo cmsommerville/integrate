@@ -3,7 +3,7 @@ from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
 from app.auth import authorization_required
-from app.extensions import api
+from .RateEngine import RateEngine
 
 
 class BaseCRUDResource(Resource):
@@ -23,93 +23,77 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     @authorization_required
-    def get(cls, *args, **kwargs):
-        return cls.retrieve(*args, **kwargs)
+    def get(cls, id, *args, **kwargs):
+        try:
+            data = cls.retrieve(id, *args, **kwargs)
+            return data, 200
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
     def post(cls, *args, **kwargs):
-        return cls.create(*args, **kwargs)
+        try:
+            data = cls.create(*args, **kwargs)
+            return data, 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
-    def put(cls, *args, **kwargs):
-        return cls.replace(*args, **kwargs)
+    def put(cls, id, *args, **kwargs):
+        try:
+            data = cls.replace(id, *args, **kwargs)
+            return data, 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
     def patch(cls, id, *args, **kwargs):
-        return cls.update(id, *args, **kwargs)
+        try:
+            data = cls.update(id, *args, **kwargs)
+            return data, 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
     def delete(cls, id, *args, **kwargs):
-        return cls.destroy(id, *args, **kwargs)
+        try:
+            cls.destroy(id, *args, **kwargs)
+            return {"status": "success", "msg": "Successfully deleted"}
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     def retrieve(cls, id, *args, **kwargs):
-        try:
-            obj = cls.model.find_one(id, **cls.model_args)
-        except Exception:
-            return {}, 200
-        return cls.schema.dump(obj), 200
+        obj = cls.model.find_one(id, **cls.model_args)
+        return cls.schema.dump(obj)
 
     @classmethod
     def create(cls, *args, **kwargs):
-        try:
-            req = request.get_json()
-            obj = cls.schema.load(req)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            obj.save_to_db()
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        req = request.get_json()
+        obj = cls.schema.load(req)
+        obj.save_to_db()
+        return cls.schema.dump(obj)
 
     @classmethod
     def replace(cls, id, *args, **kwargs):
-        try:
-            req = request.get_json()
-            obj = cls.model.replace_one(id, req)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        req = request.get_json()
+        obj = cls.model.replace_one(id, req)
+        return cls.schema.dump(obj)
 
     @classmethod
     def update(cls, id, *args, **kwargs):
-        try:
-            req = request.get_json()
-            obj = cls.model.update_one(id, req)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            return cls.schema.dump(obj), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        req = request.get_json()
+        obj = cls.model.update_one(id, req)
+        return cls.schema.dump(obj)
 
     @classmethod
     def destroy(cls, id, *args, **kwargs):
-        try:
-            obj = cls.model.find_one(id, **cls.model_args)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            obj.delete()
-            return {"status": "Deleted"}, 200
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        obj = cls.model.find_one(id, **cls.model_args)
+        obj.delete()
 
 
 class BaseCRUDResourceList(Resource):
@@ -127,37 +111,73 @@ class BaseCRUDResourceList(Resource):
     @classmethod
     @authorization_required
     def get(cls, *args, **kwargs):
-        return cls.list(*args, **kwargs)
+        try:
+            data = cls.list(*args, **kwargs)
+            return data, 200
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
     def post(cls, *args, **kwargs):
-        return cls.bulk_create(*args, **kwargs)
+        try:
+            data = cls.bulk_create(*args, **kwargs)
+            return data, 201
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     def list(cls, *args, **kwargs):
-        try:
-            objs = cls.model.find_all(**cls.model_args)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-        try:
-            if objs:
-                return cls.schema.dump(objs), 200
-            raise Exception("No data found")
-        except Exception:
-            return [], 200
+        objs = cls.model.find_all(**cls.model_args)
+        return cls.schema.dump(objs)
 
     @classmethod
     def bulk_create(cls, *args, **kwargs):
-        try:
-            req = request.get_json()
-            objs = cls.schema.load(req)
-            cls.model.save_all_to_db(objs)
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        req = request.get_json()
+        objs = cls.schema.load(req)
+        cls.model.save_all_to_db(objs)
+        return cls.schema.dump(objs)
 
-        try:
-            return cls.schema.dump(objs), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+
+class BaseSelectionCRUDResource(BaseCRUDResource):
+    @classmethod
+    def create(cls, plan_id: int, *args, **kwargs):
+        event = f"create:{getattr(cls, 'EVENT', cls.__name__)}"
+        data = super().create(*args, **kwargs)
+        rater = RateEngine(plan_id, event)
+        rater.calculate()
+        return data
+
+    @classmethod
+    def update(cls, id: int, plan_id: int, *args, **kwargs):
+        event = f"update:{getattr(cls, 'EVENT', cls.__name__)}"
+        data = super().update(id, *args, **kwargs)
+        rater = RateEngine(plan_id, event)
+        rater.calculate()
+        return data
+
+    @classmethod
+    def replace(cls, id: int, plan_id: int, *args, **kwargs):
+        event = f"replace:{getattr(cls, 'EVENT', cls.__name__)}"
+        data = super().replace(id, *args, **kwargs)
+        rater = RateEngine(plan_id, event)
+        rater.calculate()
+        return data
+
+    @classmethod
+    def destroy(cls, id: int, plan_id: int, *args, **kwargs):
+        event = f"destroy:{getattr(cls, 'EVENT', cls.__name__)}"
+        super().replace(id, *args, **kwargs)
+        rater = RateEngine(plan_id, event)
+        rater.calculate()
+        return None
+
+
+class BaseSelectionCRUDResourceList(BaseCRUDResourceList):
+    @classmethod
+    def bulk_create(cls, plan_id: int, *args, **kwargs):
+        event = f"bulk_create:{getattr(cls, 'EVENT', cls.__name__)}"
+        data = super().bulk_create(*args, **kwargs)
+        rater = RateEngine(plan_id, event)
+        rater.calculate()
+        return data

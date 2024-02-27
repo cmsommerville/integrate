@@ -4,6 +4,7 @@ from app.shared import BaseModel
 from ..tables import TBL_NAMES
 
 CONFIG_FACTOR = TBL_NAMES["CONFIG_FACTOR"]
+CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
 CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
 SELECTION_FACTOR = TBL_NAMES["SELECTION_FACTOR"]
 SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
@@ -21,12 +22,21 @@ class Model_SelectionFactor(BaseModel):
             onupdate="CASCADE",
         ),
         nullable=True,
+        index=True,
+    )
+    config_factor_set_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_FACTOR_SET}.config_factor_set_id",
+            # ondelete="SET NULL",
+            # onupdate="SET NULL",
+        ),
+        nullable=True,
     )
     config_factor_id = db.Column(
         db.ForeignKey(
             f"{CONFIG_FACTOR}.config_factor_id",
-            ondelete="SET NULL",
-            onupdate="SET NULL",
+            # ondelete="SET NULL",
+            # onupdate="SET NULL",
         ),
         nullable=True,
     )

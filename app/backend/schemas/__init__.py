@@ -19,6 +19,7 @@ from .Config_BenefitProvision import Schema_ConfigBenefitProvision
 from .Config_BenefitVariationState import (
     Schema_ConfigBenefitVariationState,
     Schema_ConfigBenefitVariationStateRatesetUpdate,
+    Schema_ConfigBenefitVariationState_QuotableBenefits,
 )
 from .Config_Coverage import Schema_ConfigCoverage
 from .Config_Factor import Schema_ConfigFactor, Schema_ConfigFactorSet
@@ -47,8 +48,10 @@ from .Config_RatingMapperSet import Schema_ConfigRatingMapperSet
 from .Config_RatingMapperDetail import Schema_ConfigRatingMapperDetail
 from .Config_RatingMapperCollection import Schema_ConfigRatingMapperCollection
 
+from .Selection_AgeBand import Schema_SelectionAgeBand
 from .Selection_Benefit import Schema_SelectionBenefit
 from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
+from .Selection_BenefitRate import Schema_SelectionBenefitRate
 from .Selection_Factor import (
     Schema_SelectionFactor,
     Schema_SelectionFactorFromConfigFactor,
@@ -59,3 +62,6 @@ from .Selection_Provision import (
     Schema_SelectionProvision_CreatePayloadValidator,
     Schema_SelectionProvision_UpdatePayloadValidator,
 )
+
+from .Selection_RatingMapperDetail import Schema_SelectionRatingMapperDetail
+from .Selection_RatingMapperSet import Schema_SelectionRatingMapperSet

@@ -3,6 +3,7 @@ from sqlalchemy.orm import joinedload
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
 from app.shared import BaseCRUDResource, BaseCRUDResourceList
+from app.shared.RateEngine import RateEngine
 from ..models import (
     Model_ConfigProvision,
     Model_SelectionProvision,
@@ -21,6 +22,7 @@ class CRUD_SelectionProvision(BaseCRUDResource):
     schema = Schema_SelectionProvision()
     create_validator = Schema_SelectionProvision_CreatePayloadValidator()
     update_validator = Schema_SelectionProvision_UpdatePayloadValidator()
+    EVENT = "selection_provision"
 
     @staticmethod
     def config_to_selection_factor(
@@ -28,6 +30,7 @@ class CRUD_SelectionProvision(BaseCRUDResource):
     ):
         return Model_SelectionFactor(
             selection_provision_id=selection_provision_id,
+            config_factor_set_id=config_factor.config_factor_set_id,
             config_factor_id=config_factor.config_factor_id,
             selection_rate_table_age_value=config_factor.rate_table_age_value,
             selection_rating_attr_id1=config_factor.rating_attr_id1,
@@ -123,12 +126,12 @@ class CRUD_SelectionProvision(BaseCRUDResource):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            return {"status": "error", "msg": str(e)}, 400
+            raise e
 
-        try:
-            return cls.schema.dump(selection_provision), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        data = cls.schema.dump(selection_provision)
+        rater = RateEngine(kwargs["plan_id"], cls.EVENT)
+        rater.calculate()
+        return data
 
     @classmethod
     def update(cls, id, *args, **kwargs):
@@ -177,12 +180,13 @@ class CRUD_SelectionProvision(BaseCRUDResource):
             db.session.commit()
         except Exception as e:
             db.session.rollback()
-            return {"status": "error", "msg": str(e)}, 400
+            raise e
 
-        try:
-            return cls.schema.dump(selection_provision), 201
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
+        data = cls.schema.dump(selection_provision)
+
+        rater = RateEngine(kwargs["plan_id"], cls.EVENT)
+        rater.calculate()
+        return data
 
     @classmethod
     def replace(cls, id, *args, **kwargs):

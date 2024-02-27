@@ -294,3 +294,23 @@ ns_selection.add_resource(
     res.CRUD_SelectionBenefitDuration_List,
     "/plan/<int:plan_id>/benefit/<int:benefit_id>/durations",
 )
+
+ns_selection.add_resource(
+    res.CRUD_SelectionAgeBand,
+    "/plan/<int:plan_id>/age-band/<int:id>",
+    "/plan/<int:plan_id>/age-band",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionAgeBand_List,
+    "/plan/<int:plan_id>/age-bands",
+)
+
+ns_selection.add_resource(
+    res.CRUD_SelectionRatingMapperSet,
+    "/plan/<int:plan_id>/mapper-set/<int:id>",
+    "/plan/<int:plan_id>/mapper-set",
+)
+ns_selection.add_resource(
+    res.CRUD_SelectionRatingMapperSet_List,
+    "/plan/<int:plan_id>/mapper-sets",
+)

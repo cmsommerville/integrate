@@ -36,10 +36,12 @@ from . import (
     Ref_RatingStrategy,
     Ref_States,
     Ref_UnitType,
+    Selection_AgeBand,
     Selection_Benefit,
     Selection_BenefitDuration,
     Selection_Plan,
     Selection_Provision,
+    Selection_RatingMappers,
 )
 
 
@@ -84,7 +86,9 @@ def load_config(hostname: str, *args, **kwargs):
 
 
 def load_generic(hostname, *args, **kwargs):
-    # Selection_Plan.load(hostname, **kwargs)
-    # Selection_Benefit.load(hostname, **kwargs)
-    # Selection_BenefitDuration.load(hostname, **kwargs)
+    Selection_Plan.load(hostname, **kwargs)
+    Selection_RatingMappers.load(hostname, **kwargs)
+    Selection_Benefit.load(hostname, **kwargs)
+    Selection_BenefitDuration.load(hostname, **kwargs)
     Selection_Provision.load(hostname, **kwargs)
+    Selection_AgeBand.load(hostname, **kwargs)

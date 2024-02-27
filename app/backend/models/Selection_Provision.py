@@ -20,6 +20,7 @@ class Model_SelectionProvision(BaseModel):
             ondelete="CASCADE",
             onupdate="CASCADE",
         ),
+        index=True,
     )
     config_provision_id = db.Column(
         db.ForeignKey(

@@ -1,6 +1,7 @@
 from app.extensions import db
 from app.shared import BaseModel, BaseRowLevelSecurityTable
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy import select, func
 
 from ..tables import TBL_NAMES
 

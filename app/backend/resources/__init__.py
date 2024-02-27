@@ -102,6 +102,7 @@ from .Config_RatingMapperDetail import (
 from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List
 
+from .Selection_AgeBand import CRUD_SelectionAgeBand, CRUD_SelectionAgeBand_List
 from .Selection_Benefit import CRUD_SelectionBenefit, CRUD_SelectionBenefit_List
 from .Selection_BenefitDuration import (
     CRUD_SelectionBenefitDuration,
@@ -109,3 +110,11 @@ from .Selection_BenefitDuration import (
 )
 from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
 from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
+from .Selection_RatingMapperDetail import (
+    CRUD_SelectionRatingMapperDetail,
+    CRUD_SelectionRatingMapperDetail_List,
+)
+from .Selection_RatingMapperSet import (
+    CRUD_SelectionRatingMapperSet,
+    CRUD_SelectionRatingMapperSet_List,
+)

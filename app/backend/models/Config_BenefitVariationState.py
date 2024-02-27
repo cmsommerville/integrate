@@ -1,5 +1,8 @@
+import datetime
 from app.extensions import db
 from app.shared import BaseModel
+from .Config_BenefitVariation import Model_ConfigBenefitVariation
+from .Config_Benefit import Model_ConfigBenefit
 
 from ..tables import TBL_NAMES
 
@@ -45,3 +48,30 @@ class Model_ConfigBenefitVariationState(BaseModel):
     benefit_variation = db.relationship("Model_ConfigBenefitVariation")
     state = db.relationship("Model_RefStates")
     rate_table_set = db.relationship("Model_ConfigRateTableSet")
+
+    @classmethod
+    def find_quotable_benefits(
+        cls,
+        config_product_variation_id: int,
+        state_id: int,
+        plan_effective_date: datetime.date,
+        *args,
+        **kwargs,
+    ):
+        BV = Model_ConfigBenefitVariation
+        B = Model_ConfigBenefit
+        data = (
+            db.session.query(cls, B)
+            .join(BV, BV.config_benefit_variation_id == cls.config_benefit_variation_id)
+            .join(B, BV.config_benefit_id == B.config_benefit_id)
+            .filter(
+                BV.config_product_variation_id == config_product_variation_id,
+                cls.state_id == state_id,
+                cls.config_benefit_variation_state_effective_date
+                <= plan_effective_date,
+                cls.config_benefit_variation_state_expiration_date
+                >= plan_effective_date,
+            )
+            .all()
+        )
+        return data

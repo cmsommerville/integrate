@@ -52,8 +52,12 @@ from .Config_RatingMapperSet import Model_ConfigRatingMapperSet
 from .Ref_Master import *
 from .Ref_States import Model_RefStates
 
+from .Selection_AgeBand import Model_SelectionAgeBand
 from .Selection_Benefit import Model_SelectionBenefit
+from .Selection_BenefitRate import Model_SelectionBenefitRate
 from .Selection_BenefitDuration import Model_SelectionBenefitDuration
 from .Selection_Factor import Model_SelectionFactor
 from .Selection_Plan import Model_SelectionPlan, Model_SelectionPlan_ACL
 from .Selection_Provision import Model_SelectionProvision
+from .Selection_RatingMapperDetail import Model_SelectionRatingMapperDetail
+from .Selection_RatingMapperSet import Model_SelectionRatingMapperSet

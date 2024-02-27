@@ -5,6 +5,8 @@ from requests.compat import urljoin
 from ..models import (
     Model_ConfigProduct,
     Model_ConfigBenefit,
+    Model_ConfigBenefitVariation,
+    Model_ConfigBenefitVariationState,
     Model_RefRateFrequency,
 )
 from ..classes.RateTableCohorts import RateTableCohorts
@@ -16,6 +18,16 @@ def PRODUCT(code: str):
 
 def BENEFITS(product_id: int):
     return Model_ConfigBenefit.find_by_product(product_id)
+
+
+def BENEFIT_VARIATION_STATES(benefit_variation_id: int):
+    return Model_ConfigBenefitVariationState.find_all_by_attr(
+        {"config_benefit_variation_id": benefit_variation_id}
+    )
+
+
+def BENEFIT_VARIATIONS(benefit_id: int):
+    return Model_ConfigBenefitVariation.find_by_benefit(benefit_id)
 
 
 def RATESET(product: Model_ConfigProduct, benefit: Model_ConfigBenefit):
@@ -40,7 +52,7 @@ def RATESET(product: Model_ConfigProduct, benefit: Model_ConfigBenefit):
                 **row,
                 "rate_per_unit": row["rating_age"] * 0.1,
                 "rate_frequency_id": rate_frequency_id,
-                "rate_unit_value": 1,
+                "rate_unit_value": 100,
             }
             for row in cohorts
         ],
@@ -61,3 +73,32 @@ def load(hostname: str, *args, **kwargs) -> None:
         res = requests.post(url, json=rateset, **kwargs)
         if not res.ok:
             raise Exception(res.text)
+
+        data = res.json()
+        if data.get("config_rate_table_set_id") is None:
+            raise Exception(
+                "Response does not contain required field, `config_rate_table_set_id`."
+            )
+
+        bnft_variations = BENEFIT_VARIATIONS(benefit.config_benefit_id)
+        bnft_variation_states = []
+        for variation in bnft_variations:
+            bnft_variation_states.extend(
+                BENEFIT_VARIATION_STATES(variation.config_benefit_variation_id)
+            )
+
+        for state in bnft_variation_states:
+            url = urljoin(
+                hostname,
+                f"api/config/product/{product.config_product_id}/benefit-variation/{state.config_benefit_variation_id}/state/{state.config_benefit_variation_state_id}",
+            )
+            res = requests.patch(
+                url,
+                json={
+                    "config_rate_table_set_id": data.get("config_rate_table_set_id"),
+                    "version_id": state.version_id,
+                },
+                **kwargs,
+            )
+            if not res.ok:
+                raise Exception(res.text)
