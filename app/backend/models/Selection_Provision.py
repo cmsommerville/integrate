@@ -39,6 +39,10 @@ class Model_SelectionProvision(BaseModel):
     config_provision = db.relationship("Model_ConfigProvision")
     factors = db.relationship("Model_SelectionFactor")
 
+    @classmethod
+    def find_by_plan(cls, selection_plan_id: int):
+        return cls.query.filter(cls.selection_plan_id == selection_plan_id)
+
     def get_product_factor(self):
         """
         Passes the selection provision object into the apply_ruleset function

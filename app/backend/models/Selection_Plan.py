@@ -51,5 +51,6 @@ class Model_SelectionPlan(BaseModel):
 
     situs_state = db.relationship("Model_RefStates")
     config_product = db.relationship("Model_ConfigProduct")
+    config_product_variation = db.relationship("Model_ConfigProductVariation")
     acl = db.relationship("Model_SelectionPlan_ACL")
     rating_mapper_sets = db.relationship("Model_SelectionRatingMapperSet")

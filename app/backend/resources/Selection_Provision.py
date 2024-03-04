@@ -196,3 +196,7 @@ class CRUD_SelectionProvision(BaseCRUDResource):
 class CRUD_SelectionProvision_List(BaseCRUDResourceList):
     model = Model_SelectionProvision
     schema = Schema_SelectionProvision(many=True)
+
+    @classmethod
+    def bulk_create(cls, *args, **kwargs):
+        raise NotImplementedError("Method not implemented")

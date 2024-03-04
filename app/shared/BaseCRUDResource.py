@@ -3,6 +3,7 @@ from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
 from app.auth import authorization_required
+from app.extensions import db
 from .RateEngine import RateEngine
 
 
@@ -19,7 +20,7 @@ class BaseCRUDResource(Resource):
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
     @classmethod
     @authorization_required
@@ -27,6 +28,8 @@ class BaseCRUDResource(Resource):
         try:
             data = cls.retrieve(id, *args, **kwargs)
             return data, 200
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -36,6 +39,8 @@ class BaseCRUDResource(Resource):
         try:
             data = cls.create(*args, **kwargs)
             return data, 201
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -45,6 +50,8 @@ class BaseCRUDResource(Resource):
         try:
             data = cls.replace(id, *args, **kwargs)
             return data, 201
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -54,6 +61,8 @@ class BaseCRUDResource(Resource):
         try:
             data = cls.update(id, *args, **kwargs)
             return data, 201
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -63,6 +72,8 @@ class BaseCRUDResource(Resource):
         try:
             cls.destroy(id, *args, **kwargs)
             return {"status": "success", "msg": "Successfully deleted"}
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -106,7 +117,7 @@ class BaseCRUDResourceList(Resource):
     }
 
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
     @classmethod
     @authorization_required
@@ -114,6 +125,8 @@ class BaseCRUDResourceList(Resource):
         try:
             data = cls.list(*args, **kwargs)
             return data, 200
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
@@ -123,6 +136,8 @@ class BaseCRUDResourceList(Resource):
         try:
             data = cls.bulk_create(*args, **kwargs)
             return data, 201
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 

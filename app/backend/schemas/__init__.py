@@ -1,6 +1,8 @@
 from .Ref_Master import *
 from .Ref_States import Schema_RefStates
 
+from .ConfigProductLoader import ProductLoaderSchema
+
 from .Config_AgeBandDetail import Schema_ConfigAgeBandDetail
 from .Config_AgeBandSet import Schema_ConfigAgeBandSet
 from .Config_AgeDistribution import Schema_ConfigAgeDistribution

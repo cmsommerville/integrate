@@ -36,3 +36,7 @@ class Model_SelectionBenefit(BaseModel):
     config_benefit_variation_state = db.relationship(
         "Model_ConfigBenefitVariationState"
     )
+
+    @classmethod
+    def find_by_plan(cls, selection_plan_id: int):
+        return cls.query.filter(cls.selection_plan_id == selection_plan_id)

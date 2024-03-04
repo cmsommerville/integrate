@@ -4,10 +4,7 @@ from requests.compat import urljoin
 from ..models import (
     Model_ConfigProduct,
     Model_ConfigProductVariation,
-    Model_ConfigRatingMapperCollection,
-    Model_ConfigRatingMapperSet,
     Model_RefPlanStatus,
-    Model_SelectionPlan,
 )
 
 

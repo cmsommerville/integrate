@@ -32,7 +32,7 @@ class Model_ConfigBenefitVariationState(BaseModel):
             onupdate="CASCADE",
             ondelete="CASCADE",
         ),
-        nullable=False,
+        nullable=True,
     )
     state_id = db.Column(db.ForeignKey(f"{REF_STATES}.state_id"), nullable=False)
     config_benefit_variation_state_effective_date = db.Column(db.Date, nullable=False)
@@ -45,7 +45,6 @@ class Model_ConfigBenefitVariationState(BaseModel):
         )
     )
 
-    benefit_variation = db.relationship("Model_ConfigBenefitVariation")
     state = db.relationship("Model_RefStates")
     rate_table_set = db.relationship("Model_ConfigRateTableSet")
 

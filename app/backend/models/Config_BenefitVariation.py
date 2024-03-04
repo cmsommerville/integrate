@@ -25,6 +25,7 @@ class Model_ConfigBenefitVariation(BaseModel):
 
     benefit = db.relationship("Model_ConfigBenefit")
     product_variation = db.relationship("Model_ConfigProductVariation")
+    states = db.relationship("Model_ConfigBenefitVariationState")
 
     @classmethod
     def find_by_benefit(cls, benefit_id: int):
