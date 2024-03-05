@@ -12,11 +12,8 @@ from .Config_AttributeSet import (
     Schema_ConfigAttributeSet,
 )
 from .Config_Benefit import Schema_ConfigBenefit_Data, Schema_ConfigBenefit_CRUD
-from .Config_BenefitCovarianceDetail import Schema_ConfigBenefitCovarianceDetail
-from .Config_BenefitCovarianceSet import Schema_ConfigBenefitCovarianceSet
 from .Config_BenefitDurationDetail import Schema_ConfigBenefitDurationDetail
 from .Config_BenefitDurationSet import Schema_ConfigBenefitDurationSet
-from .Config_BenefitVariation import Schema_ConfigBenefitVariation
 from .Config_BenefitProvision import Schema_ConfigBenefitProvision
 from .Config_BenefitVariationState import (
     Schema_ConfigBenefitVariationState,

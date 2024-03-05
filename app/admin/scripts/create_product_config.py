@@ -321,7 +321,10 @@ def fn_product_variations():
         {
             "config_product_variation_code": "base",
             "config_product_variation_label": "Base Accident",
-            "states": fn_states("config_product_variation"),
+            "states": [
+                {**val, "default_config_age_band_set_label": None}
+                for val in fn_states("config_product_variation")
+            ],
         }
     ]
 

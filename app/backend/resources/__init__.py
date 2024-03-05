@@ -27,14 +27,6 @@ from .Config_Benefit import (
     Data_ConfigBenefit,
     Data_ConfigBenefit_List,
 )
-from .Config_BenefitCovarianceDetail import (
-    CRUD_ConfigBenefitCovarianceDetail,
-    CRUD_ConfigBenefitCovarianceDetail_List,
-)
-from .Config_BenefitCovarianceSet import (
-    CRUD_ConfigBenefitCovarianceSet,
-    CRUD_ConfigBenefitCovarianceSet_List,
-)
 from .Config_BenefitDurationDetail import (
     CRUD_ConfigBenefitDurationDetail,
     CRUD_ConfigBenefitDurationDetail_List,
@@ -42,10 +34,6 @@ from .Config_BenefitDurationDetail import (
 from .Config_BenefitDurationSet import (
     CRUD_ConfigBenefitDurationSet,
     CRUD_ConfigBenefitDurationSet_List,
-)
-from .Config_BenefitVariation import (
-    CRUD_ConfigBenefitVariation,
-    CRUD_ConfigBenefitVariation_List,
 )
 from .Config_BenefitProvision import (
     CRUD_ConfigBenefitProvision,

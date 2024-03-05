@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Dict
 from marshmallow import ValidationError, EXCLUDE
 from app.extensions import db
 from ..models import (
@@ -10,9 +10,12 @@ from ..models import (
     Model_RefStates,
     Model_RefUnitCode,
     Model_ConfigAgeDistributionSet,
+    Model_ConfigAgeBandSet,
     Model_ConfigAttributeDetail,
     Model_ConfigBenefit,
     Model_ConfigProductVariation,
+    Model_ConfigProductVariationState,
+    Model_ConfigProvision,
     Model_ConfigRateGroup,
     Model_ConfigRateTableSet,
     Model_ConfigRatingMapperCollection,
@@ -20,7 +23,9 @@ from ..models import (
 from ..schemas import (
     ProductLoaderSchema,
     Schema_ConfigBenefit_CRUD,
-    Schema_ConfigBenefitVariation,
+    Schema_ConfigBenefitDurationSet,
+    Schema_ConfigBenefitProvision,
+    Schema_ConfigBenefitVariationState,
     Schema_ConfigFactorSet,
     Schema_ConfigProduct,
     Schema_ConfigProductState,
@@ -34,6 +39,15 @@ from ..schemas import (
 
 
 class AttrGetterMixin:
+    @classmethod
+    def get_age_band_set_id(cls, label: Union[str, None]):
+        if label is None:
+            return None
+        obj = Model_ConfigAgeBandSet.find_one_by_attr(
+            {"config_age_band_set_label": label}
+        )
+        return obj.config_age_band_set_id if obj else None
+
     @classmethod
     def get_rating_strategy_id(cls, code: Union[str, None]):
         if code is None:
@@ -168,11 +182,22 @@ class AttrGetterMixin:
 
 class ConfigBenefitLoader(AttrGetterMixin):
     def __init__(
-        self, benefits_data, benefit_variations_data, rate_tables_data, **kwargs
+        self,
+        config_product_id,
+        benefits_data,
+        benefit_variations_data,
+        rate_tables_data,
+        **kwargs,
     ):
+        self.config_product_id = config_product_id
         self.benefits_data = benefits_data
         self.benefit_variations_data = benefit_variations_data
         self.rate_tables_data = rate_tables_data
+        self.ref_states = Model_RefStates.find_all()
+
+    @staticmethod
+    def flatten(list_of_lists):
+        return [x for xs in list_of_lists for x in xs]
 
     @classmethod
     def process_rate_table_detail(cls, rate, rate_table_set):
@@ -220,36 +245,34 @@ class ConfigBenefitLoader(AttrGetterMixin):
         return benefit
 
     @classmethod
-    def process_benefit_variation_state(cls, bvs_list, ref_states, benefit_id):
-        state_mapper = {obj.state_code: obj for obj in ref_states}
-        EXCLUDE_FIELDS = [
-            "config_benefit_variation_state_code",
-            "config_rate_table_set_label",
-        ]
+    def process_benefit_variation(cls, bv, state_mapper, benefit_id, rate_table_mapper):
         return [
             {
-                **{k: v for k, v in bvs.items() if k not in EXCLUDE_FIELDS},
+                "config_benefit_id": benefit_id,
+                "config_product_variation_state_id": state_mapper[
+                    state["config_benefit_variation_state_code"]
+                ].config_product_variation_state_id,
                 "state_id": state_mapper[
-                    bvs["config_benefit_variation_state_code"]
+                    state["config_benefit_variation_state_code"]
                 ].state_id,
-                "config_rate_table_set_id": cls.get_rate_table_set_id(
-                    bvs["config_rate_table_set_label"], benefit_id
-                ),
+                "config_rate_table_set_id": rate_table_mapper[
+                    state["config_rate_table_set_label"]
+                ],
+                **state,
             }
-            for bvs in bvs_list
+            for state in bv["states"]
         ]
 
     @classmethod
-    def process_benefit_variation(cls, bv, ref_states):
-        return {
-            "config_benefit_id": cls.get_benefit_id(bv["config_benefit_code"]),
-            "config_product_variation_id": cls.get_product_variation_id(
-                bv["config_product_variation_code"]
-            ),
-            "states": cls.process_benefit_variation_state(
-                bv["states"], ref_states, cls.get_benefit_id(bv["config_benefit_code"])
-            ),
-        }
+    def process_benefit_duration_set(cls, benefit_id, bnft_data):
+        if bnft_data.get("duration_sets") is None:
+            return []
+        if not bnft_data["duration_sets"]:
+            return []
+
+        return [
+            {**ds, "config_benefit_id": benefit_id} for ds in bnft_data["duration_sets"]
+        ]
 
     def benefit_loader(self, config_product_id: int):
         schema = Schema_ConfigBenefit_CRUD(many=True, unknown=EXCLUDE)
@@ -268,6 +291,23 @@ class ConfigBenefitLoader(AttrGetterMixin):
         self.benefits = objs
         return schema.dump(self.benefits)
 
+    def benefit_durations_loader(self):
+        schema = Schema_ConfigBenefitDurationSet(many=True, unknown=EXCLUDE)
+        bnft_mapper = {
+            b.config_benefit_code: b
+            for b in Model_ConfigBenefit.find_by_product(self.config_product_id)
+        }
+
+        data = []
+        for bnft in self.benefits_data:
+            benefit_id = bnft_mapper[bnft["config_benefit_code"]].config_benefit_id
+            data.extend(self.process_benefit_duration_set(benefit_id, bnft))
+
+        objs = schema.load(data)
+        db.session.add_all(objs)
+        db.session.flush()
+        self.benefit_durations = objs
+
     def rate_table_loader(self):
         schema = Schema_ConfigRateTableSet(many=True, unknown=EXCLUDE)
         rate_tables = [self.process_rate_table_set(rt) for rt in self.rate_tables_data]
@@ -278,11 +318,40 @@ class ConfigBenefitLoader(AttrGetterMixin):
         return schema.dump(self.rate_tables)
 
     def benefit_variations_loader(self):
-        schema = Schema_ConfigBenefitVariation(many=True, unknown=EXCLUDE)
-        data = [
-            {**self.process_benefit_variation(bv, self.ref_states)}
-            for bv in self.benefit_variations_data
-        ]
+        schema = Schema_ConfigBenefitVariationState(many=True, unknown=EXCLUDE)
+        data = []
+        for bv in self.benefit_variations_data:
+            benefit_id = self.get_benefit_id(bv["config_benefit_code"])
+            product_variation = Model_ConfigProductVariation.find_one_by_attr(
+                {
+                    "config_product_id": self.config_product_id,
+                    "config_product_variation_code": bv[
+                        "config_product_variation_code"
+                    ],
+                }
+            )
+            product_variation_states = (
+                Model_ConfigProductVariationState.find_by_product_variation(
+                    product_variation.config_product_variation_id
+                )
+            )
+            pv_state_mapper = {
+                pvs.state.state_code: pvs for pvs in product_variation_states
+            }
+
+            rate_table_mapper = {
+                rt.config_rate_table_set_label: rt.config_rate_table_set_id
+                for rt in Model_ConfigRateTableSet.find_all_by_attr(
+                    {"config_benefit_id": benefit_id}
+                )
+            }
+
+            data.extend(
+                self.process_benefit_variation(
+                    bv, pv_state_mapper, benefit_id, rate_table_mapper
+                )
+            )
+
         objs = schema.load(data)
         db.session.add_all(objs)
         db.session.flush()
@@ -291,6 +360,7 @@ class ConfigBenefitLoader(AttrGetterMixin):
 
     def save_to_db(self, product_id, commit=True, **kwargs):
         self.benefit_loader(product_id)
+        self.benefit_durations_loader()
         self.rate_table_loader()
         self.benefit_variations_loader()
         if commit:
@@ -301,8 +371,10 @@ class ConfigBenefitLoader(AttrGetterMixin):
 
 
 class ConfigProvisionLoader(AttrGetterMixin):
-    def __init__(self, provisions_data, **kwargs):
+    def __init__(self, product_id, provisions_data, **kwargs):
+        self.config_product_id = product_id
         self.provisions_data = provisions_data
+        self.ref_states = Model_RefStates.find_all()
 
     @classmethod
     def process_factor_rule(cls, rule):
@@ -328,6 +400,35 @@ class ConfigProvisionLoader(AttrGetterMixin):
             rating_attr_code = val.pop(f"rating_attr_code{i}")
             val[f"rating_attr_id{i}"] = cls.get_rating_attr_id(rating_attr_code)
         return val
+
+    @classmethod
+    def process_benefit_provision(
+        cls,
+        provision_obj: Model_ConfigProvision,
+        prov_data,
+        bnft_mapper: Dict[str, Model_ConfigBenefit],
+    ):
+        exclude = prov_data["benefit_provisions"].get("exclude", None)
+        include = prov_data["benefit_provisions"].get("include", None)
+
+        if include is not None:
+            return [
+                {
+                    "config_benefit_id": bnft.config_benefit_id,
+                    "config_provision_id": provision_obj.config_provision_id,
+                }
+                for code, bnft in bnft_mapper.items()
+                if code in include
+            ]
+
+        return [
+            {
+                "config_benefit_id": bnft.config_benefit_id,
+                "config_provision_id": provision_obj.config_provision_id,
+            }
+            for code, bnft in bnft_mapper.items()
+            if code not in exclude
+        ]
 
     def provision_loader(self, config_product_id: int):
         schema = Schema_ConfigProvision(
@@ -407,10 +508,38 @@ class ConfigProvisionLoader(AttrGetterMixin):
             factor_sets.extend(objs)
         self.factors = factor_sets
 
+    def benefit_provisions_loader(self):
+        schema = Schema_ConfigBenefitProvision(many=True, unknown=EXCLUDE)
+        provisions_mapper = {
+            p.config_provision_code: p
+            for p in Model_ConfigProvision.find_all_by_attr(
+                {"config_product_id": self.config_product_id}
+            )
+        }
+        benefits_mapper = {
+            b.config_benefit_code: b
+            for b in Model_ConfigBenefit.find_all_by_attr(
+                {"config_product_id": self.config_product_id}
+            )
+        }
+
+        data = []
+        for prov in self.provisions_data:
+            provision = provisions_mapper[prov["config_provision_code"]]
+            data.extend(
+                self.process_benefit_provision(provision, prov, benefits_mapper)
+            )
+
+        objs = schema.load(data)
+        db.session.add_all(objs)
+        db.session.flush()
+        self.benefit_provisions = objs
+
     def save_to_db(self, product_id, commit=True, **kwargs):
         self.provision_loader(product_id)
         self.provision_state_loader()
         self.factor_loader()
+        self.benefit_provisions_loader()
         if commit:
             try:
                 db.session.commit()
@@ -560,6 +689,9 @@ class ConfigProductLoader(AttrGetterMixin):
                     "state_id": state_mapper[
                         pvs["config_product_variation_state_code"]
                     ].state_id,
+                    "default_config_age_band_set_id": self.get_age_band_set_id(
+                        pvs["default_config_age_band_set_label"]
+                    ),
                     **pvs,
                 }
                 for pvs in states
@@ -580,11 +712,17 @@ class ConfigProductLoader(AttrGetterMixin):
             self.product_variation_loader(product_id)
             self.product_variation_state_loader()
 
-            provision_loader = ConfigProvisionLoader(self.provisions_data)
+            benefit_loader = ConfigBenefitLoader(
+                product_id,
+                self.benefits_data,
+                self.benefit_variations_data,
+                self.rate_tables_data,
+            )
+            benefit_loader.save_to_db(product_id, commit=False)
+
+            provision_loader = ConfigProvisionLoader(product_id, self.provisions_data)
             provision_loader.save_to_db(product_id, commit=False)
 
-            benefit_loader = ConfigBenefitLoader(self.benefits_data)
-            benefit_loader.save_to_db(product_id, commit=False)
             db.session.commit()
         except Exception as e:
             db.session.rollback()

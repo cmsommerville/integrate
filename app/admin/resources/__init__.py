@@ -11,4 +11,5 @@ from .Admin_InitializeData import (
     Resource_AdminInitConfig,
     Resource_AdminLoadData,
     Resource_ConfigProductLoader,
+    Resource_RandomSelectionPlan,
 )

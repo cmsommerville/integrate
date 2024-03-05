@@ -17,10 +17,10 @@ class Schema_ConfigBenefitVariationState_QuotableBenefits(Schema):
     config_benefit_variation_state_id = fields.Function(
         lambda obj: obj[0].config_benefit_variation_state_id
     )
-    config_benefit_variation_id = fields.Function(
-        lambda obj: obj[0].config_benefit_variation_id
+    config_product_variation_state_id = fields.Function(
+        lambda obj: obj[0].config_product_variation_state_id
     )
-    config_benefit_id = fields.Function(lambda obj: obj[1].config_benefit_id)
+    config_benefit_id = fields.Function(lambda obj: obj[0].config_benefit_id)
     config_benefit_variation_state_effective_date = fields.Function(
         lambda obj: str(obj[0].config_benefit_variation_state_effective_date)
     )

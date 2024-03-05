@@ -67,10 +67,16 @@ ns_crud_product = Namespace("crud-product", "Namespace of product CRUD endpoints
 ns_crud_product.add_resource(res.CRUD_ConfigBenefit, "/benefit/<int:id>", "/benefit")
 ns_crud_product.add_resource(res.CRUD_ConfigBenefit_List, "/benefits")
 ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitCovarianceSet_List, "/benefit-covariance/sets"
+    res.CRUD_ConfigBenefitProvision,
+    "/benefit/<int:benefit_id>/provision/<int:id>",
+    "/benefit/<int:benefit_id>/provision",
+    "/provision/<int:provision_id>/benefit/<int:id>",
+    "/provision/<int:provision_id>/benefit",
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitProvision_List, "/benefit-provisions"
+    res.CRUD_ConfigBenefitProvision_List,
+    "/benefit/<int:benefit_id>/provisions",
+    "/provision/<int:provision_id>/benefits",
 )
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage, "/coverage/<int:id>", "/coverage")
 ns_crud_product.add_resource(res.CRUD_ConfigCoverage_List, "/coverages")
@@ -155,26 +161,18 @@ ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitDurationSet_List, "/benefit/<int:benefit_id>/duration-sets"
 )
 ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitVariation,
-    "/benefit/<int:benefit_id>/variation/<int:id>",
-    "/benefit/<int:benefit_id>/variation",
-)
-ns_crud_product.add_resource(
-    res.CRUD_ConfigBenefitVariation_List, "/benefit/<int:benefit_id>/variations"
-)
-ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitVariationState,
-    "/benefit-variation/<int:benefit_variation_id>/state/<int:id>",
-    "/benefit-variation/<int:benefit_variation_id>/state",
+    "/benefit/<int:benefit_id>/state/<int:id>",
+    "/benefit/<int:benefit_id>/state",
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigBenefitVariationState_List,
-    "/benefit-variation/<int:benefit_variation_id>/states",
+    "/benefit/<int:benefit_id>/states",
 )
 
 ns_crud_product.add_resource(
     res.ConfigBenefitVariationStateRateset,
-    "/benefit-variation/<int:benefit_variation_id>:update-rateset",
+    "/benefit/<int:benefit_id>/states:update-rateset",
 )
 ns_crud_product.add_resource(
     res.CRUD_ConfigRateTableSet,
@@ -193,17 +191,6 @@ ns_crud_provision.add_resource(res.CRUD_ConfigProvisionUI, "/ui/<int:id>", "/ui"
 
 ns_crud_benefit = Namespace("crud-benefit", "Namespace of benefit CRUD endpoints")
 
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitCovarianceDetail,
-    "/covariance/detail/<int:id>",
-    "/covariance/detail",
-)
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitCovarianceDetail_List, "/covariance/details"
-)
-ns_crud_benefit.add_resource(
-    res.CRUD_ConfigBenefitCovarianceSet, "/covariance/set/<int:id>", "/covariance/set"
-)
 ns_crud_benefit.add_resource(
     res.CRUD_ConfigBenefitProvision, "/provision/<int:id>", "/provision"
 )

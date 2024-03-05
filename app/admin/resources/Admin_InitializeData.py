@@ -1,7 +1,7 @@
 import os
 from flask import request
 from flask_restx import Resource
-from app.backend.data import load_refdata, load_config, load_generic
+from app.backend.data import load_refdata, load_config, load_generic, create_random_plan
 from app.backend.classes.ConfigProductLoader import ConfigProductLoader
 
 
@@ -44,5 +44,17 @@ class Resource_ConfigProductLoader(Resource):
             loader = ConfigProductLoader(data)
             loader.save_to_db()
             return getattr(loader, attr), 200
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+
+class Resource_RandomSelectionPlan(Resource):
+    @classmethod
+    def post(cls):
+        try:
+            hostname = request.host_url
+            product_code = request.args.get("product", "CI21000")
+            plan_id = create_random_plan(hostname, product_code)
+            return {"status": "success", "selection_plan_id": plan_id}, 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400

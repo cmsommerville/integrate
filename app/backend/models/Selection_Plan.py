@@ -4,7 +4,7 @@ from app.shared import BaseModel
 from ..tables import TBL_NAMES
 
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
-CONFIG_PRODUCT_VARIATION = TBL_NAMES["CONFIG_PRODUCT_VARIATION"]
+CONFIG_PRODUCT_VARIATION_STATE = TBL_NAMES["CONFIG_PRODUCT_VARIATION_STATE"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
 REF_STATES = TBL_NAMES["REF_STATES"]
 SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
@@ -40,9 +40,12 @@ class Model_SelectionPlan(BaseModel):
     config_product_id = db.Column(db.ForeignKey(f"{CONFIG_PRODUCT}.config_product_id"))
     selection_plan_effective_date = db.Column(db.Date, nullable=False)
     situs_state_id = db.Column(db.ForeignKey(f"{REF_STATES}.state_id"))
-    config_product_variation_id = db.Column(
-        db.ForeignKey(f"{CONFIG_PRODUCT_VARIATION}.config_product_variation_id")
+    config_product_variation_state_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_PRODUCT_VARIATION_STATE}.config_product_variation_state_id"
+        )
     )
+    selection_group_id = db.Column(db.Integer, nullable=True)
     cloned_from_selection_plan_id = db.Column(
         db.ForeignKey(f"{SELECTION_PLAN}.selection_plan_id"), nullable=True
     )
@@ -51,6 +54,8 @@ class Model_SelectionPlan(BaseModel):
 
     situs_state = db.relationship("Model_RefStates")
     config_product = db.relationship("Model_ConfigProduct")
-    config_product_variation = db.relationship("Model_ConfigProductVariation")
+    config_product_variation_state = db.relationship(
+        "Model_ConfigProductVariationState"
+    )
     acl = db.relationship("Model_SelectionPlan_ACL")
     rating_mapper_sets = db.relationship("Model_SelectionRatingMapperSet")

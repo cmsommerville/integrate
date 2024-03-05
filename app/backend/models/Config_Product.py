@@ -136,3 +136,4 @@ class Model_ConfigProduct(BaseModel):
 
     states = db.relationship("Model_ConfigProductState")
     config_rate_groups = db.relationship("Model_ConfigRateGroup")
+    product_variations = db.relationship("Model_ConfigProductVariation")

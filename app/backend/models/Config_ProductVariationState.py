@@ -1,6 +1,9 @@
+import datetime
 from app.extensions import db
 from app.shared import BaseModel
 
+from .Config_ProductVariation import Model_ConfigProductVariation
+from .Ref_States import Model_RefStates
 from ..tables import TBL_NAMES
 
 CONFIG_AGE_BAND_SET = TBL_NAMES["CONFIG_AGE_BAND_SET"]
@@ -46,3 +49,30 @@ class Model_ConfigProductVariationState(BaseModel):
     @classmethod
     def find_by_product_variation(cls, id):
         return cls.query.filter(cls.config_product_variation_id == id).all()
+
+    @classmethod
+    def find_one_for_selection_plan(
+        cls,
+        config_product_id: int,
+        config_product_variation_code: str,
+        state_code: str,
+        plan_effective_date: datetime.date,
+    ):
+        PV = Model_ConfigProductVariation
+        S = Model_RefStates
+        return (
+            db.session.query(cls)
+            .join(PV, cls.config_product_variation_id == PV.config_product_variation_id)
+            .join(S, cls.state_id == S.state_id)
+            .filter(
+                PV.config_product_variation_code == config_product_variation_code,
+                PV.config_product_id == config_product_id,
+                S.state_code == state_code,
+                cls.config_product_variation_state_effective_date
+                <= plan_effective_date,
+                plan_effective_date
+                <= cls.config_product_variation_state_expiration_date,
+            )
+            .order_by(cls.config_product_variation_state_effective_date.desc())
+            .one()
+        )

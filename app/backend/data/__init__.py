@@ -1,18 +1,13 @@
 from . import (
     Config_AgeBand,
     Config_AgeDistribution,
-    Config_AgeMapper,
     Config_AttributeSet,
     Config_Benefit,
     Config_BenefitDuration,
     Config_BenefitProvision,
-    Config_BenefitCovariance,
-    Config_BenefitVariation,
     Config_BenefitVariationState,
-    Config_Coverage,
     Config_Factor,
     Config_Product,
-    Config_ProductMapper,
     Config_ProductState,
     Config_ProductVariation,
     Config_ProductVariationState,
@@ -42,6 +37,7 @@ from . import (
     Selection_Plan,
     Selection_Provision,
     Selection_RatingMappers,
+    Random_Selection,
 )
 
 
@@ -64,7 +60,6 @@ def load_refdata(hostname: str, *args, **kwargs):
 
 
 def load_config(hostname: str, *args, **kwargs):
-    pass
     Config_AgeBand.load(hostname, **kwargs)
     Config_AttributeSet.load(hostname, **kwargs)
     Config_RatingMapper.load(hostname, **kwargs)
@@ -79,10 +74,9 @@ def load_config(hostname: str, *args, **kwargs):
     Config_Provision.load(hostname, **kwargs)
     Config_ProvisionState.load(hostname, **kwargs)
     Config_Factor.load(hostname, **kwargs)
-    Config_BenefitProvision.load(hostname, **kwargs)
-    Config_BenefitVariation.load(hostname, **kwargs)
     Config_BenefitVariationState.load(hostname, **kwargs)
     Config_RateTable.load(hostname, **kwargs)
+    Config_BenefitProvision.load(hostname, **kwargs)
 
 
 def load_generic(hostname, *args, **kwargs):
@@ -92,3 +86,7 @@ def load_generic(hostname, *args, **kwargs):
     Selection_BenefitDuration.load(hostname, **kwargs)
     Selection_Provision.load(hostname, **kwargs)
     Selection_AgeBand.load(hostname, **kwargs)
+
+
+def create_random_plan(hostname, product_code, *args, **kwargs):
+    return Random_Selection.load(hostname, product_code, **kwargs)

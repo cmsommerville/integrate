@@ -15,6 +15,9 @@ class ProductVariationStateSchema(Schema):
     config_product_variation_state_code = fields.Str(validate=validate.Length(equal=2))
     config_product_variation_state_effective_date = fields.Str()
     config_product_variation_state_expiration_date = fields.Str()
+    default_config_age_band_set_label = fields.Str(
+        validate=validate.Length(max=100), allow_none=True
+    )
 
 
 class BenefitVariationStateSchema(Schema):
