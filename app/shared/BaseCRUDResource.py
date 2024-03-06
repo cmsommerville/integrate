@@ -1,15 +1,17 @@
+from typing import Union
 from flask import request
 from flask_restx import Resource
 from .BaseModel import BaseModel
 from .BaseSchema import BaseSchema
+from .BaseValidator import BaseValidator, BaseListValidator
 from app.auth import authorization_required
-from app.extensions import db
 from .RateEngine import RateEngine
 
 
 class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
+    validator: Union[BaseValidator, None] = None
     model_args: dict = {}
     permissions: dict = {
         "get": ["*"],
@@ -85,6 +87,8 @@ class BaseCRUDResource(Resource):
     @classmethod
     def create(cls, *args, **kwargs):
         req = request.get_json()
+        if cls.validator:
+            cls.validator.create(req)
         obj = cls.schema.load(req)
         obj.save_to_db()
         return cls.schema.dump(obj)
@@ -92,12 +96,16 @@ class BaseCRUDResource(Resource):
     @classmethod
     def replace(cls, id, *args, **kwargs):
         req = request.get_json()
+        if cls.validator:
+            cls.validator.replace(req)
         obj = cls.model.replace_one(id, req)
         return cls.schema.dump(obj)
 
     @classmethod
     def update(cls, id, *args, **kwargs):
         req = request.get_json()
+        if cls.validator:
+            cls.validator.update(req)
         obj = cls.model.update_one(id, req)
         return cls.schema.dump(obj)
 
@@ -110,6 +118,7 @@ class BaseCRUDResource(Resource):
 class BaseCRUDResourceList(Resource):
     model: BaseModel
     schema: BaseSchema
+    validator: Union[BaseListValidator, None] = None
     model_args: dict = {}
     permissions: dict = {
         "get": ["*"],
@@ -149,6 +158,8 @@ class BaseCRUDResourceList(Resource):
     @classmethod
     def bulk_create(cls, *args, **kwargs):
         req = request.get_json()
+        if cls.validator:
+            cls.validator.bulk_create(req)
         objs = cls.schema.load(req)
         cls.model.save_all_to_db(objs)
         return cls.schema.dump(objs)

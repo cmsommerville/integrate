@@ -4,3 +4,7 @@ class ExpiredRowVersionError(Exception):
 
 class PlanInvalidError(Exception):
     pass
+
+
+class AppValidationError(Exception):
+    pass
