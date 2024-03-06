@@ -6,6 +6,7 @@ from . import (
     Config_BenefitDuration,
     Config_BenefitProvision,
     Config_BenefitVariationState,
+    Config_Dropdown,
     Config_Factor,
     Config_Product,
     Config_ProductState,
@@ -60,6 +61,7 @@ def load_refdata(hostname: str, *args, **kwargs):
 
 
 def load_config(hostname: str, *args, **kwargs):
+    Config_Dropdown.load(hostname, **kwargs)
     Config_AgeBand.load(hostname, **kwargs)
     Config_AttributeSet.load(hostname, **kwargs)
     Config_RatingMapper.load(hostname, **kwargs)

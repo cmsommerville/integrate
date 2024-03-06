@@ -1,6 +1,6 @@
 import requests
 from requests.compat import urljoin
-from ..models import Model_ConfigProduct, Model_RefDataTypes
+from ..models import Model_ConfigProduct, Model_RefDataTypes, Model_ConfigDropdownSet
 
 
 def PRODUCT(product_code: str):
@@ -25,6 +25,9 @@ def DATA(product: Model_ConfigProduct):
             "config_provision_data_type_id": Model_RefDataTypes.find_one_by_attr(
                 {"ref_attr_code": "string"}
             ).ref_id,
+            "config_dropdown_set_id": Model_ConfigDropdownSet.find_one_by_attr(
+                {"config_dropdown_set_label": "SIC Codes"}
+            ).config_dropdown_set_id,
             "config_provision_description": "This is the standard provision for CI21000 SIC code.",
         },
         {

@@ -19,6 +19,8 @@ from .Config_BenefitDurationSet import Model_ConfigBenefitDurationSet
 from .Config_BenefitVariationState import Model_ConfigBenefitVariationState
 from .Config_BenefitProvision import Model_ConfigBenefitProvision
 from .Config_Coverage import Model_ConfigCoverage
+from .Config_DropdownDetail import Model_ConfigDropdownDetail
+from .Config_DropdownSet import Model_ConfigDropdownSet
 from .Config_Factor import Model_ConfigFactorSet, Model_ConfigFactor
 from .Config_FactorRule import Model_ConfigFactorRule
 from .Config_Product import Model_ConfigProduct

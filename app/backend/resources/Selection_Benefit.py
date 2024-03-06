@@ -2,18 +2,24 @@ from app.extensions import db
 from app.shared import BaseSelectionCRUDResource, BaseSelectionCRUDResourceList
 from ..models import Model_SelectionBenefit
 from ..schemas import Schema_SelectionBenefit
+from ..validators.Selection_Benefit import (
+    Validator_SelectionBenefit,
+    Validator_SelectionBenefitList,
+)
 
 
 class CRUD_SelectionBenefit(BaseSelectionCRUDResource):
     model = Model_SelectionBenefit
     schema = Schema_SelectionBenefit()
     EVENT = "selection_benefit"
+    validator = Validator_SelectionBenefit
 
 
 class CRUD_SelectionBenefit_List(BaseSelectionCRUDResourceList):
     model = Model_SelectionBenefit
     schema = Schema_SelectionBenefit(many=True)
     EVENT = "selection_benefit"
+    validator = Validator_SelectionBenefitList
 
     @classmethod
     def bulk_create(cls, *args, **kwargs):

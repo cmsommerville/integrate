@@ -21,6 +21,8 @@ from .Config_BenefitVariationState import (
     Schema_ConfigBenefitVariationState_QuotableBenefits,
 )
 from .Config_Coverage import Schema_ConfigCoverage
+from .Config_DropdownDetail import Schema_ConfigDropdownDetail
+from .Config_DropdownSet import Schema_ConfigDropdownSet
 from .Config_Factor import Schema_ConfigFactor, Schema_ConfigFactorSet
 from .Config_FactorRule import Schema_ConfigFactorRule
 from .Config_Product import (

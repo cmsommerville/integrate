@@ -45,6 +45,11 @@ from .Config_BenefitVariationState import (
     ConfigBenefitVariationStateRateset,
 )
 from .Config_Coverage import CRUD_ConfigCoverage, CRUD_ConfigCoverage_List
+from .Config_DropdownDetail import (
+    CRUD_ConfigDropdownDetail,
+    CRUD_ConfigDropdownDetail_List,
+)
+from .Config_DropdownSet import CRUD_ConfigDropdownSet, CRUD_ConfigDropdownSet_List
 from .Config_Factor import CRUD_ConfigFactorSet, CRUD_ConfigFactorSet_List
 from .Config_FactorRule import CRUD_ConfigFactorRule, CRUD_ConfigFactorRule_List
 from .Config_Product import (

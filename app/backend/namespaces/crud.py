@@ -43,6 +43,13 @@ ns_crud.add_resource(
     res.CRUD_ConfigAttributeDetail_List, "/attribute/set/<int:set_id>/details"
 )
 
+ns_crud.add_resource(
+    res.CRUD_ConfigDropdownSet,
+    "/dropdown/set/<int:id>",
+    "/dropdown/set",
+)
+ns_crud.add_resource(res.CRUD_ConfigDropdownSet_List, "/dropdown/sets")
+
 
 ns_crud.add_resource(res.CRUD_ConfigProduct, "/product/<int:id>", "/product")
 ns_crud.add_resource(res.CRUD_ConfigProduct_List, "/products")

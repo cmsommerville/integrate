@@ -62,7 +62,7 @@ class Model_ConfigBenefitVariationState(BaseModel):
         nullable=True,
     )
 
-    benefit = db.relationship("Model_ConfigBenefit")
+    benefit = db.relationship("Model_ConfigBenefit", lazy="joined")
     state = db.relationship("Model_RefStates")
     rate_table_set = db.relationship("Model_ConfigRateTableSet")
 

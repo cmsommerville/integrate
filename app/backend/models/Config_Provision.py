@@ -3,6 +3,7 @@ from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
+CONFIG_DROPDOWN_SET = TBL_NAMES["CONFIG_DROPDOWN_SET"]
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
@@ -23,9 +24,17 @@ class Model_ConfigProvision(BaseModel):
     config_provision_data_type_id = db.Column(
         db.ForeignKey(f"{REF_MASTER}.ref_id"), nullable=False
     )
+    config_dropdown_set_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_DROPDOWN_SET}.config_dropdown_set_id",
+            ondelete="SET NULL",
+            onupdate="SET NULL",
+        ),
+        nullable=True,
+    )
     config_provision_description = db.Column(db.String(1000))
 
-    ui_component = db.relationship("Model_ConfigProvisionUI")
+    dropdown_set = db.relationship("Model_ConfigDropdownSet")
     data_type = db.relationship(
         "Model_RefDataTypes",
         lazy="joined",
