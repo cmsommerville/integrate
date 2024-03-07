@@ -111,6 +111,7 @@ class BenefitDurationDetailSchema(Schema):
     config_benefit_duration_detail_code = fields.Str(validate=validate.Length(max=30))
     config_benefit_duration_detail_label = fields.Str(validate=validate.Length(max=100))
     config_benefit_duration_factor = fields.Float()
+    is_restricted = fields.Bool(default=False)
     acl = fields.Nested(ACLSchema, many=True)
 
 
@@ -200,6 +201,9 @@ class ProvisionSchema(Schema):
     config_provision_code = fields.Str(validate=validate.Length(max=30))
     config_provision_label = fields.Str(validate=validate.Length(max=100))
     config_provision_data_type_code = fields.Str(validate=validate.Length(max=30))
+    config_dropdown_set_label = fields.Str(
+        validate=validate.Length(max=100), allow_none=True
+    )
     config_provision_description = fields.Str(validate=validate.Length(max=1000))
     states = fields.Nested(ProvisionStateSchema, many=True)
     factors = fields.Nested(FactorSetSchema, many=True)

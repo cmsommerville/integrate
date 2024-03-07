@@ -38,7 +38,6 @@ class Model_ConfigBenefitDurationDetail(BaseModel):
     config_benefit_duration_detail_code = db.Column(db.String(30), nullable=False)
     config_benefit_duration_detail_label = db.Column(db.String(100), nullable=False)
     config_benefit_duration_factor = db.Column(db.Numeric(8, 5), nullable=False)
+    is_restricted = db.Column(db.Boolean, default=False)
 
-    acl = db.relationship(
-        "Model_ConfigBenefitDurationDetailAuth_ACL", innerjoin=True, lazy="joined"
-    )
+    acl = db.relationship("Model_ConfigBenefitDurationDetailAuth_ACL", lazy="joined")

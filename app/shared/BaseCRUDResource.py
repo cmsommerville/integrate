@@ -12,7 +12,6 @@ class BaseCRUDResource(Resource):
     model: BaseModel
     schema: BaseSchema
     validator: Union[BaseValidator, None] = None
-    model_args: dict = {}
     permissions: dict = {
         "get": ["*"],
         "post": ["*"],
@@ -81,7 +80,7 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     def retrieve(cls, id, *args, **kwargs):
-        obj = cls.model.find_one(id, **cls.model_args)
+        obj = cls.model.find_one(id, *args, **kwargs)
         return cls.schema.dump(obj)
 
     @classmethod
@@ -111,7 +110,7 @@ class BaseCRUDResource(Resource):
 
     @classmethod
     def destroy(cls, id, *args, **kwargs):
-        obj = cls.model.find_one(id, **cls.model_args)
+        obj = cls.model.find_one(id, *args, **kwargs)
         obj.delete()
 
 
@@ -119,7 +118,6 @@ class BaseCRUDResourceList(Resource):
     model: BaseModel
     schema: BaseSchema
     validator: Union[BaseListValidator, None] = None
-    model_args: dict = {}
     permissions: dict = {
         "get": ["*"],
         "post": ["*"],
@@ -152,7 +150,7 @@ class BaseCRUDResourceList(Resource):
 
     @classmethod
     def list(cls, *args, **kwargs):
-        objs = cls.model.find_all(**cls.model_args)
+        objs = cls.model.find_all(*args, **kwargs)
         return cls.schema.dump(objs)
 
     @classmethod

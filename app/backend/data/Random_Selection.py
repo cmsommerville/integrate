@@ -69,8 +69,15 @@ def PROVISIONS(plan: Model_SelectionPlan):
     selections = []
     for provision in provisions:
         data_type = provision.data_type.ref_attr_code
-        if data_type == "string":
-            value = np.random.choice(["A", "B"])
+        dropdown_details = getattr(provision.dropdown_set, "dropdown_details", [])
+        dropdown_items = [item.config_dropdown_detail_code for item in dropdown_details]
+
+        if data_type == "string" and dropdown_items:
+            value = np.random.choice(dropdown_items)
+        if data_type == "string" and not dropdown_items:
+            raise Exception(
+                "Provisions with string data type must be selected from a valid dropdown list"
+            )
         elif data_type == "boolean":
             value = np.random.choice([True, False])
         else:

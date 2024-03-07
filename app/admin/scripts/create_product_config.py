@@ -1,6 +1,19 @@
+import requests
 import numpy as np
 import datetime
 import json
+
+CONFIG_DROPDOWN_SET_LABEL = "SIC Codes"
+req = requests.get("http://127.0.0.1:5000/api/config/dropdown/sets")
+data = req.json()
+DROPDOWN_SET = next(
+    (
+        row
+        for row in data
+        if row["config_dropdown_set_label"] == CONFIG_DROPDOWN_SET_LABEL
+    )
+)
+print(DROPDOWN_SET["config_dropdown_set_label"])
 
 STATES = [
     "AK",
@@ -139,7 +152,7 @@ def fn_rate_tables(n=500):
     ]
 
 
-def fn_factors(data_type):
+def fn_factors(data_type, config_dropdown_set_label):
     if data_type == "number":
         return [
             {
@@ -190,48 +203,46 @@ def fn_factors(data_type):
             },
         ]
     elif data_type == "string":
-        return [
-            {
-                "factor_priority": 1,
-                "factor_rules": [
-                    {
-                        "comparison_attr_name": "selection_value",
-                        "comparison_operator_symbol": "=",
-                        "comparison_attr_value": "A",
-                        "comparison_attr_data_type_code": data_type,
-                    },
-                ],
-                "factor_values": [
-                    {"factor_value": round(np.random.normal(1, 0.05), 3)}
-                ],
-            },
-            {
-                "factor_priority": 2,
-                "vary_by_rating_attr1": True,
-                "factor_rules": [
-                    {
-                        "comparison_attr_name": "selection_value",
-                        "comparison_operator_symbol": "=",
-                        "comparison_attr_value": "B",
-                        "comparison_attr_data_type_code": data_type,
-                    },
-                ],
-                "factor_values": [
-                    {
-                        "rating_attr_code1": "EE",
-                        "factor_value": round(np.random.normal(1, 0.05), 3),
-                    },
-                    {
-                        "rating_attr_code1": "SP",
-                        "factor_value": round(np.random.normal(1, 0.05), 3),
-                    },
-                    {
-                        "rating_attr_code1": "CH",
-                        "factor_value": round(np.random.normal(1, 0.05), 3),
-                    },
-                ],
-            },
-        ]
+        dropdown_details = DROPDOWN_SET.get("dropdown_details")
+        factors = []
+
+        for ix, item in enumerate(dropdown_details):
+            vary_by_rating_attr1 = bool(np.random.choice([True, False]))
+            factors.append(
+                {
+                    "factor_priority": ix,
+                    "vary_by_rating_attr1": vary_by_rating_attr1,
+                    "factor_rules": [
+                        {
+                            "comparison_attr_name": "selection_value",
+                            "comparison_operator_symbol": "=",
+                            "comparison_attr_value": item[
+                                "config_dropdown_detail_code"
+                            ],
+                            "comparison_attr_data_type_code": data_type,
+                        },
+                    ],
+                    "factor_values": [
+                        {
+                            "rating_attr_code1": "EE",
+                            "factor_value": round(np.random.normal(1, 0.05), 3),
+                        },
+                        {
+                            "rating_attr_code1": "SP",
+                            "factor_value": round(np.random.normal(1, 0.05), 3),
+                        },
+                        {
+                            "rating_attr_code1": "CH",
+                            "factor_value": round(np.random.normal(1, 0.05), 3),
+                        },
+                    ]
+                    if vary_by_rating_attr1
+                    else [{"factor_value": round(np.random.normal(1, 0.05), 3)}],
+                }
+            )
+
+        return factors
+
     return [
         {
             "factor_priority": 1,
@@ -250,13 +261,17 @@ def fn_factors(data_type):
 
 def fn_provision_single(i):
     data_type = np.random.choice(["number", "string", "boolean"], p=[0.7, 0.2, 0.1])
+    config_dropdown_set_label = DROPDOWN_SET["config_dropdown_set_label"]
     return {
         "config_provision_code": f"prov{i:03}",
         "config_provision_label": f"Provision {i:03}",
         "config_provision_data_type_code": data_type,
+        "config_dropdown_set_label": config_dropdown_set_label
+        if data_type == "string"
+        else None,
         "config_provision_description": f"Provision {i:03}",
         "states": fn_states("config_provision"),
-        "factors": fn_factors(data_type),
+        "factors": fn_factors(data_type, config_dropdown_set_label),
         "benefit_provisions": {
             "exclude": [f"bnft{j:03}" for j in range(500) if (j + 1) % (75 + i) == 0]
         },

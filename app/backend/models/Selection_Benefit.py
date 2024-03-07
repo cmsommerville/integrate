@@ -39,4 +39,4 @@ class Model_SelectionBenefit(BaseModel):
 
     @classmethod
     def find_by_plan(cls, selection_plan_id: int):
-        return cls.query.filter(cls.selection_plan_id == selection_plan_id)
+        return cls.query.filter(cls.selection_plan_id == selection_plan_id).all()

@@ -13,6 +13,7 @@ from ..models import (
     Model_ConfigAgeBandSet,
     Model_ConfigAttributeDetail,
     Model_ConfigBenefit,
+    Model_ConfigDropdownSet,
     Model_ConfigProductVariation,
     Model_ConfigProductVariationState,
     Model_ConfigProvision,
@@ -39,6 +40,15 @@ from ..schemas import (
 
 
 class AttrGetterMixin:
+    @classmethod
+    def get_dropdown_set_id(cls, label: Union[str, None]):
+        if label is None:
+            return None
+        obj = Model_ConfigDropdownSet.find_one_by_attr(
+            {"config_dropdown_set_label": label}
+        )
+        return obj.config_dropdown_set_id if obj else None
+
     @classmethod
     def get_age_band_set_id(cls, label: Union[str, None]):
         if label is None:
@@ -440,6 +450,9 @@ class ConfigProvisionLoader(AttrGetterMixin):
                 "config_product_id": config_product_id,
                 "config_provision_data_type_id": self.get_data_type_id(
                     p["config_provision_data_type_code"]
+                ),
+                "config_dropdown_set_id": self.get_dropdown_set_id(
+                    p["config_dropdown_set_label"]
                 ),
                 **{
                     k: v

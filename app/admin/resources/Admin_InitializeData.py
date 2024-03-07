@@ -54,7 +54,9 @@ class Resource_RandomSelectionPlan(Resource):
         try:
             hostname = request.host_url
             product_code = request.args.get("product", "CI21000")
-            plan_id = create_random_plan(hostname, product_code)
+            plan_id = create_random_plan(
+                hostname, product_code, headers=request.headers
+            )
             return {"status": "success", "selection_plan_id": plan_id}, 201
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400

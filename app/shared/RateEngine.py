@@ -1,4 +1,5 @@
 from app.extensions import db
+from logger import logger
 from app.shared import errors as errs
 from sqlalchemy import text
 
@@ -58,6 +59,9 @@ class RateEngine:
             db.session.execute(
                 rating_sql, {"selection_plan_id": self.selection_plan_id}
             )
-            db.session.commit()
+            logger.info(
+                f"Successfully executed {self.RATING_ENGINE_PROC_NAME} for selection plan ID: {self.selection_plan_id}"
+            )
         except Exception as e:
-            db.session.rollback()
+            logger.error(str(e))
+            raise e

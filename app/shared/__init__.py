@@ -6,7 +6,11 @@ from .BaseCRUDResource import (
     BaseSelectionCRUDResourceList,
 )
 from .BaseFileHandlers import upload_file, NoFileProvidedException
-from .BaseModel import BaseModel, BaseRuleModel, BaseRowLevelSecurityTable
+from .BaseModel import (
+    BaseModel,
+    BaseRuleModel,
+    BaseRowLevelSecurityTable,
+)
 from .BaseRouter import bind_namespaces
 from .BaseSchema import BaseSchema, PrimitiveField
 from .BaseTemporalTable import BaseTemporalTable

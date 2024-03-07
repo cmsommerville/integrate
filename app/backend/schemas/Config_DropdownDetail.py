@@ -10,3 +10,4 @@ class Schema_ConfigDropdownDetail(BaseSchema):
         load_instance = True
         include_relationships = True
         include_fk = True
+        load_only = ("acl",)
