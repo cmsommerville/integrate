@@ -96,7 +96,9 @@ class CRUD_SelectionProvision(BaseCRUDResource):
             config_provision = (
                 db.session.query(Model_ConfigProvision)
                 .options(joinedload(Model_ConfigProvision.factors))
-                .filter_by(config_provision_id=selection_provision.config_provision_id)
+                .filter_by(
+                    config_provision_id=selection_provision.config_provision.config_provision_id
+                )
                 .first()
             )
 
@@ -129,7 +131,7 @@ class CRUD_SelectionProvision(BaseCRUDResource):
             raise e
 
         data = cls.schema.dump(selection_provision)
-        rater = RateEngine(kwargs["plan_id"], cls.EVENT)
+        rater = RateEngine(kwargs["plan_id"], f"create:{cls.EVENT}")
         rater.calculate()
         return data
 
@@ -150,7 +152,9 @@ class CRUD_SelectionProvision(BaseCRUDResource):
             config_provision = (
                 db.session.query(Model_ConfigProvision)
                 .options(joinedload(Model_ConfigProvision.factors))
-                .filter_by(config_provision_id=selection_provision.config_provision_id)
+                .filter_by(
+                    config_provision_id=selection_provision.config_provision.config_provision_id
+                )
                 .all()
             )
 
@@ -184,7 +188,7 @@ class CRUD_SelectionProvision(BaseCRUDResource):
 
         data = cls.schema.dump(selection_provision)
 
-        rater = RateEngine(kwargs["plan_id"], cls.EVENT)
+        rater = RateEngine(kwargs["plan_id"], f"update:{cls.EVENT}")
         rater.calculate()
         return data
 

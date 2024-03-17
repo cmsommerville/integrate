@@ -1,10 +1,27 @@
-from app.extensions import db
+from flask import request
+from flask_restx import Resource, fields
+from sqlalchemy import case
+from app.auth import authorization_required
+from app.extensions import db, api
 from app.shared import BaseSelectionCRUDResource, BaseSelectionCRUDResourceList
-from ..models import Model_SelectionBenefit
-from ..schemas import Schema_SelectionBenefit
+from ..models import (
+    Model_SelectionBenefit,
+    Model_ConfigBenefitVariationState,
+    Model_SelectionPlan,
+)
+from ..schemas import (
+    Schema_SelectionBenefit,
+)
 from ..validators.Selection_Benefit import (
     Validator_SelectionBenefit,
     Validator_SelectionBenefitList,
+)
+
+APIModel_PATCH_SetPlanDesign = api.model(
+    "PATCH_SelectionPlan_SetPlanDesign",
+    {
+        "config_plan_design_set_id": fields.Integer,
+    },
 )
 
 

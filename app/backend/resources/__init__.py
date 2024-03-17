@@ -52,6 +52,24 @@ from .Config_DropdownDetail import (
 from .Config_DropdownSet import CRUD_ConfigDropdownSet, CRUD_ConfigDropdownSet_List
 from .Config_Factor import CRUD_ConfigFactorSet, CRUD_ConfigFactorSet_List
 from .Config_FactorRule import CRUD_ConfigFactorRule, CRUD_ConfigFactorRule_List
+from .Config_PlanDesignDetail import (
+    CRUD_ConfigPlanDesignDetail_Benefit,
+    CRUD_ConfigPlanDesignDetail_Benefit_List,
+    CRUD_ConfigPlanDesignDetail_PlanDesign,
+    CRUD_ConfigPlanDesignDetail_PlanDesign_List,
+)
+from .Config_PlanDesignSet import (
+    CRUD_ConfigPlanDesignSet_Coverage,
+    CRUD_ConfigPlanDesignSet_Coverage_List,
+    CRUD_ConfigPlanDesignSet_Product,
+    CRUD_ConfigPlanDesignSet_Product_List,
+)
+from .Config_PlanDesignVariationState import (
+    CRUD_ConfigPlanDesignVariationState,
+    CRUD_ConfigPlanDesignVariationState_List,
+    Resource_ConfigPlanDesignVariationState_CoveragePlanDesignList,
+    Resource_ConfigPlanDesignVariationState_ProductPlanDesignList,
+)
 from .Config_Product import (
     CRUD_ConfigProduct,
     CRUD_ConfigProduct_List,
@@ -96,7 +114,10 @@ from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List
 
 from .Selection_AgeBand import CRUD_SelectionAgeBand, CRUD_SelectionAgeBand_List
-from .Selection_Benefit import CRUD_SelectionBenefit, CRUD_SelectionBenefit_List
+from .Selection_Benefit import (
+    CRUD_SelectionBenefit,
+    CRUD_SelectionBenefit_List,
+)
 from .Selection_BenefitDuration import (
     CRUD_SelectionBenefitDuration,
     CRUD_SelectionBenefitDuration_List,
@@ -110,4 +131,9 @@ from .Selection_RatingMapperDetail import (
 from .Selection_RatingMapperSet import (
     CRUD_SelectionRatingMapperSet,
     CRUD_SelectionRatingMapperSet_List,
+)
+
+from .Diagnostics_ConfigProductVariationState import (
+    Resource_Diagnostics_ConfigProductVariationState,
+    Resource_Diagnostics_ConfigProductVariation,
 )
