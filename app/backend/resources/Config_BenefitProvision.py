@@ -14,6 +14,19 @@ class CRUD_ConfigBenefitProvision_List(BaseCRUDResourceList):
     model = Model_ConfigBenefitProvision
     schema = Schema_ConfigBenefitProvision(many=True)
 
+    @staticmethod
+    def identify_parent(parent_id: int):
+        bnft_route_part = f"benefit/{parent_id}/provisions"
+        prov_route_part = f"provision/{parent_id}/benefits"
+        if bnft_route_part in request.path:
+            return "BENEFIT"
+        elif prov_route_part in request.path:
+            return "PROVISION"
+        else:
+            raise Exception(
+                "Cannot determine whether parent_id is a provision_id or benefit_id"
+            )
+
     @classmethod
     def bulk_create(cls, *args, **kwargs):
         """
@@ -30,17 +43,17 @@ class CRUD_ConfigBenefitProvision_List(BaseCRUDResourceList):
         }
         ```
         """
-        config_benefit_id = kwargs.get("benefit_id", None)
-        config_provision_id = kwargs.get("provision_id", None)
+        parent_id = kwargs.get("parent_id")
+        parent_type = cls.identify_parent(parent_id)
         data = request.get_json()
-        if config_benefit_id is not None:
+        if parent_type == "BENEFIT":
             modified_data = [
-                {"config_provision_id": val, "config_benefit_id": config_benefit_id}
+                {"config_provision_id": val, "config_benefit_id": parent_id}
                 for val in data["config_provision_id"]
             ]
-        elif config_provision_id is not None:
+        elif parent_type == "PROVISION":
             modified_data = [
-                {"config_benefit_id": val, "config_provision_id": config_provision_id}
+                {"config_benefit_id": val, "config_provision_id": parent_id}
                 for val in data["config_benefit_id"]
             ]
         else:

@@ -1,17 +1,22 @@
 from app.extensions import db
 from app.shared import BaseModel
+from sqlalchemy.ext.hybrid import hybrid_property
+from .Config_Provision import Model_ConfigProvision
+from .Config_ProvisionState import Model_ConfigProvisionState
 
 from ..tables import TBL_NAMES
 
 CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
-CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
+CONFIG_PROVISION_STATE = TBL_NAMES["CONFIG_PROVISION_STATE"]
 SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
 SELECTION_PROVISION = TBL_NAMES["SELECTION_PROVISION"]
 
 
 class Model_SelectionProvision(BaseModel):
     __tablename__ = SELECTION_PROVISION
-    __table_args__ = (db.UniqueConstraint("selection_plan_id", "config_provision_id"),)
+    __table_args__ = (
+        db.UniqueConstraint("selection_plan_id", "config_provision_state_id"),
+    )
 
     selection_provision_id = db.Column(db.Integer, primary_key=True)
     selection_plan_id = db.Column(
@@ -22,9 +27,9 @@ class Model_SelectionProvision(BaseModel):
         ),
         index=True,
     )
-    config_provision_id = db.Column(
+    config_provision_state_id = db.Column(
         db.ForeignKey(
-            f"{CONFIG_PROVISION}.config_provision_id",
+            f"{CONFIG_PROVISION_STATE}.config_provision_state_id",
             ondelete="NO ACTION",
             onupdate="NO ACTION",
         ),
@@ -36,7 +41,23 @@ class Model_SelectionProvision(BaseModel):
     )
     selection_value = db.Column(db.String(100), nullable=False)
 
-    config_provision = db.relationship("Model_ConfigProvision")
+    @hybrid_property
+    def config_provision(self):
+        return (
+            db.session.query(Model_ConfigProvision)
+            .join(
+                Model_ConfigProvisionState,
+                Model_ConfigProvisionState.config_provision_id
+                == Model_ConfigProvision.config_provision_id,
+            )
+            .filter(
+                Model_ConfigProvisionState.config_provision_state_id
+                == self.config_provision_state_id
+            )
+            .first()
+        )
+
+    config_provision_state = db.relationship("Model_ConfigProvisionState")
     factors = db.relationship("Model_SelectionFactor")
 
     @classmethod

@@ -33,6 +33,7 @@ class Schema_ConfigBenefit_CRUD(BaseSchema):
         load_instance = True
         include_relationships = True
         include_fk = True
+        load_only = ("benefit_auth",)
 
     benefit_auth = ma.Nested(Schema_ConfigBenefitAuth, many=True)
     unit_type = ma.Nested(Schema_RefUnitCode, dump_only=True)

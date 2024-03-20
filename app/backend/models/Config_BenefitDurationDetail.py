@@ -41,3 +41,4 @@ class Model_ConfigBenefitDurationDetail(BaseModel):
     is_restricted = db.Column(db.Boolean, default=False)
 
     acl = db.relationship("Model_ConfigBenefitDurationDetailAuth_ACL", lazy="joined")
+    parent = db.relationship("Model_ConfigBenefitDurationSet")

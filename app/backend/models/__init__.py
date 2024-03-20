@@ -23,6 +23,15 @@ from .Config_DropdownDetail import Model_ConfigDropdownDetail
 from .Config_DropdownSet import Model_ConfigDropdownSet
 from .Config_Factor import Model_ConfigFactorSet, Model_ConfigFactor
 from .Config_FactorRule import Model_ConfigFactorRule
+from .Config_PlanDesignDetail import (
+    Model_ConfigPlanDesignDetail_Benefit,
+    Model_ConfigPlanDesignDetail_PlanDesign,
+)
+from .Config_PlanDesignSet import (
+    Model_ConfigPlanDesignSet_Coverage,
+    Model_ConfigPlanDesignSet_Product,
+)
+from .Config_PlanDesignVariationState import Model_ConfigPlanDesignVariationState
 from .Config_Product import Model_ConfigProduct
 from .Config_ProductState import Model_ConfigProductState
 from .Config_ProductVariation import Model_ConfigProductVariation

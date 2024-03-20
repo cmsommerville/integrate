@@ -1,5 +1,6 @@
 from app.extensions import db
 from app.shared import BaseModel
+from .Config_Provision import Model_ConfigProvision
 
 from ..tables import TBL_NAMES
 
@@ -34,3 +35,18 @@ class Model_ConfigProvisionState(BaseModel):
 
     provision = db.relationship("Model_ConfigProvision")
     state = db.relationship("Model_RefStates")
+
+    @classmethod
+    def get_provision_states_by_product(cls, product_id: int, state_id: int):
+        return (
+            db.session.query(cls)
+            .join(
+                Model_ConfigProvision,
+                Model_ConfigProvision.config_provision_id == cls.config_provision_id,
+            )
+            .filter(
+                Model_ConfigProvision.config_product_id == product_id,
+                cls.state_id == state_id,
+            )
+            .all()
+        )

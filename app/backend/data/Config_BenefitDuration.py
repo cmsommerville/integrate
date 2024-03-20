@@ -59,7 +59,7 @@ def load(hostname: str, *args, **kwargs) -> None:
     benefit = BENEFIT(product, "skin_cancer")
     url = urljoin(
         hostname,
-        f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/duration-sets",
+        f"api/config/benefit/{benefit.config_benefit_id}/durations",
     )
     d = DATA_BENEFIT_DURATION(benefit.config_benefit_id)
     res = requests.post(url, json=d, **kwargs)
@@ -68,12 +68,12 @@ def load(hostname: str, *args, **kwargs) -> None:
         raise Exception(res.text)
 
     # set default duration detail item to last one
-    for item in data:
+    for item in data["data"]:
         config_benefit_duration_set_id = item["config_benefit_duration_set_id"]
         version_id = item["version_id"]
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/duration-set/{config_benefit_duration_set_id}",
+            f"api/config/benefit/{benefit.config_benefit_id}/duration/{config_benefit_duration_set_id}",
         )
         default_item = item.get("duration_items")[-1]
         default_id = default_item.get("config_benefit_duration_detail_id")

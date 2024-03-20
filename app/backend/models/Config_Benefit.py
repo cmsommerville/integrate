@@ -1,7 +1,6 @@
 from app.extensions import db
 from app.shared import BaseModel, BaseRowLevelSecurityTable
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import select, func
 
 from ..tables import TBL_NAMES
 
@@ -64,13 +63,24 @@ class Model_ConfigBenefit(BaseModel):
     )
     config_benefit_code = db.Column(db.String(30), nullable=False)
     config_benefit_label = db.Column(db.String(100), nullable=False)
+    config_coverage_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_COVERAGE}.config_coverage_id",
+            onupdate="NO ACTION",
+            ondelete="NO ACTION",
+        ),
+        nullable=True,
+    )
     config_rate_group_id = db.Column(
         db.ForeignKey(f"{CONFIG_RATE_GROUP}.config_rate_group_id")
     )
     unit_type_id = db.Column(db.ForeignKey(f"{REF_MASTER}.ref_id"))
     config_benefit_description = db.Column(db.String(1000))
 
-    durations = db.relationship("Model_ConfigBenefitDurationSet")
+    parent = db.relationship("Model_ConfigProduct")
+    durations = db.relationship(
+        "Model_ConfigBenefitDurationSet", back_populates="parent"
+    )
     rate_group = db.relationship("Model_ConfigRateGroup")
     unit_type = db.relationship(
         "Model_RefUnitCode",

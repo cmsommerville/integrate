@@ -13,6 +13,10 @@ UNKNOWN_USER = {
 }
 
 
+class AuthenticationError(Exception):
+    pass
+
+
 def validate_user(user):
     if user.get("auth_user_id") is None:
         raise ValueError("User must have auth_user_id key")
@@ -30,7 +34,7 @@ def validate_user(user):
 
 def get_user():
     if session.get("user", None) is None:
-        return UNKNOWN_USER
+        raise AuthenticationError("User has not been authenticated. Please login.")
     return session.get("user", None)
 
 

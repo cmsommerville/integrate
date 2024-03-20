@@ -31,16 +31,18 @@ def DATA(plan: Model_SelectionPlan):
     schema = Schema_ConfigBenefitVariationState_QuotableBenefits(many=True)
     data = schema.dump(objs)
 
-    return [
-        {
-            "selection_plan_id": plan.selection_plan_id,
-            "config_benefit_variation_state_id": d.get(
-                "config_benefit_variation_state_id"
-            ),
-            "selection_value": d.get("default_value"),
-        }
-        for d in data
-    ]
+    return {
+        "data": [
+            {
+                "selection_plan_id": plan.selection_plan_id,
+                "config_benefit_variation_state_id": d.get(
+                    "config_benefit_variation_state_id"
+                ),
+                "selection_value": d.get("default_value"),
+            }
+            for d in data
+        ]
+    }
 
 
 def load(hostname: str, *args, **kwargs) -> None:

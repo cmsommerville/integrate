@@ -1,8 +1,9 @@
 import datetime
+from sqlalchemy.orm import joinedload
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db
 from app.shared import BaseModel
 from .Config_Benefit import Model_ConfigBenefit
-from .Config_ProductVariationState import Model_ConfigProductVariationState
 
 from ..tables import TBL_NAMES
 
@@ -62,7 +63,7 @@ class Model_ConfigBenefitVariationState(BaseModel):
         nullable=True,
     )
 
-    benefit = db.relationship("Model_ConfigBenefit", lazy="joined")
+    parent = db.relationship("Model_ConfigBenefit")
     state = db.relationship("Model_RefStates")
     rate_table_set = db.relationship("Model_ConfigRateTableSet")
 

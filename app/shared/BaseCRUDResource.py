@@ -28,18 +28,7 @@ class BaseCRUDResource(Resource):
     def get(cls, id, *args, **kwargs):
         try:
             data = cls.retrieve(id, *args, **kwargs)
-            return data, 200
-        except NotImplementedError as e:
-            return {"status": "error", "msg": str(e)}, 405
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
-
-    @classmethod
-    @authorization_required
-    def post(cls, *args, **kwargs):
-        try:
-            data = cls.create(*args, **kwargs)
-            return data, 201
+            return {"status": "success", "data": data}, 200
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
@@ -50,7 +39,7 @@ class BaseCRUDResource(Resource):
     def put(cls, id, *args, **kwargs):
         try:
             data = cls.replace(id, *args, **kwargs)
-            return data, 201
+            return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
@@ -61,7 +50,7 @@ class BaseCRUDResource(Resource):
     def patch(cls, id, *args, **kwargs):
         try:
             data = cls.update(id, *args, **kwargs)
-            return data, 201
+            return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
@@ -84,27 +73,20 @@ class BaseCRUDResource(Resource):
         return cls.schema.dump(obj)
 
     @classmethod
-    def create(cls, *args, **kwargs):
-        req = request.get_json()
-        if cls.validator:
-            cls.validator.create(req)
-        obj = cls.schema.load(req)
-        obj.save_to_db()
-        return cls.schema.dump(obj)
-
-    @classmethod
     def replace(cls, id, *args, **kwargs):
         req = request.get_json()
+        queryparams = request.args
         if cls.validator:
-            cls.validator.replace(req)
+            req = cls.validator.replace(req, *args, **{**queryparams, **kwargs})
         obj = cls.model.replace_one(id, req)
         return cls.schema.dump(obj)
 
     @classmethod
     def update(cls, id, *args, **kwargs):
         req = request.get_json()
+        queryparams = request.args
         if cls.validator:
-            cls.validator.update(req)
+            req = cls.validator.update(req, *args, **{**queryparams, **kwargs})
         obj = cls.model.update_one(id, req)
         return cls.schema.dump(obj)
 
@@ -131,7 +113,7 @@ class BaseCRUDResourceList(Resource):
     def get(cls, *args, **kwargs):
         try:
             data = cls.list(*args, **kwargs)
-            return data, 200
+            return {"status": "success", "data": data}, 200
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
@@ -142,7 +124,7 @@ class BaseCRUDResourceList(Resource):
     def post(cls, *args, **kwargs):
         try:
             data = cls.bulk_create(*args, **kwargs)
-            return data, 201
+            return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
         except Exception as e:
@@ -150,14 +132,18 @@ class BaseCRUDResourceList(Resource):
 
     @classmethod
     def list(cls, *args, **kwargs):
-        objs = cls.model.find_all(*args, **kwargs)
+        if hasattr(cls.model, "parent"):
+            objs = cls.model.find_by_parent(*args, **kwargs)
+        else:
+            objs = cls.model.find_all(*args, **kwargs)
         return cls.schema.dump(objs)
 
     @classmethod
     def bulk_create(cls, *args, **kwargs):
         req = request.get_json()
+        queryparams = request.args
         if cls.validator:
-            cls.validator.bulk_create(req)
+            req = cls.validator.bulk_create(req, *args, **{**queryparams, **kwargs})
         objs = cls.schema.load(req)
         cls.model.save_all_to_db(objs)
         return cls.schema.dump(objs)
@@ -165,43 +151,63 @@ class BaseCRUDResourceList(Resource):
 
 class BaseSelectionCRUDResource(BaseCRUDResource):
     @classmethod
-    def create(cls, plan_id: int, *args, **kwargs):
-        event = f"create:{getattr(cls, 'EVENT', cls.__name__)}"
-        data = super().create(*args, **kwargs)
-        rater = RateEngine(plan_id, event)
-        rater.calculate()
-        return data
-
-    @classmethod
-    def update(cls, id: int, plan_id: int, *args, **kwargs):
+    def update(cls, id: int, parent_id: int, *args, **kwargs):
         event = f"update:{getattr(cls, 'EVENT', cls.__name__)}"
-        data = super().update(id, *args, **kwargs)
-        rater = RateEngine(plan_id, event)
+        data = super().update(id, plan_id=parent_id, *args, **kwargs)
+        rater = RateEngine(parent_id, event)
         rater.calculate()
         return data
 
     @classmethod
-    def replace(cls, id: int, plan_id: int, *args, **kwargs):
+    def replace(cls, id: int, parent_id: int, *args, **kwargs):
         event = f"replace:{getattr(cls, 'EVENT', cls.__name__)}"
-        data = super().replace(id, *args, **kwargs)
-        rater = RateEngine(plan_id, event)
+        data = super().replace(id, plan_id=parent_id, *args, **kwargs)
+        rater = RateEngine(parent_id, event)
         rater.calculate()
         return data
 
     @classmethod
-    def destroy(cls, id: int, plan_id: int, *args, **kwargs):
+    def destroy(cls, id: int, parent_id: int, *args, **kwargs):
         event = f"destroy:{getattr(cls, 'EVENT', cls.__name__)}"
-        super().replace(id, *args, **kwargs)
-        rater = RateEngine(plan_id, event)
+        super().replace(id, plan_id=parent_id, *args, **kwargs)
+        rater = RateEngine(parent_id, event)
         rater.calculate()
         return None
 
 
+class BaseSelectionCRUDResource_Create(Resource):
+    model: BaseModel
+    schema: BaseSchema
+    validator: Union[BaseValidator, None] = None
+    permissions: dict = {
+        "post": ["*"],
+    }
+
+    @classmethod
+    @authorization_required
+    def post(cls, *args, **kwargs):
+        try:
+            data = cls.create(*args, **kwargs)
+            return {"status": "success", "data": data}, 201
+        except NotImplementedError as e:
+            return {"status": "error", "msg": str(e)}, 405
+        except Exception as e:
+            return {"status": "error", "msg": str(e)}, 400
+
+    @classmethod
+    def create(cls, id: int, parent_id: int, *args, **kwargs):
+        event = f"create:{getattr(cls, 'EVENT', cls.__name__)}"
+        data = super().update(id, plan_id=parent_id, *args, **kwargs)
+        rater = RateEngine(parent_id, event)
+        rater.calculate()
+        return data
+
+
 class BaseSelectionCRUDResourceList(BaseCRUDResourceList):
     @classmethod
-    def bulk_create(cls, plan_id: int, *args, **kwargs):
+    def bulk_create(cls, parent_id: int, *args, **kwargs):
         event = f"bulk_create:{getattr(cls, 'EVENT', cls.__name__)}"
-        data = super().bulk_create(*args, **kwargs)
-        rater = RateEngine(plan_id, event)
+        data = super().bulk_create(plan_id=parent_id, *args, **kwargs)
+        rater = RateEngine(parent_id, event)
         rater.calculate()
         return data

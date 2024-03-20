@@ -1,6 +1,7 @@
 from typing import Union, Dict
 from marshmallow import ValidationError, EXCLUDE
 from app.extensions import db
+from logger import logger
 from ..models import (
     Model_RefCensusStrategy,
     Model_RefComparisonOperator,
@@ -370,8 +371,11 @@ class ConfigBenefitLoader(AttrGetterMixin):
 
     def save_to_db(self, product_id, commit=True, **kwargs):
         self.benefit_loader(product_id)
+        logger.info("Loading benefit durations...")
         self.benefit_durations_loader()
+        logger.info("Loading rate tables...")
         self.rate_table_loader()
+        logger.info("Loading benefit variations...")
         self.benefit_variations_loader()
         if commit:
             try:
@@ -550,8 +554,11 @@ class ConfigProvisionLoader(AttrGetterMixin):
 
     def save_to_db(self, product_id, commit=True, **kwargs):
         self.provision_loader(product_id)
+        logger.info("Loading provision states...")
         self.provision_state_loader()
+        logger.info("Loading factors...")
         self.factor_loader()
+        logger.info("Loading benefit provisions...")
         self.benefit_provisions_loader()
         if commit:
             try:
@@ -718,11 +725,16 @@ class ConfigProductLoader(AttrGetterMixin):
 
     def save_to_db(self):
         try:
+            logger.info("Loading product...")
             product = self.product_loader()
             product_id = product["config_product_id"]
+            logger.info("Loading product states...")
             self.product_state_loader(product_id)
+            logger.info("Loading rate groups...")
             self.rate_group_loader(product_id)
+            logger.info("Loading product variations...")
             self.product_variation_loader(product_id)
+            logger.info("Loading product variation states...")
             self.product_variation_state_loader()
 
             benefit_loader = ConfigBenefitLoader(
@@ -731,8 +743,10 @@ class ConfigProductLoader(AttrGetterMixin):
                 self.benefit_variations_data,
                 self.rate_tables_data,
             )
+            logger.info("Loading benefits...")
             benefit_loader.save_to_db(product_id, commit=False)
 
+            logger.info("Loading provisions...")
             provision_loader = ConfigProvisionLoader(product_id, self.provisions_data)
             provision_loader.save_to_db(product_id, commit=False)
 

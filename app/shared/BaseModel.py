@@ -6,6 +6,7 @@ from functools import reduce
 from flask import current_app
 from typing import List
 from sqlalchemy import text
+from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import text as text_sql
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.inspection import inspect
@@ -52,72 +53,50 @@ class BaseModel(db.Model):
         return f"<{self.__class__.__name__}: {getattr(self, inspect(self.__class__).primary_key[0].name)}>"
 
     @classmethod
-    def find_one(cls, id, as_of_ts=None, *args, **kwargs) -> BaseModel:
-        SUPPORT_TEMPORAL_TABLES = current_app.config.get(
-            "SUPPORT_TEMPORAL_TABLES", False
-        )
+    def find_one(cls, id, parent_id=None, *args, **kwargs) -> BaseModel:
+        pk = inspect(cls).primary_key[0]
         qry = cls.query
-        if as_of_ts and SUPPORT_TEMPORAL_TABLES:
-            qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
-        return qry.get(id)
+        if parent_id is not None and cls.parent is not None:
+            parent_id_col = inspect(cls.parent.property.entity).primary_key[0]
+            qry = qry.options(joinedload(cls.parent)).filter(parent_id_col == parent_id)
+        return qry.filter(pk == id).one_or_none()
 
     @classmethod
-    def find_one_by_attr(
-        cls, attrs: dict, as_of_ts=None, as_pandas=False, *args, **kwargs
+    def find_by_parent(
+        cls, parent_id, limit=1000, offset=0, *args, **kwargs
     ) -> List[BaseModel]:
-        SUPPORT_TEMPORAL_TABLES = current_app.config.get(
-            "SUPPORT_TEMPORAL_TABLES", False
+        if cls.parent is None:
+            raise ValueError("This model does not have a parent relationship")
+
+        parent_id_col = inspect(cls.parent.property.entity).primary_key[0]
+        qry = (
+            cls.query.options(joinedload(cls.parent))
+            .filter(parent_id_col == parent_id)
+            .slice(offset, offset + limit)
         )
+        return qry.all()
+
+    @classmethod
+    def find_one_by_attr(cls, attrs: dict, *args, **kwargs) -> List[BaseModel]:
         qry = cls.query.filter(*[getattr(cls, k) == v for k, v in attrs.items()])
-        if as_of_ts and SUPPORT_TEMPORAL_TABLES:
-            qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
 
         if kwargs.get("last"):
             qry = qry.order_by(cls.created_dts.desc())
 
-        if as_pandas:
-            return pd.read_sql(
-                qry.statement, qry.session.bind, coerce_float=False
-            ).iloc[0]
         return qry.first()
 
     @classmethod
-    def find_all_by_attr(
-        cls, attrs: dict, as_of_ts=None, as_pandas=False, *args, **kwargs
-    ) -> List[BaseModel]:
-        SUPPORT_TEMPORAL_TABLES = current_app.config.get(
-            "SUPPORT_TEMPORAL_TABLES", False
-        )
-        qry = cls.query.filter(
+    def find_all_by_attr(cls, attrs: dict, *args, **kwargs) -> List[BaseModel]:
+        return cls.query.filter(
             *[
                 getattr(cls, k).in_(v) if isinstance(v, list) else getattr(cls, k) == v
                 for k, v in attrs.items()
             ]
-        )
-        if as_of_ts and SUPPORT_TEMPORAL_TABLES:
-            qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
-
-        if as_pandas:
-            return pd.read_sql(qry.statement, qry.session.bind, coerce_float=False)
-        return qry.all()
+        ).all()
 
     @classmethod
-    def find_all(
-        cls, limit=1000, offset=0, as_of_ts=None, as_pandas=False, *args, **kwargs
-    ) -> List[BaseModel]:
-        SUPPORT_TEMPORAL_TABLES = current_app.config.get(
-            "SUPPORT_TEMPORAL_TABLES", False
-        )
-        qry = cls.query
-        if as_of_ts and SUPPORT_TEMPORAL_TABLES:
-            qry = qry.with_hint(cls, f"FOR SYSTEM_TIME AS OF '{as_of_ts}'")
-        if as_pandas:
-            return pd.read_sql(
-                qry.slice(offset, offset + limit).statement,
-                qry.session.bind,
-                coerce_float=False,
-            )
-        return qry.slice(offset, offset + limit).all()
+    def find_all(cls, limit=1000, offset=0, *args, **kwargs) -> List[BaseModel]:
+        return cls.query.slice(offset, offset + limit).all()
 
     @classmethod
     def save_all_to_db(cls, data) -> None:

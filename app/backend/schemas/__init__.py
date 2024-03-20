@@ -25,6 +25,19 @@ from .Config_DropdownDetail import Schema_ConfigDropdownDetail
 from .Config_DropdownSet import Schema_ConfigDropdownSet
 from .Config_Factor import Schema_ConfigFactor, Schema_ConfigFactorSet
 from .Config_FactorRule import Schema_ConfigFactorRule
+from .Config_PlanDesignDetail import (
+    Schema_ConfigPlanDesignDetail_Benefit,
+    Schema_ConfigPlanDesignDetail_PlanDesign,
+)
+from .Config_PlanDesignSet import (
+    Schema_ConfigPlanDesignSet_Coverage,
+    Schema_ConfigPlanDesignSet_Product,
+)
+from .Config_PlanDesignVariationState import (
+    Schema_ConfigPlanDesignVariationState,
+    Schema_ConfigPlanDesignVariationState_CoveragePlanDesignList,
+    Schema_ConfigPlanDesignVariationState_ProductPlanDesignList,
+)
 from .Config_Product import (
     Schema_ConfigProduct,
     Schema_ConfigProduct_RatingMapperCollections,
@@ -50,7 +63,11 @@ from .Config_RatingMapperDetail import Schema_ConfigRatingMapperDetail
 from .Config_RatingMapperCollection import Schema_ConfigRatingMapperCollection
 
 from .Selection_AgeBand import Schema_SelectionAgeBand
-from .Selection_Benefit import Schema_SelectionBenefit
+from .Selection_Benefit import (
+    Schema_SelectionBenefit,
+    APISchema_SelectionBenefit_Payload,
+    APISchema_SelectionBenefit_ListPayload,
+)
 from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
 from .Selection_BenefitRate import Schema_SelectionBenefitRate
 from .Selection_Factor import (

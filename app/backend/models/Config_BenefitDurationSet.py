@@ -29,7 +29,10 @@ class Model_ConfigBenefitDurationSet(BaseModel):
     config_benefit_duration_set_label = db.Column(db.String(100), nullable=False)
     default_config_benefit_duration_detail_id = db.Column(db.Integer, nullable=True)
 
-    _duration_items = db.relationship("Model_ConfigBenefitDurationDetail")
+    parent = db.relationship("Model_ConfigBenefit")
+    _duration_items = db.relationship(
+        "Model_ConfigBenefitDurationDetail", back_populates="parent"
+    )
     default_item = db.relationship(
         "Model_ConfigBenefitDurationDetail",
         foreign_keys=[default_config_benefit_duration_detail_id],

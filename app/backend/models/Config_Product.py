@@ -6,6 +6,7 @@ from ..tables import TBL_NAMES
 
 CONFIG_AGE_DISTRIBUTION_SET = TBL_NAMES["CONFIG_AGE_DISTRIBUTION_SET"]
 CONFIG_ATTRIBUTE_SET = TBL_NAMES["CONFIG_ATTRIBUTE_SET"]
+CONFIG_PLAN_DESIGN_SET = TBL_NAMES["CONFIG_PLAN_DESIGN_SET"]
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 CONFIG_RATING_MAPPER_COLLECTION = TBL_NAMES["CONFIG_RATING_MAPPER_COLLECTION"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
@@ -29,6 +30,10 @@ class Model_ConfigProduct(BaseModel):
     master_product_code = db.Column(db.String(30))
     form_code = db.Column(db.String(30))
 
+    default_plan_design_set_id = db.Column(
+        db.Integer,
+        nullable=True,
+    )
     age_rating_strategy_id = db.Column(
         db.ForeignKey(f"{REF_MASTER}.ref_id"),
         comment="Indicates whether age is used for rating, underwriting, or not at all. Allows for other strategies to be created.",
@@ -134,6 +139,10 @@ class Model_ConfigProduct(BaseModel):
         primaryjoin="Model_ConfigProduct.employer_paid_census_strategy_id == Model_RefCensusStrategy.ref_id",
     )
 
-    states = db.relationship("Model_ConfigProductState")
-    config_rate_groups = db.relationship("Model_ConfigRateGroup")
-    product_variations = db.relationship("Model_ConfigProductVariation")
+    states = db.relationship("Model_ConfigProductState", back_populates="parent")
+    config_rate_groups = db.relationship(
+        "Model_ConfigRateGroup", back_populates="parent"
+    )
+    product_variations = db.relationship(
+        "Model_ConfigProductVariation", back_populates="parent"
+    )

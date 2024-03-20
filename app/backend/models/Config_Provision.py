@@ -34,6 +34,7 @@ class Model_ConfigProvision(BaseModel):
     )
     config_provision_description = db.Column(db.String(1000))
 
+    parent = db.relationship("Model_ConfigProduct")
     dropdown_set = db.relationship("Model_ConfigDropdownSet")
     data_type = db.relationship(
         "Model_RefDataTypes",

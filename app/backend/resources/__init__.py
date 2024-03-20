@@ -122,8 +122,16 @@ from .Selection_BenefitDuration import (
     CRUD_SelectionBenefitDuration,
     CRUD_SelectionBenefitDuration_List,
 )
-from .Selection_Plan import CRUD_SelectionPlan, CRUD_SelectionPlan_List
-from .Selection_Provision import CRUD_SelectionProvision, CRUD_SelectionProvision_List
+from .Selection_Plan import (
+    CRUD_SelectionPlan,
+    CRUD_SelectionPlan_List,
+    CRUD_SelectionPlan_CreateOnly,
+)
+from .Selection_Provision import (
+    CRUD_SelectionProvision,
+    CRUD_SelectionProvision_List,
+    CRUD_SelectionProvision_CreateOnly,
+)
 from .Selection_RatingMapperDetail import (
     CRUD_SelectionRatingMapperDetail,
     CRUD_SelectionRatingMapperDetail_List,

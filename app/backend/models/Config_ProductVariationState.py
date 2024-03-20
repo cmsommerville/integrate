@@ -1,12 +1,16 @@
 import datetime
+from sqlalchemy.sql.functions import coalesce
+from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db
 from app.shared import BaseModel
 
 from .Config_ProductVariation import Model_ConfigProductVariation
+from .Config_PlanDesignSet import Model_ConfigPlanDesignSet_Product
 from .Ref_States import Model_RefStates
 from ..tables import TBL_NAMES
 
 CONFIG_AGE_BAND_SET = TBL_NAMES["CONFIG_AGE_BAND_SET"]
+CONFIG_PLAN_DESIGN_SET = TBL_NAMES["CONFIG_PLAN_DESIGN_SET"]
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 CONFIG_PRODUCT_VARIATION_STATE = TBL_NAMES["CONFIG_PRODUCT_VARIATION_STATE"]
 CONFIG_PRODUCT_VARIATION = TBL_NAMES["CONFIG_PRODUCT_VARIATION"]
@@ -35,13 +39,53 @@ class Model_ConfigProductVariationState(BaseModel):
             ondelete="CASCADE",
         )
     )
-    state_id = db.Column(db.ForeignKey(f"{REF_STATES}.state_id"))
+    state_id = db.Column(
+        db.ForeignKey(
+            f"{REF_STATES}.state_id", ondelete="NO ACTION", onupdate="NO ACTION"
+        )
+    )
 
     config_product_variation_state_effective_date = db.Column(db.Date, nullable=False)
     config_product_variation_state_expiration_date = db.Column(db.Date, nullable=False)
     default_config_age_band_set_id = db.Column(
-        db.ForeignKey(f"{CONFIG_AGE_BAND_SET}.config_age_band_set_id")
+        db.ForeignKey(
+            f"{CONFIG_AGE_BAND_SET}.config_age_band_set_id",
+            ondelete="SET NULL",
+            onupdate="SET NULL",
+        ),
+        nullable=True,
     )
+    default_plan_design_set_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_PLAN_DESIGN_SET}.config_plan_design_set_id",
+            onupdate="NO ACTION",
+            ondelete="NO ACTION",
+        ),
+        nullable=True,
+    )
+
+    @hybrid_property
+    def default_product_plan_design(self):
+        """
+        A product-level plan design set is composed of multiple coverage-level plan designs at the detail level.
+        This property returns all the coverage-level plan designs that are part of this product-level plan design set.
+        """
+        PD = Model_ConfigPlanDesignSet_Product
+        PV = Model_ConfigProductVariation
+        return (
+            db.session.query(PD)
+            .join(
+                PV, PV.config_product_variation_id == self.config_product_variation_id
+            )
+            .join(
+                PD,
+                PD.config_plan_design_set_id
+                == coalesce(
+                    self.default_plan_design_set_id, PV.default_plan_design_set_id
+                ),
+            )
+            .all()
+        )
 
     age_band_set = db.relationship("Model_ConfigAgeBandSet")
     state = db.relationship("Model_RefStates")

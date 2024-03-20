@@ -17,9 +17,9 @@ class CRUD_SelectionBenefitDuration_List(BaseSelectionCRUDResourceList):
 
     @classmethod
     def bulk_create(cls, *args, **kwargs):
-        benefit_id = kwargs.get("benefit_id")
-        if benefit_id is None:
-            raise Exception("Route must contain `benefit_id` parameter")
+        parent_id = kwargs.get("parent_id")
+        if parent_id is None:
+            raise Exception("Route must contain `parent_id` parameter")
 
-        db.session.query(cls.model).filter_by(selection_benefit_id=benefit_id).delete()
+        db.session.query(cls.model).filter_by(selection_benefit_id=parent_id).delete()
         return super().bulk_create(*args, **kwargs)

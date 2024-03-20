@@ -19,7 +19,7 @@ def get_benefits(plan: Model_SelectionPlan):
 
 
 def DATA(benefit: Model_SelectionBenefit):
-    duration_sets = benefit.config_benefit_variation_state.benefit.durations
+    duration_sets = benefit.config_benefit_variation_state.parent.durations
     return [
         {
             "selection_benefit_id": benefit.selection_benefit_id,
@@ -41,7 +41,7 @@ def load(hostname: str, *args, **kwargs) -> None:
     for benefit in benefits:
         url = urljoin(
             hostname,
-            f"api/selection/plan/{plan.selection_plan_id}/benefit/{benefit.selection_benefit_id}/durations",
+            f"api/selection/benefit/{benefit.selection_benefit_id}/durations",
         )
         duration_data = DATA(benefit)
         if not duration_data:

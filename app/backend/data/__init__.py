@@ -6,8 +6,11 @@ from . import (
     Config_BenefitDuration,
     Config_BenefitProvision,
     Config_BenefitVariationState,
+    Config_Coverage,
     Config_Dropdown,
     Config_Factor,
+    Config_PlanDesign_Coverage,
+    Config_PlanDesign_Product,
     Config_Product,
     Config_ProductState,
     Config_ProductVariation,
@@ -71,6 +74,7 @@ def load_config(hostname: str, *args, **kwargs):
     Config_ProductVariation.load(hostname, **kwargs)
     Config_ProductVariationState.load(hostname, **kwargs)
     Config_RateGroup.load(hostname, **kwargs)
+    Config_Coverage.load(hostname, **kwargs)
     Config_Benefit.load(hostname, **kwargs)
     Config_BenefitDuration.load(hostname, **kwargs)
     Config_Provision.load(hostname, **kwargs)
@@ -79,9 +83,15 @@ def load_config(hostname: str, *args, **kwargs):
     Config_BenefitVariationState.load(hostname, **kwargs)
     Config_RateTable.load(hostname, **kwargs)
     Config_BenefitProvision.load(hostname, **kwargs)
+    Config_PlanDesign_Coverage.load(hostname, **kwargs)
+    Config_PlanDesign_Product.load(hostname, **kwargs)
 
 
 def load_generic(hostname, *args, **kwargs):
+    pass
+
+
+def load_selection(hostname, *args, **kwargs):
     Selection_Plan.load(hostname, **kwargs)
     Selection_RatingMappers.load(hostname, **kwargs)
     Selection_Benefit.load(hostname, **kwargs)

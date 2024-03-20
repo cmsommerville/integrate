@@ -39,7 +39,7 @@ DATA = [
 
 
 def load(hostname: str, *args, **kwargs) -> None:
-    url = urljoin(hostname, "api/config/dropdown/sets")
+    url = urljoin(hostname, "api/config/dropdowns")
     res = requests.post(url, json=DATA, **kwargs)
     if not res.ok:
         raise Exception(res.text)

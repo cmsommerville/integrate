@@ -4,6 +4,7 @@ from .BaseCRUDResource import (
     BaseCRUDResourceList,
     BaseSelectionCRUDResource,
     BaseSelectionCRUDResourceList,
+    BaseSelectionCRUDResource_Create,
 )
 from .BaseFileHandlers import upload_file, NoFileProvidedException
 from .BaseModel import (

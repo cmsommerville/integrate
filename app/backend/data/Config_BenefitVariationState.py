@@ -73,7 +73,7 @@ def load(hostname: str, *args, **kwargs) -> None:
         data = DATA(product, benefit, variation_states)
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/states",
+            f"api/config/benefit/{benefit.config_benefit_id}/states",
         )
         res = requests.post(url, json=data, **kwargs)
         if not res.ok:

@@ -10,6 +10,7 @@ from ..models import (
     Model_ConfigProductVariation,
     Model_ConfigProductVariationState,
     Model_ConfigProvision,
+    Model_ConfigProvisionState,
     Model_ConfigRatingMapperSet,
     Model_RefPlanStatus,
     Model_SelectionBenefit,
@@ -63,11 +64,12 @@ def get_random_benefit_duration(duration_set):
 
 
 def PROVISIONS(plan: Model_SelectionPlan):
-    provisions = Model_ConfigProvision.find_all_by_attr(
-        {"config_product_id": plan.config_product_id}
+    provision_states = Model_ConfigProvisionState.get_provision_states_by_product(
+        plan.config_product_id, plan.situs_state_id
     )
     selections = []
-    for provision in provisions:
+    for provision_state in provision_states:
+        provision = provision_state.provision
         data_type = provision.data_type.ref_attr_code
         dropdown_details = getattr(provision.dropdown_set, "dropdown_details", [])
         dropdown_items = [item.config_dropdown_detail_code for item in dropdown_details]
@@ -85,7 +87,7 @@ def PROVISIONS(plan: Model_SelectionPlan):
         selections.append(
             {
                 "selection_plan_id": plan.selection_plan_id,
-                "config_provision_id": provision.config_provision_id,
+                "config_provision_state_id": provision_state.config_provision_state_id,
                 "selection_value": str(value),
             }
         )
@@ -176,7 +178,7 @@ def BENEFITS(plan: Model_SelectionPlan):
 
 
 def BENEFIT_DURATION(benefit: Model_SelectionBenefit):
-    duration_sets = benefit.config_benefit_variation_state.benefit.durations
+    duration_sets = benefit.config_benefit_variation_state.parent.durations
     items = []
     for duration_set in duration_sets:
         duration_item = get_random_benefit_duration(duration_set)
@@ -255,7 +257,7 @@ def load(hostname: str, product_code: str, *args, **kwargs) -> None:
     for benefit in benefits:
         url = urljoin(
             hostname,
-            f"api/selection/plan/{plan.selection_plan_id}/benefit/{benefit.selection_benefit_id}/durations",
+            f"api/selection/benefit/{benefit.selection_benefit_id}/durations",
         )
         duration_data = BENEFIT_DURATION(benefit)
         if not duration_data:

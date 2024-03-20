@@ -74,6 +74,7 @@ class Model_ConfigRateTableSet(BaseModel):
         nullable=True,
     )
 
+    parent = db.relationship("Model_ConfigBenefit")
     rates = db.relationship("Model_ConfigRateTable")
 
 

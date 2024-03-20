@@ -17,9 +17,9 @@ class CRUD_SelectionAgeBand_List(BaseSelectionCRUDResourceList):
 
     @classmethod
     def bulk_create(cls, *args, **kwargs):
-        plan_id = kwargs.get("plan_id")
-        if plan_id is None:
-            raise Exception("Route must contain `plan_id` parameter")
+        parent_id = kwargs.get("parent_id")
+        if parent_id is None:
+            raise Exception("Route must contain `parent_id` parameter")
 
-        db.session.query(cls.model).filter_by(selection_plan_id=plan_id).delete()
+        db.session.query(cls.model).filter_by(selection_plan_id=parent_id).delete()
         return super().bulk_create(*args, **kwargs)

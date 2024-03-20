@@ -4,6 +4,7 @@ from app.shared import BaseModel
 from ..tables import TBL_NAMES
 
 CONFIG_AGE_BAND_SET = TBL_NAMES["CONFIG_AGE_BAND_SET"]
+CONFIG_PLAN_DESIGN_SET = TBL_NAMES["CONFIG_PLAN_DESIGN_SET"]
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 CONFIG_PRODUCT_VARIATION = TBL_NAMES["CONFIG_PRODUCT_VARIATION"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
@@ -26,6 +27,15 @@ class Model_ConfigProductVariation(BaseModel):
     )
     config_product_variation_code = db.Column(db.String(30), nullable=False)
     config_product_variation_label = db.Column(db.String(100), nullable=False)
+    default_plan_design_set_id = db.Column(
+        db.ForeignKey(
+            f"{CONFIG_PLAN_DESIGN_SET}.config_plan_design_set_id",
+            onupdate="SET NULL",
+            ondelete="SET NULL",
+        ),
+        nullable=True,
+    )
+    parent = db.relationship("Model_ConfigProduct")
 
     @classmethod
     def find_by_product(cls, id: int):

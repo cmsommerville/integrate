@@ -1,6 +1,6 @@
 import requests
 from requests.compat import urljoin
-from ..models import Model_ConfigProduct, Model_ConfigCoverage
+from ..models import Model_ConfigProduct
 
 
 def PRODUCT_ID():
@@ -15,21 +15,25 @@ def DATA_COVERAGE(product_id: int):
             "config_product_id": product_id,
             "config_coverage_code": "base",
             "config_coverage_label": "Base Benefits",
+            "config_coverage_description": "Base Benefits",
         },
         {
             "config_product_id": product_id,
             "config_coverage_code": "heart_rider",
             "config_coverage_label": "Heart Rider",
+            "config_coverage_description": "Heart Rider",
         },
         {
             "config_product_id": product_id,
             "config_coverage_code": "prog_benefits",
             "config_coverage_label": "Progressive Disease Rider",
+            "config_coverage_description": "Progressive Disease Rider",
         },
         {
             "config_product_id": product_id,
             "config_coverage_code": "opt_benefits",
             "config_coverage_label": "Optional Benefits",
+            "config_coverage_description": "Optional Benefits",
         },
     ]
 

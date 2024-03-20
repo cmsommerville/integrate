@@ -39,7 +39,7 @@ def load(hostname: str, *args, **kwargs) -> None:
         data = {"config_benefit_id": [b.config_benefit_id for b in benefits]}
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/provision/{provision.config_provision_id}/benefits",
+            f"api/config/provision/{provision.config_provision_id}/benefits",
         )
         res = requests.post(url, json=data, **kwargs)
         if not res.ok:

@@ -61,13 +61,13 @@ def load(hostname: str, *args, **kwargs) -> None:
 
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/rateset",
+            f"api/config/benefit/{benefit.config_benefit_id}/ratesets",
         )
-        res = requests.post(url, json=rateset, **kwargs)
+        res = requests.post(url, json=[rateset], **kwargs)
         if not res.ok:
             raise Exception(res.text)
 
-        data = res.json()
+        data = res.json()["data"][0]
         if data.get("config_rate_table_set_id") is None:
             raise Exception(
                 "Response does not contain required field, `config_rate_table_set_id`."
@@ -78,7 +78,7 @@ def load(hostname: str, *args, **kwargs) -> None:
         for state in bnft_variation_states:
             url = urljoin(
                 hostname,
-                f"api/config/product/{product.config_product_id}/benefit/{state.config_benefit_id}/state/{state.config_benefit_variation_state_id}",
+                f"api/config/benefit/{state.config_benefit_id}/state/{state.config_benefit_variation_state_id}",
             )
             res = requests.patch(
                 url,
