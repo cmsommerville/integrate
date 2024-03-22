@@ -79,6 +79,7 @@ from .Config_ProductState import CRUD_ConfigProductState, CRUD_ConfigProductStat
 from .Config_ProductVariation import (
     CRUD_ConfigProductVariation,
     CRUD_ConfigProductVariation_List,
+    Resource_ConfigProductVariation_SetPlanDesignVariationStates,
 )
 from .Config_ProductVariationState import (
     CRUD_ConfigProductVariationState,

@@ -1,3 +1,4 @@
+from typing import List
 from app.extensions import db
 from app.shared import BaseModel
 from sqlalchemy import and_
@@ -86,5 +87,16 @@ class Model_ConfigPlanDesignSet_Product(Model_ConfigPlanDesignSet):
             db.session.query(CVG)
             .join(PD, PD.config_parent_id == CVG.config_plan_design_set_id)
             .filter(PD.config_plan_design_set_id == self.config_plan_design_set_id)
+            .all()
+        )
+
+    @classmethod
+    def find_by_parent(cls, parent_id, limit=1000, offset=0, *args, **kwargs):
+        return (
+            cls.query.filter(
+                cls.config_parent_id == parent_id,
+                cls.config_parent_type_code == "product",
+            )
+            .slice(offset, offset + limit)
             .all()
         )

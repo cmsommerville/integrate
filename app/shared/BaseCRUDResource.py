@@ -195,12 +195,14 @@ class BaseSelectionCRUDResource_Create(Resource):
             return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
-    def create(cls, id: int, parent_id: int, *args, **kwargs):
-        event = f"create:{getattr(cls, 'EVENT', cls.__name__)}"
-        data = super().update(id, plan_id=parent_id, *args, **kwargs)
-        rater = RateEngine(parent_id, event)
-        rater.calculate()
-        return data
+    def create(cls, parent_id: int, *args, **kwargs):
+        req = request.get_json()
+        queryparams = request.args
+        if cls.validator:
+            req = cls.validator.create(req, *args, **{**queryparams, **kwargs})
+        obj = cls.schema.load(req)
+        obj.save_to_db()
+        return cls.schema.dump(obj)
 
 
 class BaseSelectionCRUDResourceList(BaseCRUDResourceList):

@@ -11,6 +11,7 @@ from . import (
     Config_Factor,
     Config_PlanDesign_Coverage,
     Config_PlanDesign_Product,
+    Config_PlanDesignVariationState,
     Config_Product,
     Config_ProductState,
     Config_ProductVariation,
@@ -85,6 +86,7 @@ def load_config(hostname: str, *args, **kwargs):
     Config_BenefitProvision.load(hostname, **kwargs)
     Config_PlanDesign_Coverage.load(hostname, **kwargs)
     Config_PlanDesign_Product.load(hostname, **kwargs)
+    Config_PlanDesignVariationState.load(hostname, **kwargs)
 
 
 def load_generic(hostname, *args, **kwargs):

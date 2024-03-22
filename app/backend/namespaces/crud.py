@@ -119,6 +119,7 @@ PROVISION_ROUTES = {
 PRODUCT_VARIATION_ROUTES = {
     "/state/<int:id>": res.CRUD_ConfigProductVariationState,
     "/states": res.CRUD_ConfigProductVariationState_List,
+    "/plan-designs:states": res.Resource_ConfigProductVariation_SetPlanDesignVariationStates,
 }
 
 PRODUCT_VARIATION_STATE_ROUTES = {

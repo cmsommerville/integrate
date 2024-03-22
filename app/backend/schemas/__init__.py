@@ -43,7 +43,10 @@ from .Config_Product import (
     Schema_ConfigProduct_RatingMapperCollections,
 )
 from .Config_ProductState import Schema_ConfigProductState
-from .Config_ProductVariation import Schema_ConfigProductVariation
+from .Config_ProductVariation import (
+    Schema_ConfigProductVariation,
+    Schema_ConfigProductVariation_SetPlanDesignVariationStates,
+)
 from .Config_ProductVariationState import Schema_ConfigProductVariationState
 from .Config_ProvisionUI import (
     Schema_ConfigProvisionUI,
