@@ -69,7 +69,7 @@ class Model_ConfigBenefit(BaseModel):
             onupdate="NO ACTION",
             ondelete="NO ACTION",
         ),
-        nullable=True,
+        nullable=False,
     )
     config_rate_group_id = db.Column(
         db.ForeignKey(f"{CONFIG_RATE_GROUP}.config_rate_group_id")

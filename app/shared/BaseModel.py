@@ -8,11 +8,15 @@ from typing import List
 from sqlalchemy import text
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql import text as text_sql
-from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.declarative import declared_attr, DeferredReflection
 from sqlalchemy.inspection import inspect
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
 from app.auth import get_user
+
+
+class BaseReflectedModel(db.Model):
+    __abstract__ = True
 
 
 class BaseModel(db.Model):

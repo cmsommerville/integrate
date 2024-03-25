@@ -1,11 +1,10 @@
 from flask import current_app
 from flask_restx import Resource
 from app.extensions import db
-from app.shared import BaseTemporalTable, BaseRowLevelSecurityTable
+from app.shared import BaseTemporalTable, BaseRowLevelSecurityTable, BaseReflectedModel
 
 
 class Resource_AdminDropTables(Resource):
-
     @classmethod
     def post(cls):
         try:
@@ -16,7 +15,9 @@ class Resource_AdminDropTables(Resource):
 
                 if table_name in _handled_tables:
                     continue
-                
+                if issubclass(model, BaseReflectedModel):
+                    continue
+
                 # drop row level security rules
                 if issubclass(model, BaseRowLevelSecurityTable):
                     BaseRowLevelSecurityTable.drop_rls(model)
@@ -29,10 +30,16 @@ class Resource_AdminDropTables(Resource):
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
 
-        try: 
-            db.drop_all()
+        try:
+            tables = set(
+                [
+                    x.__table__
+                    for x in model_classes
+                    if not issubclass(x, BaseReflectedModel)
+                ]
+            )
+            db.metadata.drop_all(bind=db.engine, tables=tables)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
         else:
             return {"msg": "Success"}, 200
-

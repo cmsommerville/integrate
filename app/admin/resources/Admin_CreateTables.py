@@ -1,24 +1,36 @@
 from flask import current_app
 from flask_restx import Resource
 from app.extensions import db
-from app.shared import BaseTemporalTable, BaseRowLevelSecurityTable
+from app.shared import BaseTemporalTable, BaseRowLevelSecurityTable, BaseReflectedModel
 
 
 class Resource_AdminCreateTables(Resource):
-
     @classmethod
     def post(cls):
         try:
-            db.create_all()
-
             _handled_tables = []
             model_classes = [x.class_ for x in db.Model.registry.mappers]
+
+            tables = set(
+                [
+                    x.__table__
+                    for x in model_classes
+                    if not issubclass(x, BaseReflectedModel)
+                ]
+            )
+            db.metadata.create_all(
+                bind=db.engine,
+                tables=tables,
+            )
             for model in model_classes:
                 table_name = model.__tablename__
 
                 if table_name in _handled_tables:
                     continue
-                
+
+                if issubclass(model, BaseReflectedModel):
+                    continue
+
                 # add row level security rules
                 if issubclass(model, BaseRowLevelSecurityTable):
                     BaseRowLevelSecurityTable.add_rls(model)
@@ -32,4 +44,3 @@ class Resource_AdminCreateTables(Resource):
             return str(e), 400
         else:
             return {"msg": "Success"}, 200
-

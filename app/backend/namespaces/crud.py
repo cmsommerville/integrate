@@ -2,6 +2,7 @@ from flask_restx import Namespace
 from app.backend import resources as res
 from .util import add_routes
 
+ns_test = Namespace("Test routes", "Namespace containing test endpoints")
 ns_base = Namespace("Base routes", "Namespace containing standard CRUD endpoints")
 ns_product = Namespace("Product routes", "Namespace of product CRUD endpoints")
 ns_benefit = Namespace("Benefit routes", "Namespace of benefit CRUD endpoints")
@@ -33,6 +34,10 @@ ns_selection_benefit = Namespace(
 ns_selection_plan = Namespace(
     "Selection plan routes", "Namespace containing standard plan selection endpoints"
 )
+
+TEST_ROUTES = {
+    "/<int:parent_id>": res.TestResource,
+}
 
 BASE_ROUTES = {
     "/age-band-sets/<int:set_id>/detail/<int:id>": res.CRUD_ConfigAgeBandDetail,
@@ -188,7 +193,7 @@ SELECTION_BENEFIT_ROUTES = {
     "/durations": res.CRUD_SelectionBenefitDuration_List,
 }
 
-
+add_routes(ns_test, TEST_ROUTES)
 add_routes(ns_base, BASE_ROUTES)
 add_routes(ns_product, PRODUCT_ROUTES)
 add_routes(ns_benefit, BENEFIT_ROUTES)

@@ -1,5 +1,6 @@
 from flask_restx import Namespace
 
+from .TestResource import TestResource
 from .Config_AgeBandDetail import (
     CRUD_ConfigAgeBandDetail,
     CRUD_ConfigAgeBandDetail_List,
@@ -114,6 +115,8 @@ from .Config_RatingMapperDetail import (
 from .Ref_Master import *
 from .Ref_States import CRUD_RefStates, CRUD_RefStates_List
 
+
+from .Selection_RPC import Resource_Selection_RPC_Master
 from .Selection_AgeBand import CRUD_SelectionAgeBand, CRUD_SelectionAgeBand_List
 from .Selection_Benefit import (
     CRUD_SelectionBenefit,
@@ -122,6 +125,10 @@ from .Selection_Benefit import (
 from .Selection_BenefitDuration import (
     CRUD_SelectionBenefitDuration,
     CRUD_SelectionBenefitDuration_List,
+)
+from .Selection_Coverage import (
+    CRUD_SelectionCoverage,
+    CRUD_SelectionCoverage_List,
 )
 from .Selection_Plan import (
     CRUD_SelectionPlan,

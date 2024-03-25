@@ -53,6 +53,7 @@ from .Config_RateTable import Model_ConfigRateTable, Model_ConfigRateTableSet
 from .Config_RatingMapperCollection import Model_ConfigRatingMapperCollection
 from .Config_RatingMapperDetail import Model_ConfigRatingMapperDetail
 from .Config_RatingMapperSet import Model_ConfigRatingMapperSet
+from .Default_ProductRatingMapperSet import Model_DefaultProductRatingMapperSet
 
 from .Ref_Master import *
 from .Ref_States import Model_RefStates
@@ -61,6 +62,7 @@ from .Selection_AgeBand import Model_SelectionAgeBand
 from .Selection_Benefit import Model_SelectionBenefit
 from .Selection_BenefitRate import Model_SelectionBenefitRate
 from .Selection_BenefitDuration import Model_SelectionBenefitDuration
+from .Selection_Coverage import Model_SelectionCoverage
 from .Selection_Factor import Model_SelectionFactor
 from .Selection_Plan import Model_SelectionPlan, Model_SelectionPlan_ACL
 from .Selection_Provision import Model_SelectionProvision

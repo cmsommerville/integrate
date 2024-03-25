@@ -1,9 +1,11 @@
 from . import crud
+from . import rpc
 from .dropdowns import ns_dd
 from .getters import ns_getters
 from .diagnostics import ns_diagnostics
 
 NAMESPACES = [
+    {"namespace": crud.ns_test, "path": "/test"},
     {"namespace": crud.ns_ref, "path": "/ref"},
     {"namespace": crud.ns_base, "path": "/config"},
     {"namespace": crud.ns_product, "path": "/config/product/<int:parent_id>"},
@@ -29,4 +31,9 @@ NAMESPACES = [
     {"namespace": ns_dd, "path": "/dd"},
     {"namespace": ns_getters, "path": "/data"},
     {"namespace": ns_diagnostics, "path": "/diag"},
+]
+
+
+RPC_NAMESPACES = [
+    {"namespace": rpc.ns_selection_rpc, "path": "/selection"},
 ]

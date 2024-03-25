@@ -55,6 +55,7 @@ TBL_NAMES = {
     "SELECTION_BENEFIT_RATE": "selection_benefit_rate",
     "SELECTION_CENSUS_DETAIL": "selection_census_detail",
     "SELECTION_CENSUS_SET": "selection_census_set",
+    "SELECTION_COVERAGE": "selection_coverage",
     "SELECTION_FACE_AMOUNTS": "selection_face_amounts",
     "SELECTION_FACTOR": "selection_factor",
     "SELECTION_PLAN": "selection_plan",

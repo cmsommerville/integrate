@@ -8,6 +8,7 @@ from .BaseCRUDResource import (
 )
 from .BaseFileHandlers import upload_file, NoFileProvidedException
 from .BaseModel import (
+    BaseReflectedModel,
     BaseModel,
     BaseRuleModel,
     BaseRowLevelSecurityTable,

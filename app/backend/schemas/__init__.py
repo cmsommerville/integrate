@@ -64,6 +64,10 @@ from .Config_RateTable import Schema_ConfigRateTable, Schema_ConfigRateTableSet
 from .Config_RatingMapperSet import Schema_ConfigRatingMapperSet
 from .Config_RatingMapperDetail import Schema_ConfigRatingMapperDetail
 from .Config_RatingMapperCollection import Schema_ConfigRatingMapperCollection
+from .Default_ProductRatingMapperSet import (
+    Schema_DefaultProductRatingMapperSet,
+    Schema_DefaultProductRatingMapperSet_For_Selection,
+)
 
 from .Selection_AgeBand import Schema_SelectionAgeBand
 from .Selection_Benefit import (
@@ -73,6 +77,7 @@ from .Selection_Benefit import (
 )
 from .Selection_BenefitDuration import Schema_SelectionBenefitDuration
 from .Selection_BenefitRate import Schema_SelectionBenefitRate
+from .Selection_Coverage import Schema_SelectionCoverage
 from .Selection_Factor import (
     Schema_SelectionFactor,
     Schema_SelectionFactorFromConfigFactor,

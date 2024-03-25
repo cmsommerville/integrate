@@ -59,6 +59,7 @@ class RateEngine:
             db.session.execute(
                 rating_sql, {"selection_plan_id": self.selection_plan_id}
             )
+            db.session.commit()
             logger.info(
                 f"Successfully executed {self.RATING_ENGINE_PROC_NAME} for selection plan ID: {self.selection_plan_id}"
             )

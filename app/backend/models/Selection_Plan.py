@@ -60,3 +60,4 @@ class Model_SelectionPlan(BaseModel):
     )
     acl = db.relationship("Model_SelectionPlan_ACL")
     rating_mapper_sets = db.relationship("Model_SelectionRatingMapperSet")
+    benefits = db.relationship("Model_SelectionBenefit", back_populates="parent")
