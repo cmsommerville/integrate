@@ -1,6 +1,6 @@
-from typing import List, Union
 from marshmallow import Schema, fields
 from app.extensions import db
+from app.auth import get_user
 from ..models import (
     Model_ConfigPlanDesignDetail_Benefit,
     Model_ConfigBenefitDurationDetail,
@@ -18,6 +18,8 @@ from ..schemas import (
     Schema_DefaultProductRatingMapperSet_For_Selection,
     Schema_SelectionRatingMapperSet,
 )
+
+WITH_GRANT_OPTION = True
 
 
 class Schema_UpdateProductPlanDesign(Schema):
@@ -168,9 +170,17 @@ class Selection_RPC_Plan:
         )
 
     @classmethod
+    def create_plan_acl(cls):
+        user = get_user()
+        return {
+            "user_name": user.get("user_name"),
+            "with_grant_option": WITH_GRANT_OPTION,
+        }
+
+    @classmethod
     def create_default_plan(cls, payload, *args, **kwargs):
         try:
-            plan = cls.schema.load(payload)
+            plan = cls.schema.load({**payload, "acl": [cls.create_plan_acl()]})
             db.session.add(plan)
             db.session.flush()
 
