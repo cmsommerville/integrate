@@ -1,12 +1,13 @@
 from app.extensions import ma
 from app.shared import BaseSchema
 
-from ..models import Model_ConfigBenefitVariation
+from ..models import Model_ConfigDropdownDetail
 
 
-class Schema_ConfigBenefitVariation(BaseSchema):
+class Schema_ConfigDropdownDetail(BaseSchema):
     class Meta:
-        model = Model_ConfigBenefitVariation
+        model = Model_ConfigDropdownDetail
         load_instance = True
         include_relationships = True
         include_fk = True
+        load_only = ("acl",)

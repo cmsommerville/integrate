@@ -176,7 +176,7 @@ def load(hostname: str, *args, **kwargs) -> None:
         data = func(provision)
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/provision/{provision.config_provision_id}/factors",
+            f"api/config/provision/{provision.config_provision_id}/factors",
         )
         res = requests.post(url, json=data, **kwargs)
         if not res.ok:

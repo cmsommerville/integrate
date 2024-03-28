@@ -28,24 +28,25 @@ def DATA_BENEFIT_DURATION(benefit_id: int):
                     "config_benefit_duration_detail_code": "1",
                     "config_benefit_duration_detail_label": "1 per year",
                     "config_benefit_duration_factor": 0.85,
-                    "acl": [{"auth_role_code": "uw900"}, {"auth_role_code": "uw1000"}],
+                    "is_restricted": False,
                 },
                 {
                     "config_benefit_duration_detail_code": "2",
                     "config_benefit_duration_detail_label": "2 per year",
                     "config_benefit_duration_factor": 0.95,
-                    "acl": [{"auth_role_code": "uw900"}, {"auth_role_code": "uw1000"}],
+                    "is_restricted": False,
                 },
                 {
                     "config_benefit_duration_detail_code": "3",
                     "config_benefit_duration_detail_label": "3 per year",
                     "config_benefit_duration_factor": 1,
-                    "acl": [{"auth_role_code": "uw900"}, {"auth_role_code": "uw1000"}],
+                    "is_restricted": False,
                 },
                 {
                     "config_benefit_duration_detail_code": "4",
                     "config_benefit_duration_detail_label": "4 per year",
                     "config_benefit_duration_factor": 1.1,
+                    "is_restricted": True,
                     "acl": [{"auth_role_code": "uw1000"}],
                 },
             ],
@@ -58,7 +59,7 @@ def load(hostname: str, *args, **kwargs) -> None:
     benefit = BENEFIT(product, "skin_cancer")
     url = urljoin(
         hostname,
-        f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/duration-sets",
+        f"api/config/benefit/{benefit.config_benefit_id}/durations",
     )
     d = DATA_BENEFIT_DURATION(benefit.config_benefit_id)
     res = requests.post(url, json=d, **kwargs)
@@ -67,12 +68,12 @@ def load(hostname: str, *args, **kwargs) -> None:
         raise Exception(res.text)
 
     # set default duration detail item to last one
-    for item in data:
+    for item in data["data"]:
         config_benefit_duration_set_id = item["config_benefit_duration_set_id"]
         version_id = item["version_id"]
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/duration-set/{config_benefit_duration_set_id}",
+            f"api/config/benefit/{benefit.config_benefit_id}/duration/{config_benefit_duration_set_id}",
         )
         default_item = item.get("duration_items")[-1]
         default_id = default_item.get("config_benefit_duration_detail_id")

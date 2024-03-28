@@ -20,10 +20,11 @@ class Model_SelectionBenefitDuration(BaseModel):
     selection_benefit_duration_id = db.Column(db.Integer, primary_key=True)
     selection_benefit_id = db.Column(
         db.ForeignKey(
-            f"{CONFIG_BENEFIT}.config_benefit_id",
+            f"{SELECTION_BENEFIT}.selection_benefit_id",
             ondelete="CASCADE",
             onupdate="CASCADE",
-        )
+        ),
+        index=True,
     )
     config_benefit_duration_set_id = db.Column(
         db.ForeignKey(

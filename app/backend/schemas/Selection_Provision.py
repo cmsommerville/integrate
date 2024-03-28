@@ -21,7 +21,7 @@ class Schema_SelectionProvision_UpdatePayloadValidator(Schema):
 
 class Schema_SelectionProvision_CreatePayloadValidator(Schema):
     selection_plan_id = fields.Int()
-    config_provision_id = fields.Int()
+    config_provision_state_id = fields.Int()
     selection_value = fields.Str()
 
     class Meta:

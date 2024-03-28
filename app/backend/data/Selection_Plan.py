@@ -1,13 +1,11 @@
+import datetime
 import requests
 from requests.compat import urljoin
 
 from ..models import (
     Model_ConfigProduct,
-    Model_ConfigProductVariation,
-    Model_ConfigRatingMapperCollection,
-    Model_ConfigRatingMapperSet,
+    Model_ConfigProductVariationState,
     Model_RefPlanStatus,
-    Model_SelectionPlan,
 )
 
 
@@ -15,44 +13,28 @@ def get_product(code: str):
     return Model_ConfigProduct.find_one_by_attr({"config_product_code": code})
 
 
-def get_product_variation(product_id: int, code: str):
-    return Model_ConfigProductVariation.find_one_by_attr(
-        {"config_product_id": product_id, "config_product_variation_code": code}
-    )
-
-
-def get_rating_mapper_set(collection_id: int, label: str):
-    return Model_ConfigRatingMapperSet.find_one_by_attr(
-        {
-            "config_rating_mapper_collection_id": collection_id,
-            "config_rating_mapper_set_label": label,
-        }
-    ).config_rating_mapper_set_id
-
-
 def DATA():
     product = get_product("CI21000")
-    product_variation = get_product_variation(product.config_product_id, "issue_age")
+    product_state = product.states[-1]
+    state = product_state.state
+    effective_date = product_state.config_product_state_effective_date
+    product_variation_state = (
+        Model_ConfigProductVariationState.find_one_for_selection_plan(
+            product.config_product_id,
+            "issue_age",
+            state.state_code,
+            effective_date,
+        )
+    )
     return {
         "config_product_id": product.config_product_id,
-        "selection_plan_effective_date": str(product.config_product_effective_date),
-        "situs_state_id": product.states[-1].state_id,
-        "config_product_variation_id": product_variation.config_product_variation_id,
+        "selection_plan_effective_date": str(effective_date),
+        "situs_state_id": state.state_id,
+        "config_product_variation_state_id": product_variation_state.config_product_variation_state_id,
         "cloned_from_selection_plan_id": None,
+        "selection_group_id": None,
         "plan_status": Model_RefPlanStatus.find_one_by_attr(
             {"ref_attr_code": "in_progress"}
-        ),
-        "selection_rating_mapper_set_id1": get_rating_mapper_set(
-            product.rating_mapper_collection_id1,
-            "Tobacco Distinct",
-        ),
-        "selection_rating_mapper_set_id2": get_rating_mapper_set(
-            product.rating_mapper_collection_id2,
-            "50/50 Male/Female Composite",
-        ),
-        "selection_rating_mapper_set_id3": get_rating_mapper_set(
-            product.rating_mapper_collection_id3,
-            "Relationship Distinct",
         ),
         "acl": [
             {
@@ -73,6 +55,7 @@ def DATA():
 
 def load(hostname: str, *args, **kwargs) -> None:
     url = urljoin(hostname, "api/selection/plan")
-    res = requests.post(url, json=DATA(), **kwargs)
+    data = DATA()
+    res = requests.post(url, json=data, **kwargs)
     if not res.ok:
         raise Exception(res.text)

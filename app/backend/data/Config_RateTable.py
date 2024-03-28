@@ -1,10 +1,9 @@
-import numpy as np
-import pandas as pd
 import requests
 from requests.compat import urljoin
 from ..models import (
     Model_ConfigProduct,
     Model_ConfigBenefit,
+    Model_ConfigBenefitVariationState,
     Model_RefRateFrequency,
 )
 from ..classes.RateTableCohorts import RateTableCohorts
@@ -16,6 +15,12 @@ def PRODUCT(code: str):
 
 def BENEFITS(product_id: int):
     return Model_ConfigBenefit.find_by_product(product_id)
+
+
+def BENEFIT_VARIATION_STATES(benefit_id: int):
+    return Model_ConfigBenefitVariationState.find_all_by_attr(
+        {"config_benefit_id": benefit_id}
+    )
 
 
 def RATESET(product: Model_ConfigProduct, benefit: Model_ConfigBenefit):
@@ -40,7 +45,7 @@ def RATESET(product: Model_ConfigProduct, benefit: Model_ConfigBenefit):
                 **row,
                 "rate_per_unit": row["rating_age"] * 0.1,
                 "rate_frequency_id": rate_frequency_id,
-                "rate_unit_value": 1,
+                "rate_unit_value": 100,
             }
             for row in cohorts
         ],
@@ -56,8 +61,32 @@ def load(hostname: str, *args, **kwargs) -> None:
 
         url = urljoin(
             hostname,
-            f"api/config/product/{product.config_product_id}/benefit/{benefit.config_benefit_id}/rateset",
+            f"api/config/benefit/{benefit.config_benefit_id}/ratesets",
         )
-        res = requests.post(url, json=rateset, **kwargs)
+        res = requests.post(url, json=[rateset], **kwargs)
         if not res.ok:
             raise Exception(res.text)
+
+        data = res.json()["data"][0]
+        if data.get("config_rate_table_set_id") is None:
+            raise Exception(
+                "Response does not contain required field, `config_rate_table_set_id`."
+            )
+
+        bnft_variation_states = BENEFIT_VARIATION_STATES(benefit.config_benefit_id)
+
+        for state in bnft_variation_states:
+            url = urljoin(
+                hostname,
+                f"api/config/benefit/{state.config_benefit_id}/state/{state.config_benefit_variation_state_id}",
+            )
+            res = requests.patch(
+                url,
+                json={
+                    "config_rate_table_set_id": data.get("config_rate_table_set_id"),
+                    "version_id": state.version_id,
+                },
+                **kwargs,
+            )
+            if not res.ok:
+                raise Exception(res.text)

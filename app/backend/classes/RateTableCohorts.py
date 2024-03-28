@@ -3,6 +3,7 @@ from app.extensions import db
 from ..models import (
     Model_ConfigAgeDistribution,
     Model_ConfigProduct,
+    Model_ConfigRatingMapperCollection,
     Model_ConfigRatingMapperDetail,
     Model_ConfigRatingMapperSet,
 )
@@ -20,12 +21,14 @@ class RateTableCohorts:
         self.age_distribution_set_id = None
 
     @classmethod
-    def get_rating_mappers(cls, rating_mapper_collections):
+    def get_rating_mappers(cls, rating_mapper_collections, default_mapper_set=False):
         """
-        Query all of a product's rating mapper details
+        Query a product's rating mapper details.
+        If `default_mapper_set` is True, only return the default rating mapper set.
         """
         SET = Model_ConfigRatingMapperSet
         DETAIL = Model_ConfigRatingMapperDetail
+        COLL = Model_ConfigRatingMapperCollection
         collections = [
             coll for coll in rating_mapper_collections.values() if coll is not None
         ]
@@ -37,13 +40,23 @@ class RateTableCohorts:
                 DETAIL,
                 SET.config_rating_mapper_set_id == DETAIL.config_rating_mapper_set_id,
             )
-            .with_entities(
-                SET.config_rating_mapper_collection_id,
-                SET.config_rating_mapper_set_id,
-                DETAIL.rate_table_attribute_detail_id,
+            .join(
+                COLL,
+                COLL.config_rating_mapper_collection_id
+                == SET.config_rating_mapper_collection_id,
             )
-            .distinct()
         )
+        if default_mapper_set:
+            attributes = attributes.filter(
+                COLL.default_config_rating_mapper_set_id
+                == SET.config_rating_mapper_set_id
+            )
+
+        attributes = attributes.with_entities(
+            SET.config_rating_mapper_collection_id,
+            SET.config_rating_mapper_set_id,
+            DETAIL.rate_table_attribute_detail_id,
+        ).distinct()
 
         return pd.DataFrame(attributes)
 
@@ -99,7 +112,7 @@ class RateTableCohorts:
 
         return df.pipe(DFSchema_RateTableCohorts)
 
-    def create_cohorts(self, *args, **kwargs):
+    def create_cohorts(self, default_mapper_set=False, *args, **kwargs):
         product = Model_ConfigProduct.find_one(self.product_id)
         if not product:
             return None
@@ -114,7 +127,9 @@ class RateTableCohorts:
             "6": product.rating_mapper_collection_id6,
         }
 
-        df_attributes = self.get_rating_mappers(self.rating_mapper_collections)
+        df_attributes = self.get_rating_mappers(
+            self.rating_mapper_collections, default_mapper_set=default_mapper_set
+        )
         df_age_dist = self.get_age_distribution(self.age_distribution_set_id)
         self.df_cohorts = self.cross_join_age_attrs(
             self.rating_mapper_collections, df_attributes, df_age_dist

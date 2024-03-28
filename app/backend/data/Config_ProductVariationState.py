@@ -60,7 +60,7 @@ def load(hostname: str, *args, **kwargs) -> None:
     data = DATA(variation, PRODUCT_CODE)
     url = urljoin(
         hostname,
-        f"api/config/product/{product.config_product_id}/variation/{variation.config_product_variation_id}/states",
+        f"api/config/variation/{variation.config_product_variation_id}/states",
     )
     res = requests.post(url, json=data, **kwargs)
     if not res.ok:
@@ -70,7 +70,7 @@ def load(hostname: str, *args, **kwargs) -> None:
     data = DATA(variation, PRODUCT_CODE)
     url = urljoin(
         hostname,
-        f"api/config/product/{product.config_product_id}/variation/{variation.config_product_variation_id}/states",
+        f"api/config/variation/{variation.config_product_variation_id}/states",
     )
     res = requests.post(url, json=data, **kwargs)
     if not res.ok:

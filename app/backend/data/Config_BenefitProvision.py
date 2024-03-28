@@ -33,10 +33,14 @@ def DATA_BENEFIT_PROVISIONS(product_id: int):
 
 def load(hostname: str, *args, **kwargs) -> None:
     product = PRODUCT("CI21000")
-    url = urljoin(
-        hostname, f"api/config/product/{product.config_product_id}/benefit-provisions"
-    )
-    data = DATA_BENEFIT_PROVISIONS(product.config_product_id)
-    res = requests.post(url, json=data, **kwargs)
-    if not res.ok:
-        raise Exception(res.text)
+    provisions = PROVISIONS(product.config_product_id)
+    benefits = BENEFITS(product.config_product_id)
+    for provision in provisions:
+        data = {"config_benefit_id": [b.config_benefit_id for b in benefits]}
+        url = urljoin(
+            hostname,
+            f"api/config/provision/{provision.config_provision_id}/benefits",
+        )
+        res = requests.post(url, json=data, **kwargs)
+        if not res.ok:
+            raise Exception(res.text)

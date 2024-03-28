@@ -2,9 +2,10 @@ import requests
 from requests.compat import urljoin
 
 from ..models import (
-    Model_ConfigBenefit,
+    Model_ConfigBenefitVariationState,
     Model_SelectionPlan,
 )
+from ..schemas import Schema_ConfigBenefitVariationState_QuotableBenefits
 
 
 def get_plan():
@@ -12,20 +13,36 @@ def get_plan():
     return PLAN.query.order_by(PLAN.selection_plan_id.desc()).first()
 
 
-def get_benefits(product_id: int):
-    return Model_ConfigBenefit.find_by_product(product_id)
+def get_benefit_variation_states(benefit_variation_id: int, state_id: int):
+    return Model_ConfigBenefitVariationState.find_one_by_attr(
+        {
+            "config_benefit_variation_id": benefit_variation_id,
+            "state_id": state_id,
+        }
+    )
 
 
 def DATA(plan: Model_SelectionPlan):
-    benefits = get_benefits(plan.config_product_id)
-    return [
-        {
-            "selection_plan_id": plan.selection_plan_id,
-            "config_benefit_id": benefit.config_benefit_id,
-            "selection_value": float(benefit.default_value),
-        }
-        for benefit in benefits
-    ]
+    objs = Model_ConfigBenefitVariationState.find_quotable_benefits(
+        plan.config_product_variation_state_id,
+        plan.situs_state_id,
+        plan.selection_plan_effective_date,
+    )
+    schema = Schema_ConfigBenefitVariationState_QuotableBenefits(many=True)
+    data = schema.dump(objs)
+
+    return {
+        "data": [
+            {
+                "selection_plan_id": plan.selection_plan_id,
+                "config_benefit_variation_state_id": d.get(
+                    "config_benefit_variation_state_id"
+                ),
+                "selection_value": d.get("default_value"),
+            }
+            for d in data
+        ]
+    }
 
 
 def load(hostname: str, *args, **kwargs) -> None:

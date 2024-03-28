@@ -4,7 +4,7 @@ from sqlalchemy import event
 from dotenv import load_dotenv
 
 from app.extensions import db, ma, api, sess
-from app.shared import bind_namespaces
+from app.shared import bind_namespaces, BaseReflectedModel
 from app.auth import set_db_user_id
 
 load_dotenv()
@@ -22,11 +22,15 @@ def create_app(config):
     api.init_app(app)
     sess.init_app(app)
 
-    # bind routes
-    from .route_registration import NAMESPACES
+    with app.app_context():
+        # bind routes
+        from .route_registration import NAMESPACES, RPC_NAMESPACES
 
-    bind_namespaces(api, NAMESPACES, "/api")
+        bind_namespaces(api, NAMESPACES, "/api")
+        bind_namespaces(api, RPC_NAMESPACES, "/rpc")
 
-    event.listens_for(db.session, "after_begin")(set_db_user_id)
+        event.listens_for(db.session, "after_begin")(set_db_user_id)
+        # db.metadata.reflect(db.engine)
+        db.metadata.reflect(bind=db.engine)
 
     return app

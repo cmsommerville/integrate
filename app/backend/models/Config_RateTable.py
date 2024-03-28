@@ -29,6 +29,7 @@ class Model_ConfigRateTableSet(BaseModel):
     age_distribution_set_id = db.Column(
         db.ForeignKey(f"{CONFIG_AGE_DISTRIBUTION_SET}.config_age_distribution_set_id"),
         comment="Default distribution of ages at issue",
+        nullable=True,
     )
     rating_mapper_collection_id1 = db.Column(
         db.ForeignKey(
@@ -73,6 +74,7 @@ class Model_ConfigRateTableSet(BaseModel):
         nullable=True,
     )
 
+    parent = db.relationship("Model_ConfigBenefit")
     rates = db.relationship("Model_ConfigRateTable")
 
 
@@ -88,7 +90,7 @@ class Model_ConfigRateTable(BaseModel):
         ),
         nullable=True,
     )
-    rating_age = db.Column(db.Integer, nullable=False)
+    rating_age = db.Column(db.Integer, default=999)
 
     rating_attr_id1 = db.Column(
         db.ForeignKey(

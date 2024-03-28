@@ -1,6 +1,6 @@
 import requests
 from requests.compat import urljoin
-from ..models import Model_ConfigProduct, Model_RefDataTypes
+from ..models import Model_ConfigProduct, Model_RefDataTypes, Model_ConfigDropdownSet
 
 
 def PRODUCT(product_code: str):
@@ -17,6 +17,8 @@ def DATA(product: Model_ConfigProduct):
                 {"ref_attr_code": "number"}
             ).ref_id,
             "config_provision_description": "This is the standard provision for CI21000 Group Size.",
+            "default_value": None,
+            "is_default_related_attribute": False,
         },
         {
             "config_product_id": product.config_product_id,
@@ -25,7 +27,12 @@ def DATA(product: Model_ConfigProduct):
             "config_provision_data_type_id": Model_RefDataTypes.find_one_by_attr(
                 {"ref_attr_code": "string"}
             ).ref_id,
+            "config_dropdown_set_id": Model_ConfigDropdownSet.find_one_by_attr(
+                {"config_dropdown_set_label": "SIC Codes"}
+            ).config_dropdown_set_id,
             "config_provision_description": "This is the standard provision for CI21000 SIC code.",
+            "default_value": None,
+            "is_default_related_attribute": False,
         },
         {
             "config_product_id": product.config_product_id,
@@ -35,6 +42,8 @@ def DATA(product: Model_ConfigProduct):
                 {"ref_attr_code": "boolean"}
             ).ref_id,
             "config_provision_description": "This is the standard provision for CI21000 Reduction at Age 70.",
+            "default_value": str(False),
+            "is_default_related_attribute": True,
         },
     ]
 

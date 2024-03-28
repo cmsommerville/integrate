@@ -30,6 +30,7 @@ class Model_ConfigProductState(BaseModel):
     config_product_state_expiration_date = db.Column(db.Date, nullable=False)
 
     state = db.relationship("Model_RefStates")
+    parent = db.relationship("Model_ConfigProduct")
 
     @classmethod
     def find_by_product(cls, id):

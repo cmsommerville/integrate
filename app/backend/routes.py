@@ -1,1 +1,1 @@
-from .namespaces import NAMESPACES
+from .namespaces import NAMESPACES, RPC_NAMESPACES
