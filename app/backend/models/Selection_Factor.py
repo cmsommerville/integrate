@@ -27,16 +27,12 @@ class Model_SelectionFactor(BaseModel):
     config_factor_set_id = db.Column(
         db.ForeignKey(
             f"{CONFIG_FACTOR_SET}.config_factor_set_id",
-            # ondelete="SET NULL",
-            # onupdate="SET NULL",
         ),
         nullable=True,
     )
     config_factor_id = db.Column(
         db.ForeignKey(
             f"{CONFIG_FACTOR}.config_factor_id",
-            # ondelete="SET NULL",
-            # onupdate="SET NULL",
         ),
         nullable=True,
     )

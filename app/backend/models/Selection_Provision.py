@@ -35,11 +35,7 @@ class Model_SelectionProvision(BaseModel):
         ),
         nullable=False,
     )
-    config_factor_set_id = db.Column(
-        db.ForeignKey(f"{CONFIG_FACTOR_SET}.config_factor_set_id"),
-        nullable=True,
-    )
-    selection_value = db.Column(db.String(100), nullable=False)
+    selection_value = db.Column(db.String(100), nullable=True)
 
     @hybrid_property
     def config_provision(self):
@@ -57,25 +53,10 @@ class Model_SelectionProvision(BaseModel):
             .first()
         )
 
+    parent = db.relationship("Model_SelectionPlan")
     config_provision_state = db.relationship("Model_ConfigProvisionState")
     factors = db.relationship("Model_SelectionFactor")
 
     @classmethod
     def find_by_plan(cls, selection_plan_id: int):
         return cls.query.filter(cls.selection_plan_id == selection_plan_id)
-
-    def get_product_factor(self):
-        """
-        Passes the selection provision object into the apply_ruleset function
-        to find the ruleset that is True for this object
-        """
-        if self.config_provision_type_code != "product":
-            return None
-
-        factor_sets = self.config_provision.factors
-        first_valid_ruleset = next(
-            (ruleset for ruleset in factor_sets if ruleset.apply_ruleset(self)), None
-        )
-        if first_valid_ruleset is None:
-            return 1
-        return first_valid_ruleset.factor_value

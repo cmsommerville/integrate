@@ -68,7 +68,7 @@ from .Default_ProductRatingMapperSet import (
     Schema_DefaultProductRatingMapperSet,
     Schema_DefaultProductRatingMapperSet_For_Selection,
 )
-
+from .EventLog import Schema_EventLog
 from .Selection_AgeBand import Schema_SelectionAgeBand
 from .Selection_Benefit import (
     Schema_SelectionBenefit,

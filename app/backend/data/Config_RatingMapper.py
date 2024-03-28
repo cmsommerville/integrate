@@ -163,3 +163,34 @@ def load(hostname: str, *args, **kwargs) -> None:
     res = requests.post(url, json=DATA(), **kwargs)
     if not res.ok:
         raise Exception(res.text)
+
+    data = res.json()
+    for collection in data["data"]:
+        if len(collection["mapper_sets"]) == 1:
+            mapper_set = collection["mapper_sets"][0]
+        else:
+            mapper_set = next(
+                (
+                    x
+                    for x in collection["mapper_sets"]
+                    if "Distinct" in x["config_rating_mapper_set_label"]
+                ),
+                None,
+            )
+
+        url = urljoin(
+            hostname,
+            f"api/config/mappers/{collection['config_rating_mapper_collection_id']}",
+        )
+        res = requests.patch(
+            url,
+            json={
+                "default_config_rating_mapper_set_id": mapper_set[
+                    "config_rating_mapper_set_id"
+                ],
+                "version_id": collection["version_id"],
+            },
+            **kwargs,
+        )
+        if not res.ok:
+            raise Exception(res.text)

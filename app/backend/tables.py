@@ -47,6 +47,7 @@ TBL_NAMES = {
     "CONFIG_RATING_MAPPER_COLLECTION": "config_rating_mapper_collection",
     "CONFIG_RATING_MAPPER_SET": "config_rating_mapper_set",
     "CONFIG_RATING_MAPPER_DETAIL": "config_rating_mapper_detail",
+    "EVENT_LOG": "event_log",
     "REF_MASTER": "ref_master",
     "REF_STATES": "ref_states",
     "SELECTION_AGE_BAND": "selection_age_band",

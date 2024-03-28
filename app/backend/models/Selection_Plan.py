@@ -1,7 +1,11 @@
+import datetime
 from app.extensions import db
-from app.shared import BaseModel
+from app.shared import BaseModel, BaseRowLevelSecurityTable
+from app.shared.utils import system_temporal_hint
+from sqlalchemy.ext.hybrid import hybrid_method
 
 from ..tables import TBL_NAMES
+from .Selection_Coverage import Model_SelectionCoverage
 
 CONFIG_PLAN_DESIGN_SET = TBL_NAMES["CONFIG_PLAN_DESIGN_SET"]
 CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
@@ -59,5 +63,37 @@ class Model_SelectionPlan(BaseModel):
         "Model_ConfigProductVariationState"
     )
     acl = db.relationship("Model_SelectionPlan_ACL")
-    rating_mapper_sets = db.relationship("Model_SelectionRatingMapperSet")
+    rating_mapper_sets = db.relationship(
+        "Model_SelectionRatingMapperSet", lazy="joined"
+    )
     benefits = db.relationship("Model_SelectionBenefit", back_populates="parent")
+    coverages = db.relationship("Model_SelectionCoverage", back_populates="parent")
+    provisions = db.relationship("Model_SelectionProvision", back_populates="parent")
+
+    @hybrid_method
+    def get_acl(self, t=None, *args, **kwargs):
+        """
+        This method returns the ACL list for the selection plan.
+        If `t` is provided, it will return the ACL list as of that time using system-temporal table queries.
+        """
+        hint = system_temporal_hint(t)
+        return (
+            db.session.query(Model_SelectionPlan_ACL)
+            .with_hint(Model_SelectionPlan_ACL, hint)
+            .filter_by(selection_plan_id=self.selection_plan_id)
+            .all()
+        )
+
+    @hybrid_method
+    def get_coverages(self, t=None, *args, **kwargs):
+        """
+        This method returns the coverage list for the selection plan.
+        If `t` is provided, it will return the coverage list as of that time using system-temporal table queries.
+        """
+        hint = system_temporal_hint(t)
+        return (
+            db.session.query(Model_SelectionCoverage)
+            .with_hint(Model_SelectionCoverage, hint)
+            .filter_by(selection_plan_id=self.selection_plan_id)
+            .all()
+        )

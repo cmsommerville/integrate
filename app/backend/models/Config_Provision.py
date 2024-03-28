@@ -33,6 +33,8 @@ class Model_ConfigProvision(BaseModel):
         nullable=True,
     )
     config_provision_description = db.Column(db.String(1000))
+    default_value = db.Column(db.String(100), nullable=True)
+    is_default_related_attribute = db.Column(db.Boolean, default=False)
 
     parent = db.relationship("Model_ConfigProduct")
     dropdown_set = db.relationship("Model_ConfigDropdownSet")

@@ -1,20 +1,18 @@
+from flask import request
 from flask_restx import Resource
-from ..models import Model_DefaultProductRatingMapperSet
-from ..schemas import (
-    Schema_DefaultProductRatingMapperSet_For_Selection,
-    Schema_SelectionRatingMapperSet,
+from ..classes.TemporalSelectionQueries import (
+    TemporalSelectionBenefits,
+    Schema_TemporalSelectionBenefits_Plan,
 )
 
 
 class TestResource(Resource):
-    schema = Schema_DefaultProductRatingMapperSet_For_Selection(many=True)
-    selection_schema = Schema_SelectionRatingMapperSet(many=True)
+    schema = Schema_TemporalSelectionBenefits_Plan()
 
     @classmethod
     def get(cls, parent_id: int, *args, **kwargs):
-        objs = Model_DefaultProductRatingMapperSet.find_by_parent(parent_id)
-        data = cls.schema.dump(objs)
-        selection_objs = cls.selection_schema.load(
-            [{**row, "selection_plan_id": parent_id} for row in data]
+        plan = TemporalSelectionBenefits.get_plan_asof_date(
+            parent_id, t=request.args.get("t")
         )
-        return cls.selection_schema.dump(selection_objs), 200
+        data = cls.schema.dump(plan)
+        return data, 200

@@ -98,8 +98,9 @@ class Validator_SelectionBenefit(ValidatorMixin, BaseValidator):
 
         config_plan_design_set_id = kwargs.get("config_plan_design_set_id")
         selection_plan_id = kwargs.get("plan_id")
+        selection_benefit_id = kwargs.get("id")
         config_benefit_variation_state_id = cls.get_config_benefit_variation_state_id(
-            payload
+            {**payload, "selection_benefit_id": selection_benefit_id}
         )
         cls.validate_benefit_amounts(
             config_benefit_variation_state_id=config_benefit_variation_state_id,

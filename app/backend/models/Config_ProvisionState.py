@@ -1,3 +1,5 @@
+import datetime
+from sqlalchemy.orm import joinedload
 from app.extensions import db
 from app.shared import BaseModel
 from .Config_Provision import Model_ConfigProvision
@@ -33,11 +35,13 @@ class Model_ConfigProvisionState(BaseModel):
     config_provision_state_effective_date = db.Column(db.Date, nullable=False)
     config_provision_state_expiration_date = db.Column(db.Date, nullable=False)
 
-    provision = db.relationship("Model_ConfigProvision")
+    parent = db.relationship("Model_ConfigProvision")
     state = db.relationship("Model_RefStates")
 
     @classmethod
-    def get_provision_states_by_product(cls, product_id: int, state_id: int):
+    def get_provision_states_by_product(
+        cls, product_id: int, state_id: int, effective_date: datetime.date
+    ):
         return (
             db.session.query(cls)
             .join(
@@ -47,6 +51,9 @@ class Model_ConfigProvisionState(BaseModel):
             .filter(
                 Model_ConfigProvision.config_product_id == product_id,
                 cls.state_id == state_id,
+                cls.config_provision_state_effective_date <= effective_date,
+                cls.config_provision_state_expiration_date >= effective_date,
             )
+            .options(joinedload(cls.parent))
             .all()
         )

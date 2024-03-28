@@ -73,9 +73,9 @@ class SelectionProvisionMixin:
         )
 
         if validated_factor_ruleset is None:
-            return None, None
+            return []
 
-        return validated_factor_ruleset.config_factor_set_id, [
+        return [
             cls.config_to_selection_factor(
                 val, selection_provision.selection_provision_id
             )
@@ -113,7 +113,7 @@ class CRUD_SelectionProvision(SelectionProvisionMixin, BaseCRUDResource):
             )
 
             # get the selection factor set and factor values
-            factor_set_id, selection_factor_list = cls.get_first_valid_ruleset(
+            selection_factor_list = cls.get_first_valid_ruleset(
                 config_provision, selection_provision
             )
 
@@ -130,7 +130,6 @@ class CRUD_SelectionProvision(SelectionProvisionMixin, BaseCRUDResource):
             # handle happy path
             # important to delete the child selection factors first, flush transaction
             # then set to the correct values
-            selection_provision.selection_factor_set_id = factor_set_id
             selection_provision.factors = []
             db.session.flush()
 

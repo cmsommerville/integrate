@@ -1,7 +1,10 @@
 from app.extensions import db
 from app.shared import BaseModel
+from app.shared.utils import system_temporal_hint
+from sqlalchemy.ext.hybrid import hybrid_method
 
 from ..tables import TBL_NAMES
+from .Selection_Benefit import Model_SelectionBenefit
 
 CONFIG_COVERAGE = TBL_NAMES["CONFIG_COVERAGE"]
 CONFIG_PLAN_DESIGN_SET = TBL_NAMES["CONFIG_PLAN_DESIGN_SET"]
@@ -38,6 +41,20 @@ class Model_SelectionCoverage(BaseModel):
         ),
         nullable=True,
     )
+
+    @hybrid_method
+    def get_benefits(self, t=None, *args, **kwargs):
+        """
+        This method returns the benefit list for the selection plan.
+        If `t` is provided, it will return the benefit list as of that time using system-temporal table queries.
+        """
+        hint = system_temporal_hint(t)
+        return (
+            db.session.query(Model_SelectionBenefit)
+            .with_hint(Model_SelectionBenefit, hint)
+            .filter_by(selection_coverage_id=self.selection_coverage_id)
+            .all()
+        )
 
     parent = db.relationship("Model_SelectionPlan")
     coverage = db.relationship("Model_ConfigCoverage")

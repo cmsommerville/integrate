@@ -75,6 +75,8 @@ class Model_ConfigFactorRule(BaseModel, BaseRule):
         actual_value__improper_type = self.nested_getattr(
             selection_provision, self.comparison_attr_name
         )
+        if actual_value__improper_type is None:
+            return False
         # convert to the correct type
         actual_value = self.convert_data_type(actual_value__improper_type, data_type)
 

@@ -22,6 +22,7 @@ class RateEngine:
             """SELECT 
             (SELECT COUNT(1) FROM selection_benefit WHERE selection_plan_id = P.selection_plan_id), 
             (SELECT COUNT(1) FROM selection_provision WHERE selection_plan_id = P.selection_plan_id), 
+            (SELECT COUNT(selection_value) FROM selection_provision WHERE selection_plan_id = P.selection_plan_id), 
             (SELECT COUNT(1) FROM selection_age_band WHERE selection_plan_id = P.selection_plan_id), 
             (SELECT COUNT(1) FROM selection_rating_mapper_set WHERE selection_plan_id = P.selection_plan_id),
             (SELECT COUNT(1) FROM selection_factor WHERE selection_plan_id = P.selection_plan_id)
@@ -34,11 +35,13 @@ class RateEngine:
         if not res:
             raise errs.PlanInvalidError("Plan does not exist")
 
-        bnft, prov, age_band, mapper_sets, factor = res
+        bnft, prov, prov_selections, age_band, mapper_sets, factor = res
         if bnft == 0:
             raise errs.PlanInvalidError("Benefits do not exist")
         if prov == 0:
             raise errs.PlanInvalidError("Provisions do not exist")
+        if prov_selections != prov:
+            raise errs.PlanInvalidError("Not all provisions have been selected")
         if age_band == 0:
             raise errs.PlanInvalidError("Age bands do not exist")
         if mapper_sets == 0:

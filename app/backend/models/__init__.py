@@ -54,7 +54,7 @@ from .Config_RatingMapperCollection import Model_ConfigRatingMapperCollection
 from .Config_RatingMapperDetail import Model_ConfigRatingMapperDetail
 from .Config_RatingMapperSet import Model_ConfigRatingMapperSet
 from .Default_ProductRatingMapperSet import Model_DefaultProductRatingMapperSet
-
+from .EventLog import Model_EventLog
 from .Ref_Master import *
 from .Ref_States import Model_RefStates
 

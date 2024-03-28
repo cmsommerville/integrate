@@ -77,7 +77,7 @@ class BaseCRUDResource(Resource):
         req = request.get_json()
         queryparams = request.args
         if cls.validator:
-            req = cls.validator.replace(req, *args, **{**queryparams, **kwargs})
+            req = cls.validator.replace(req, id=id, *args, **{**queryparams, **kwargs})
         obj = cls.model.replace_one(id, req)
         return cls.schema.dump(obj)
 
@@ -86,7 +86,7 @@ class BaseCRUDResource(Resource):
         req = request.get_json()
         queryparams = request.args
         if cls.validator:
-            req = cls.validator.update(req, *args, **{**queryparams, **kwargs})
+            req = cls.validator.update(req, id=id, *args, **{**queryparams, **kwargs})
         obj = cls.model.update_one(id, req)
         return cls.schema.dump(obj)
 

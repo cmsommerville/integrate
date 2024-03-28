@@ -17,6 +17,8 @@ def DATA(product: Model_ConfigProduct):
                 {"ref_attr_code": "number"}
             ).ref_id,
             "config_provision_description": "This is the standard provision for CI21000 Group Size.",
+            "default_value": None,
+            "is_default_related_attribute": False,
         },
         {
             "config_product_id": product.config_product_id,
@@ -29,6 +31,8 @@ def DATA(product: Model_ConfigProduct):
                 {"config_dropdown_set_label": "SIC Codes"}
             ).config_dropdown_set_id,
             "config_provision_description": "This is the standard provision for CI21000 SIC code.",
+            "default_value": None,
+            "is_default_related_attribute": False,
         },
         {
             "config_product_id": product.config_product_id,
@@ -38,6 +42,8 @@ def DATA(product: Model_ConfigProduct):
                 {"ref_attr_code": "boolean"}
             ).ref_id,
             "config_provision_description": "This is the standard provision for CI21000 Reduction at Age 70.",
+            "default_value": str(False),
+            "is_default_related_attribute": True,
         },
     ]
 

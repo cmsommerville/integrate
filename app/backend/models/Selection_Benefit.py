@@ -1,7 +1,10 @@
 from app.extensions import db
 from app.shared import BaseModel
+from app.shared.utils import system_temporal_hint
+from sqlalchemy.ext.hybrid import hybrid_method
 
 from ..tables import TBL_NAMES
+from .Selection_BenefitDuration import Model_SelectionBenefitDuration
 
 CONFIG_BENEFIT_VARIATION_STATE = TBL_NAMES["CONFIG_BENEFIT_VARIATION_STATE"]
 SELECTION_BENEFIT = TBL_NAMES["SELECTION_BENEFIT"]
@@ -49,6 +52,20 @@ class Model_SelectionBenefit(BaseModel):
         "Model_ConfigBenefitVariationState"
     )
     duration_sets = db.relationship("Model_SelectionBenefitDuration")
+
+    @hybrid_method
+    def get_benefit_durations(self, t=None, *args, **kwargs):
+        """
+        This method returns the benefit duration list for the selection plan.
+        If `t` is provided, it will return the benefit duration list as of that time using system-temporal table queries.
+        """
+        hint = system_temporal_hint(t)
+        return (
+            db.session.query(Model_SelectionBenefitDuration)
+            .with_hint(Model_SelectionBenefitDuration, hint)
+            .filter_by(selection_benefit_id=self.selection_benefit_id)
+            .all()
+        )
 
     @classmethod
     def find_by_plan(cls, selection_plan_id: int):
