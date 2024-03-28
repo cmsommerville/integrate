@@ -1,3 +1,4 @@
+from logger import logger
 from app.extensions import db
 from marshmallow import Schema, fields
 from app.shared.utils import system_temporal_hint
@@ -9,6 +10,7 @@ from ..models import (
     Model_SelectionPlan,
     Model_SelectionProvision,
     Model_SelectionFactor,
+    Model_SelectionRatingMapperSet,
 )
 
 
@@ -68,6 +70,14 @@ class Schema_TemporalSelectionBenefits_SitusState(Schema):
     state_name = fields.String()
 
 
+class Schema_TemporalSelectionBenefits_RatingMapperSet(Schema):
+    selection_rating_mapper_set_id = fields.Integer()
+    selection_plan_id = fields.Integer()
+    selection_rating_mapper_set_type = fields.String()
+    config_rating_mapper_set_id = fields.Integer()
+    has_custom_weights = fields.Boolean()
+
+
 class Schema_TemporalSelectionBenefits_Plan(Schema):
     selection_plan_id = fields.Integer()
     config_product_id = fields.Integer()
@@ -82,11 +92,23 @@ class Schema_TemporalSelectionBenefits_Plan(Schema):
     situs_state = fields.Nested(Schema_TemporalSelectionBenefits_SitusState)
     coverages = fields.Nested(Schema_TemporalSelectionBenefits_Coverage, many=True)
     provisions = fields.Nested(Schema_TemporalSelectionBenefits_Provision, many=True)
+    rating_mapper_sets = fields.Nested(
+        Schema_TemporalSelectionBenefits_RatingMapperSet, many=True
+    )
 
 
 class TemporalSelectionBenefits:
     @classmethod
     def load_plan_asof_date(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        """
+        This is a tricky method!
+
+        The first query loads the relevant selection instances as of the correct point in time into the identity map.
+        The format of the output is difficult because it is a list of tuples.
+
+        The second query pulls the plan instance plus all relevant collections. This query must be designed
+        to eagerly pull from the identity map, which is why the first query is necessary.
+        """
         asof = system_temporal_hint(t)
         PLAN = Model_SelectionPlan
         CVG = Model_SelectionCoverage
@@ -94,40 +116,27 @@ class TemporalSelectionBenefits:
         DUR = Model_SelectionBenefitDuration
         PROV = Model_SelectionProvision
         FCTR = Model_SelectionFactor
+        RMS = Model_SelectionRatingMapperSet
         qry = (
-            db.session.query(PLAN, CVG, BNFT, DUR, PROV, FCTR)
-            .select_from(BNFT)
+            db.session.query(PLAN, CVG, BNFT, DUR, PROV, FCTR, RMS)
+            .select_from(PLAN)
+            .join(CVG, PLAN.coverages, isouter=True)
+            .join(PROV, PLAN.provisions, isouter=True)
+            .join(BNFT, CVG.benefits, isouter=True)
             .join(DUR, BNFT.duration_sets, isouter=True)
-            .join(CVG, BNFT.selection_coverage_id == CVG.selection_coverage_id)
-            .join(PLAN, BNFT.selection_plan_id == PLAN.selection_plan_id)
-            .join(PROV, PROV.selection_plan_id == PLAN.selection_plan_id)
-            .join(
-                FCTR,
-                FCTR.selection_provision_id == PROV.selection_provision_id,
-            )
+            .join(FCTR, PROV.factors, isouter=True)
+            .join(RMS, PLAN.rating_mapper_sets, isouter=True)
+            .filter(PLAN.selection_plan_id == selection_plan_id)
             .with_hint(PLAN, asof)
             .with_hint(CVG, asof)
             .with_hint(BNFT, asof)
             .with_hint(DUR, asof)
             .with_hint(PROV, asof)
             .with_hint(FCTR, asof)
-            .filter(BNFT.selection_plan_id == selection_plan_id)
+            .with_hint(RMS, asof)
         )
-        results = qry.all()
-        return results
+        _ = qry.all()
 
-    @classmethod
-    def get_plan_asof_date(cls, selection_plan_id: int, t=None, *args, **kwargs):
-        """
-        Fetch plan + coverages + benefits + duration_sets for a given `selection_plan_id` as of time `t`.
-        If no time is provided, fetch the latest data.
-        """
-        # this method just loads the data into SQLAlchemy's identity map
-        res = cls.load_plan_asof_date(selection_plan_id, t, *args, **kwargs)
-
-        # requery the plan to pull data from the identity map
-        # it is very tricky to setup this query to prevent marshmallow from refetching data on serialization
-        # CRITICAL: query should not refetch from database
         qry = (
             db.session.query(Model_SelectionPlan)
             .filter_by(selection_plan_id=selection_plan_id)
@@ -139,8 +148,16 @@ class TemporalSelectionBenefits:
                 joinedload(Model_SelectionPlan.provisions).joinedload(
                     Model_SelectionProvision.factors
                 ),
+                joinedload(Model_SelectionPlan.rating_mapper_sets),
             )
         )
         plan = qry.one()
-        db.session.expunge(plan)
         return plan
+
+    @classmethod
+    def get_plan_asof_date(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        """
+        Fetch plan + coverages + benefits + duration_sets for a given `selection_plan_id` as of time `t`.
+        If no time is provided, fetch the latest data.
+        """
+        return cls.load_plan_asof_date(selection_plan_id, t, *args, **kwargs)

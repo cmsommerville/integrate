@@ -63,10 +63,8 @@ class Model_SelectionPlan(BaseModel):
         "Model_ConfigProductVariationState"
     )
     acl = db.relationship("Model_SelectionPlan_ACL")
-    rating_mapper_sets = db.relationship(
-        "Model_SelectionRatingMapperSet", lazy="joined"
-    )
-    benefits = db.relationship("Model_SelectionBenefit", back_populates="parent")
+    rating_mapper_sets = db.relationship("Model_SelectionRatingMapperSet")
+    # benefits = db.relationship("Model_SelectionBenefit", back_populates="parent")
     coverages = db.relationship("Model_SelectionCoverage", back_populates="parent")
     provisions = db.relationship("Model_SelectionProvision", back_populates="parent")
 

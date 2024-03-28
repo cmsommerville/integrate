@@ -1,5 +1,5 @@
 import datetime
-from sqlalchemy.sql.functions import coalesce
+from sqlalchemy.sql import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db
 from app.shared import BaseModel
@@ -103,6 +103,29 @@ class Model_ConfigProductVariationState(BaseModel):
     age_band_set = db.relationship("Model_ConfigAgeBandSet")
     state = db.relationship("Model_RefStates")
     parent = db.relationship("Model_ConfigProductVariation")
+
+    @classmethod
+    def is_plan_valid(
+        cls,
+        config_product_variation_state_id: int,
+        situs_state_id: int,
+        effective_date: datetime.date,
+    ) -> bool:
+        """
+        Validates if the plan effective date is valid for the config_product_variation_state_id.
+        """
+        return (
+            db.session.query(func.count(cls.config_product_variation_state_id))
+            .filter(
+                cls.config_product_variation_state_id
+                == config_product_variation_state_id,
+                cls.state_id == situs_state_id,
+                cls.config_product_variation_state_effective_date <= effective_date,
+                effective_date <= cls.config_product_variation_state_expiration_date,
+            )
+            .scalar()
+            == 1
+        )
 
     @classmethod
     def find_by_product_variation(cls, id):

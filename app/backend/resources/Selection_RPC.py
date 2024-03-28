@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 from app.auth import authorization_required, NotAuthorizedError
+from app.shared.errors import PlanInvalidError
 from app.extensions import db
 
 from .Selection_RPC_PlanDesign import Selection_RPC_PlanDesign
@@ -72,7 +73,7 @@ class Resource_Selection_RPC_Dispatcher(Resource):
             )
             cls.log_event(event, data)
             return {"status": "success", "data": result}, 200
-        except PayloadValidationError as e:
+        except (PayloadValidationError, PlanInvalidError) as e:
             return {"status": "error", "msg": str(e)}, 400
         except NotAuthorizedError as e:
             return {"status": "error", "msg": str(e)}, 403

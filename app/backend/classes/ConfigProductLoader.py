@@ -28,6 +28,7 @@ from ..schemas import (
     Schema_ConfigBenefitDurationSet,
     Schema_ConfigBenefitProvision,
     Schema_ConfigBenefitVariationState,
+    Schema_ConfigCoverage,
     Schema_ConfigFactorSet,
     Schema_ConfigProduct,
     Schema_ConfigProductState,
@@ -198,12 +199,14 @@ class ConfigBenefitLoader(AttrGetterMixin):
         benefits_data,
         benefit_variations_data,
         rate_tables_data,
+        coverage_data,
         **kwargs,
     ):
         self.config_product_id = config_product_id
         self.benefits_data = benefits_data
         self.benefit_variations_data = benefit_variations_data
         self.rate_tables_data = rate_tables_data
+        self.coverage_data = coverage_data
         self.ref_states = Model_RefStates.find_all()
 
     @staticmethod
@@ -246,13 +249,18 @@ class ConfigBenefitLoader(AttrGetterMixin):
         return rt
 
     @classmethod
-    def process_benefit(cls, bnft):
+    def process_benefit(cls, bnft, coverage_mapper):
         benefit = {**bnft}
         unit_type_code = benefit.pop("unit_type_code")
         benefit["unit_type_id"] = cls.get_unit_type_id(unit_type_code)
 
         config_rate_group_code = benefit.pop("config_rate_group_code")
         benefit["config_rate_group_id"] = cls.get_rate_group_id(config_rate_group_code)
+
+        config_coverage_code = benefit.pop("config_coverage_code")
+        benefit["config_coverage_id"] = coverage_mapper[
+            config_coverage_code
+        ].config_coverage_id
         return benefit
 
     @classmethod
@@ -285,11 +293,24 @@ class ConfigBenefitLoader(AttrGetterMixin):
             {**ds, "config_benefit_id": benefit_id} for ds in bnft_data["duration_sets"]
         ]
 
+    def coverage_loader(self, config_product_id: int):
+        schema = Schema_ConfigCoverage(many=True, unknown=EXCLUDE)
+        data = [
+            {**row, "config_product_id": config_product_id}
+            for row in self.coverage_data
+        ]
+        objs = schema.load(data)
+        db.session.add_all(objs)
+        db.session.flush()
+        self.coverages = objs
+        return schema.dump(self.coverages)
+
     def benefit_loader(self, config_product_id: int):
         schema = Schema_ConfigBenefit_CRUD(many=True, unknown=EXCLUDE)
+        coverage_mapper = {cvg.config_coverage_code: cvg for cvg in self.coverages}
         data = [
             {
-                **self.process_benefit(bnft),
+                **self.process_benefit(bnft, coverage_mapper),
                 "config_product_id": config_product_id,
                 "benefit_variation_states": [],
                 "duration_sets": [],
@@ -370,6 +391,9 @@ class ConfigBenefitLoader(AttrGetterMixin):
         return schema.dump(self.benefit_variations)
 
     def save_to_db(self, product_id, commit=True, **kwargs):
+        logger.info("Loading coverages...")
+        self.coverage_loader(product_id)
+        logger.info("Loading benefits...")
         self.benefit_loader(product_id)
         logger.info("Loading benefit durations...")
         self.benefit_durations_loader()
@@ -579,6 +603,7 @@ class ConfigProductLoader(AttrGetterMixin):
         self.product_states_data = _config.pop("states", [])
         self.product_variations_data = _config.pop("product_variations", [])
         self.rate_groups_data = _config.pop("rate_groups", [])
+        self.coverage_data = _config.pop("coverages", [])
         self.benefits_data = _config.pop("benefits", [])
         self.provisions_data = _config.pop("provisions", [])
         self.rate_tables_data = _config.pop("rate_tables", [])
@@ -742,6 +767,7 @@ class ConfigProductLoader(AttrGetterMixin):
                 self.benefits_data,
                 self.benefit_variations_data,
                 self.rate_tables_data,
+                self.coverage_data,
             )
             logger.info("Loading benefits...")
             benefit_loader.save_to_db(product_id, commit=False)

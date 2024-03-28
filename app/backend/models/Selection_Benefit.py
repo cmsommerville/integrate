@@ -44,10 +44,9 @@ class Model_SelectionBenefit(BaseModel):
     selection_value = db.Column(db.Numeric(12, 2), nullable=False)
 
     parent = db.relationship(
-        "Model_SelectionPlan",
+        "Model_SelectionCoverage",
         cascade="all, delete",
     )
-    coverage = db.relationship("Model_SelectionCoverage", back_populates="benefits")
     config_benefit_variation_state = db.relationship(
         "Model_ConfigBenefitVariationState"
     )

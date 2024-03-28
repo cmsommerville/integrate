@@ -38,4 +38,5 @@ class Model_SelectionRatingMapperSet(BaseModel):
     )
     has_custom_weights = db.Column(db.Boolean, default=False)
 
-    mapper_details = db.relationship("Model_SelectionRatingMapperDetail", lazy="joined")
+    mapper_details = db.relationship("Model_SelectionRatingMapperDetail")
+    config_mapper_set = db.relationship("Model_ConfigRatingMapperSet")

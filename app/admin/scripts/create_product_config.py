@@ -4,12 +4,12 @@ import datetime
 import json
 
 CONFIG_DROPDOWN_SET_LABEL = "SIC Codes"
-req = requests.get("http://127.0.0.1:5000/api/config/dropdown/sets")
+req = requests.get("http://127.0.0.1:5000/api/config/dropdowns")
 data = req.json()
 DROPDOWN_SET = next(
     (
         row
-        for row in data
+        for row in data["data"]
         if row["config_dropdown_set_label"] == CONFIG_DROPDOWN_SET_LABEL
     )
 )
@@ -305,11 +305,12 @@ def fn_benefit_variations(product_variation_code: str, n=500):
     ]
 
 
-def fn_benefits(n=500):
+def fn_benefits(n=500, n_coverage=20):
     return [
         {
             "config_benefit_code": f"bnft{i:03}",
             "config_benefit_label": f"Benefit {i:03}",
+            "config_coverage_code": f"cov{(i % n_coverage):03}",
             "config_rate_group_code": "FLAT",
             "benefit_auth": [
                 {
@@ -322,6 +323,17 @@ def fn_benefits(n=500):
             "unit_type_code": "dollars",
             "config_benefit_description": f"Benefit {i:03}",
             "duration_sets": fn_benefit_durations() if (i + 1) % 9 == 0 else [],
+        }
+        for i in range(n)
+    ]
+
+
+def fn_coverages(n=20):
+    return [
+        {
+            "config_coverage_code": f"cov{i:03}",
+            "config_coverage_label": f"Coverage {i:03}",
+            "config_coverage_description": f"Coverage {i:03}",
         }
         for i in range(n)
     ]
@@ -344,6 +356,10 @@ def fn_product_variations():
     ]
 
 
+def fn_plan_designs(benefits_data):
+    pass
+
+
 def fn_rate_groups():
     return [
         {
@@ -363,6 +379,7 @@ def fn_rate_groups():
 
 def fn_product():
     n_benefits = 500
+    n_coverage = 20
     return {
         "config_product_code": "AC70000",
         "config_product_label": "Accident Series 70000",
@@ -385,7 +402,8 @@ def fn_product():
         "states": fn_states("config_product"),
         "product_variations": fn_product_variations(),
         "rate_groups": fn_rate_groups(),
-        "benefits": fn_benefits(n=n_benefits),
+        "coverages": fn_coverages(n=n_coverage),
+        "benefits": fn_benefits(n=n_benefits, n_coverage=n_coverage),
         "provisions": fn_provisions(),
         "rate_tables": fn_rate_tables(n=n_benefits),
         "benefit_variations": fn_benefit_variations("base", n=n_benefits),

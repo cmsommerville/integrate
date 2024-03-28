@@ -4,6 +4,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db
 from app.shared import BaseModel
 from .Config_Benefit import Model_ConfigBenefit
+from .Config_Coverage import Model_ConfigCoverage
 
 from ..tables import TBL_NAMES
 
@@ -77,9 +78,11 @@ class Model_ConfigBenefitVariationState(BaseModel):
         **kwargs,
     ):
         B = Model_ConfigBenefit
+        CVG = Model_ConfigCoverage
         data = (
-            db.session.query(cls, B)
+            db.session.query(cls, B, CVG)
             .join(B, cls.config_benefit_id == B.config_benefit_id)
+            .join(CVG, B.config_coverage_id == CVG.config_coverage_id)
             .filter(
                 cls.config_product_variation_state_id
                 == config_product_variation_state_id,

@@ -132,6 +132,7 @@ class BenefitAuthSchema(Schema):
 
 class BenefitSchema(Schema):
     config_benefit_code = fields.Str(validate=validate.Length(max=30))
+    config_coverage_code = fields.Str(validate=validate.Length(max=30))
     config_benefit_label = fields.Str(validate=validate.Length(max=100))
     config_rate_group_code = fields.Str(validate=validate.Length(max=30))
     unit_type_code = fields.Str(validate=validate.Length(max=30))
@@ -197,6 +198,12 @@ class FactorSetSchema(Schema):
                 )
 
 
+class CoverageSchema(Schema):
+    config_coverage_code = fields.Str(validate=validate.Length(max=30))
+    config_coverage_label = fields.Str(validate=validate.Length(max=100))
+    config_coverage_description = fields.Str(validate=validate.Length(max=1000))
+
+
 class ProvisionSchema(Schema):
     config_provision_code = fields.Str(validate=validate.Length(max=30))
     config_provision_label = fields.Str(validate=validate.Length(max=100))
@@ -246,6 +253,7 @@ class ProductLoaderSchema(Schema):
     states = fields.Nested(ProductStateSchema, many=True)
     rate_groups = fields.Nested(RateGroupSchema, many=True)
     product_variations = fields.Nested(ProductVariationSchema, many=True)
+    coverages = fields.Nested(CoverageSchema, many=True)
     benefits = fields.Nested(BenefitSchema, many=True)
     provisions = fields.Nested(ProvisionSchema, many=True)
     rate_tables = fields.Nested(RateTableSetSchema, many=True)

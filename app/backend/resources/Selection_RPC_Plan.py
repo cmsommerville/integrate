@@ -2,12 +2,14 @@ import datetime
 from marshmallow import Schema, fields
 from app.extensions import db
 from app.auth import get_user, NotAuthorizedError
+from app.shared.errors import PlanInvalidError
 from ..models import (
     Model_ConfigPlanDesignDetail_Benefit,
     Model_ConfigBenefitDurationDetail,
     Model_ConfigBenefitDurationSet,
     Model_ConfigBenefitVariationState,
     Model_ConfigFactor,
+    Model_ConfigProductVariationState,
     Model_ConfigProvision,
     Model_ConfigProvisionState,
     Model_DefaultProductRatingMapperSet,
@@ -187,12 +189,12 @@ class Selection_RPC_Plan(
     schema = Schema_SelectionPlan()
 
     @classmethod
-    def create_default_coverage_benefits(
-        cls, plan: Model_SelectionPlan, *args, **kwargs
+    def _default_coverage_benefits__plan_design(
+        cls, default_product_plan_design, plan: Model_SelectionPlan
     ):
-        default_product_plan_design = (
-            plan.config_product_variation_state.default_product_plan_design
-        )
+        """
+        Create coverages and benefits based on the default product plan design.
+        """
         default_coverage_plan_designs = (
             default_product_plan_design.coverage_plan_designs
         )
@@ -210,14 +212,56 @@ class Selection_RPC_Plan(
         return selection_coverages
 
     @classmethod
+    def _default_coverage_benefits__config_benefit(cls, plan: Model_SelectionPlan):
+        quotable_benefits = Model_ConfigBenefitVariationState.find_quotable_benefits(
+            plan.config_product_variation_state_id,
+            plan.situs_state_id,
+            plan.selection_plan_effective_date,
+        )
+
+        selection_coverages_dict = {}
+        for bvs, bnft, cvg in quotable_benefits:
+            if cvg.config_coverage_id not in selection_coverages_dict:
+                selection_coverages_dict[cvg.config_coverage_id] = (
+                    Model_SelectionCoverage(
+                        selection_plan_id=plan.selection_plan_id,
+                        config_coverage_id=cvg.config_coverage_id,
+                    )
+                )
+            selection_coverages_dict[cvg.config_coverage_id].benefits.append(
+                Model_SelectionBenefit(
+                    selection_plan_id=plan.selection_plan_id,
+                    config_benefit_variation_state_id=bvs.config_benefit_variation_state_id,
+                    selection_value=bnft.default_value,
+                )
+            )
+        return selection_coverages_dict.values()
+
+    @classmethod
+    def create_default_coverage_benefits(
+        cls, plan: Model_SelectionPlan, *args, **kwargs
+    ):
+        default_product_plan_design = (
+            plan.config_product_variation_state.default_product_plan_design
+        )
+        if default_product_plan_design is None:
+            return cls._default_coverage_benefits__config_benefit(plan)
+
+        return cls._default_coverage_benefits__plan_design(
+            default_product_plan_design, plan
+        )
+
+    @classmethod
     def create_default_age_bands(cls, plan: Model_SelectionPlan, *args, **kwargs):
         default_age_band_set = plan.config_product_variation_state.age_band_set
         if default_age_band_set is None:
-            return Model_SelectionAgeBand(
-                selection_plan_id=plan.selection_plan_id,
-                age_band_lower=0,
-                age_band_upper=999,
-            )
+            return [
+                Model_SelectionAgeBand(
+                    selection_plan_id=plan.selection_plan_id,
+                    age_band_lower=0,
+                    age_band_upper=999,
+                )
+            ]
 
         return [
             Model_SelectionAgeBand(
@@ -267,17 +311,27 @@ class Selection_RPC_Plan(
         return selection_provisions
 
     @classmethod
-    def create_plan_acl(cls):
-        user = get_user()
-        return {
-            "user_name": user.get("user_name"),
-            "with_grant_option": WITH_GRANT_OPTION,
-        }
+    def create_plan(cls, payload):
+        is_plan_valid = Model_ConfigProductVariationState.is_plan_valid(
+            payload["config_product_variation_state_id"],
+            payload["situs_state_id"],
+            payload["selection_plan_effective_date"],
+        )
+        if is_plan_valid:
+            user = get_user()
+            default_acl = {
+                "user_name": user.get("user_name"),
+                "with_grant_option": WITH_GRANT_OPTION,
+            }
+            return cls.schema.load({**payload, "acl": [default_acl]})
+        raise PlanInvalidError(
+            "Situs state, product variation, and effective date are incompatible"
+        )
 
     @classmethod
     def create_default_plan(cls, payload, *args, **kwargs):
         try:
-            plan = cls.schema.load({**payload, "acl": [cls.create_plan_acl()]})
+            plan = cls.create_plan(payload)
             db.session.add(plan)
             db.session.flush()
 

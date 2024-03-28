@@ -19,6 +19,7 @@ class Schema_SelectionPlan(BaseSchema):
         include_fk = True
 
     coverages = ma.Nested("Schema_SelectionCoverage", many=True)
+    acl = ma.Nested("Schema_SelectionPlan_ACL", many=True, load_only=True)
     # coverages = ma.Method("get_coverages", deserialize="load_coverages")
 
     def get_acl(self, obj, *args, **kwargs):

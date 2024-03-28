@@ -58,7 +58,7 @@ class Model_SelectionCoverage(BaseModel):
 
     parent = db.relationship("Model_SelectionPlan")
     coverage = db.relationship("Model_ConfigCoverage")
-    benefits = db.relationship("Model_SelectionBenefit", back_populates="coverage")
+    benefits = db.relationship("Model_SelectionBenefit", back_populates="parent")
     plan_design = db.relationship("Model_ConfigPlanDesignSet")
 
     @classmethod
