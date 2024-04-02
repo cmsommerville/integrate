@@ -8,8 +8,8 @@ ns_selection_rpc = Namespace(
 )
 
 SELECTION_RPC_ROUTES = {
-    "/plan/<int:parent_id>::<string:event>": res.Resource_Selection_RPC_Dispatcher,
-    "/plan::<string:event>": res.Resource_Selection_RPC_Dispatcher,
+    "/plan/<int:parent_id>/<string:event>": res.Resource_Selection_RPC_Dispatcher,
+    "/plan/<string:event>": res.Resource_Selection_RPC_Dispatcher,
 }
 
 add_routes(ns_selection_rpc, SELECTION_RPC_ROUTES)

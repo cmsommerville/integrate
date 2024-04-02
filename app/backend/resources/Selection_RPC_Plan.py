@@ -85,6 +85,55 @@ class SelectionProvisionMixin:
 
 class SelectionBenefitMixin:
     @classmethod
+    def _default_coverage_benefits__plan_design(
+        cls, default_product_plan_design, plan: Model_SelectionPlan
+    ):
+        """
+        Create coverages and benefits based on the default product plan design.
+        """
+        default_coverage_plan_designs = (
+            default_product_plan_design.coverage_plan_designs
+        )
+        selection_coverages = []
+        for cpd in default_coverage_plan_designs:
+            coverage = Model_SelectionCoverage(
+                selection_plan_id=plan.selection_plan_id,
+                config_coverage_id=cpd.config_parent_id,
+                config_plan_design_set_id=cpd.config_plan_design_set_id,
+            )
+            coverage.benefits = cls.load_plan_design_to_selection_benefit(
+                cpd.config_plan_design_set_id, plan
+            )
+            selection_coverages.append(coverage)
+        return selection_coverages
+
+    @classmethod
+    def _default_coverage_benefits__config_benefit(cls, plan: Model_SelectionPlan):
+        quotable_benefits = Model_ConfigBenefitVariationState.find_quotable_benefits(
+            plan.config_product_variation_state_id,
+            plan.situs_state_id,
+            plan.selection_plan_effective_date,
+        )
+
+        selection_coverages_dict = {}
+        for bvs, bnft, cvg in quotable_benefits:
+            if cvg.config_coverage_id not in selection_coverages_dict:
+                selection_coverages_dict[cvg.config_coverage_id] = (
+                    Model_SelectionCoverage(
+                        selection_plan_id=plan.selection_plan_id,
+                        config_coverage_id=cvg.config_coverage_id,
+                    )
+                )
+            selection_coverages_dict[cvg.config_coverage_id].benefits.append(
+                Model_SelectionBenefit(
+                    selection_plan_id=plan.selection_plan_id,
+                    config_benefit_variation_state_id=bvs.config_benefit_variation_state_id,
+                    selection_value=bnft.default_value,
+                )
+            )
+        return selection_coverages_dict.values()
+
+    @classmethod
     def _qry_plan_design_benefits(
         cls,
         config_plan_design_set_id: int,
@@ -187,55 +236,6 @@ class Selection_RPC_Plan(
     SelectionProvisionMixin, SelectionBenefitMixin, SelectionPlanMixin
 ):
     schema = Schema_SelectionPlan()
-
-    @classmethod
-    def _default_coverage_benefits__plan_design(
-        cls, default_product_plan_design, plan: Model_SelectionPlan
-    ):
-        """
-        Create coverages and benefits based on the default product plan design.
-        """
-        default_coverage_plan_designs = (
-            default_product_plan_design.coverage_plan_designs
-        )
-        selection_coverages = []
-        for cpd in default_coverage_plan_designs:
-            coverage = Model_SelectionCoverage(
-                selection_plan_id=plan.selection_plan_id,
-                config_coverage_id=cpd.config_parent_id,
-                config_plan_design_set_id=cpd.config_plan_design_set_id,
-            )
-            coverage.benefits = cls.load_plan_design_to_selection_benefit(
-                cpd.config_plan_design_set_id, plan
-            )
-            selection_coverages.append(coverage)
-        return selection_coverages
-
-    @classmethod
-    def _default_coverage_benefits__config_benefit(cls, plan: Model_SelectionPlan):
-        quotable_benefits = Model_ConfigBenefitVariationState.find_quotable_benefits(
-            plan.config_product_variation_state_id,
-            plan.situs_state_id,
-            plan.selection_plan_effective_date,
-        )
-
-        selection_coverages_dict = {}
-        for bvs, bnft, cvg in quotable_benefits:
-            if cvg.config_coverage_id not in selection_coverages_dict:
-                selection_coverages_dict[cvg.config_coverage_id] = (
-                    Model_SelectionCoverage(
-                        selection_plan_id=plan.selection_plan_id,
-                        config_coverage_id=cvg.config_coverage_id,
-                    )
-                )
-            selection_coverages_dict[cvg.config_coverage_id].benefits.append(
-                Model_SelectionBenefit(
-                    selection_plan_id=plan.selection_plan_id,
-                    config_benefit_variation_state_id=bvs.config_benefit_variation_state_id,
-                    selection_value=bnft.default_value,
-                )
-            )
-        return selection_coverages_dict.values()
 
     @classmethod
     def create_default_coverage_benefits(
@@ -357,7 +357,7 @@ class Selection_RPC_Plan(
     def grant_plan(cls, payload, plan_id, *args, **kwargs):
         try:
             schema = Schema_GrantPlanACL()
-            validated_data = schema.dump(payload)
+            validated_data = schema.load(payload)
             user = get_user()
             plan, with_grant_option = cls.query_plan_acl_with_grant_option(
                 plan_id, user.get("user_name", None)
@@ -384,7 +384,7 @@ class Selection_RPC_Plan(
     def revoke_plan(cls, payload, plan_id, *args, **kwargs):
         try:
             schema = Schema_RevokePlanACL()
-            validated_data = schema.dump(payload)
+            validated_data = schema.load(payload)
             user = get_user()
             plan, with_grant_option = cls.query_plan_acl_with_grant_option(
                 plan_id, user.get("user_name", None)

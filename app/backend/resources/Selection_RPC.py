@@ -4,6 +4,7 @@ from app.auth import authorization_required, NotAuthorizedError
 from app.shared.errors import PlanInvalidError
 from app.extensions import db
 
+from .Selection_RPC_Benefit import Selection_RPC_Benefit
 from .Selection_RPC_PlanDesign import Selection_RPC_PlanDesign
 from .Selection_RPC_Plan import Selection_RPC_Plan
 from ..schemas import Schema_EventLog
@@ -23,8 +24,8 @@ SELECTION_EVENT_MAPPER = {
     # product variation changes
     "update:product_variation": None,
     # benefit changes
-    "update:benefit": None,
-    "remove:benefit": None,
+    "upsert:benefit": Selection_RPC_Benefit.upsert_benefit,  # this should update or create a benefit; should not require client to differentiate
+    "remove:benefit": Selection_RPC_Benefit.remove_benefit,
     # benefit duration changes
     "update:benefit_duration": None,
     # age band changes
