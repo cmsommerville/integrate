@@ -35,7 +35,7 @@ def validate_user(user):
 def get_user():
     if session.get("user", None) is None:
         raise AuthenticationError("User has not been authenticated. Please login.")
-    return session.get("user", None)
+    return session["user"]
 
 
 def login_user(user):
@@ -114,6 +114,13 @@ def set_db_user_id(session, transaction, connection, *args, **kwargs):
 
         roles = ";".join(get_user_roles())
         stmt = f"EXEC sp_set_session_context 'user_roles', N'{roles}'"
+        connection.execute(text(stmt))
+
+        user = get_user()
+        if user is None:
+            raise Exception("User is not authenticated")
+        user_name = user.get("user_name")
+        stmt = f"EXEC sp_set_session_context 'user_name', N'{user_name}'"
         connection.execute(text(stmt))
     except Exception:
         pass

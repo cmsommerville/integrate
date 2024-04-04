@@ -1,15 +1,11 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
+from marshmallow import Schema, fields, ValidationError
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
 from ..models import (
-    Model_ConfigBenefit,
-    Model_ConfigBenefitVariationState,
-    Model_SelectionCoverage,
-    Model_SelectionBenefit,
+    Model_ConfigBenefitDurationDetail,
+    Model_SelectionBenefitDuration,
 )
-from ..schemas import (
-    Schema_SelectionBenefit,
-)
+from ..schemas import Schema_SelectionBenefitDuration
 
 
 class RowNotFoundError(Exception):
@@ -17,39 +13,94 @@ class RowNotFoundError(Exception):
 
 
 class Schema_UpdateBenefitDuration(Schema):
-    selection_benefit_id = fields.Integer(required=False)
-    config_benefit_variation_state_id = fields.Integer(required=False)
-    selection_value = fields.Float(required=True)
-    version_id = fields.String(required=False)
-
-    @validates_schema
-    def validate_update_or_insert(self, data, **kwargs):
-        """
-        Validate that if the rate groups assigned to each benefit are defined on the product
-        """
-        if (data.get("selection_benefit_id") is not None) and (
-            data.get("version_id") is not None
-        ):
-            pass
-        elif data.get("config_benefit_variation_state_id") is not None:
-            pass
-        else:
-            raise ValidationError(
-                "Either selection_benefit_id + version_id or config_benefit_variation_state_id must be provided"
-            )
-
-
-class Schema_RemoveBenefit(Schema):
-    selection_benefit_id = fields.Integer(required=True)
+    selection_benefit_duration_id = fields.Integer(required=True)
+    config_benefit_duration_detail_id = fields.Integer(required=True)
     version_id = fields.String(required=True)
 
 
 class Selection_RPC_BenefitDuration:
-    schema = Schema_SelectionBenefit()
+    schema = Schema_SelectionBenefitDuration()
+
+    @classmethod
+    def modify_errors(cls, validated_data, *args, **kwargs):
+        """
+        Call this method to check if the version ID is expired or
+        the benefit provided does not exist.
+        """
+        row_count = (
+            db.session.query(
+                Model_SelectionBenefitDuration.selection_benefit_duration_id
+            )
+            .filter_by(
+                selection_benefit_duration_id=validated_data[
+                    "selection_benefit_duration_id"
+                ],
+            )
+            .count()
+        )
+        if row_count == 0:
+            raise RowNotFoundError("Benefit does not exist")
+        raise ExpiredRowVersionError(
+            "The benefit you are trying to update has been modified by another user"
+        )
+
+    @classmethod
+    def get_duration_detail(
+        cls,
+        selection_benefit_duration_id: int,
+        config_benefit_duration_detail_id: int,
+        *args,
+        **kwargs,
+    ):
+        """
+        This query returns the configured benefit duration detail instance.
+        It validates that the configured benefit duration detail is a valid option for the duration set on the selected benefit duration.
+        """
+        BDD = Model_ConfigBenefitDurationDetail
+        SBD = Model_SelectionBenefitDuration
+        return (
+            db.session.query(BDD)
+            .select_from(SBD)
+            .join(
+                BDD,
+                BDD.config_benefit_duration_set_id
+                == SBD.config_benefit_duration_set_id,
+            )
+            .filter(
+                SBD.selection_benefit_duration_id == selection_benefit_duration_id,
+                BDD.config_benefit_duration_detail_id
+                == config_benefit_duration_detail_id,
+            )
+            .one()
+        )
 
     @classmethod
     def update_benefit_duration(cls, payload, plan_id, *args, **kwargs):
         """
-        Update the existing selection benefit duration.
+        Update the existing selection benefit if it exists, otherwise create a new one.
         """
-        pass
+        validated_data = Schema_UpdateBenefitDuration().load(payload)
+        config_duration_detail = cls.get_duration_detail(**validated_data)
+        res = (
+            db.session.query(Model_SelectionBenefitDuration)
+            .filter_by(
+                selection_benefit_duration_id=validated_data[
+                    "selection_benefit_duration_id"
+                ]
+            )
+            .update(
+                {
+                    "config_benefit_duration_detail_id": config_duration_detail.config_benefit_duration_detail_id,
+                    "selection_factor": config_duration_detail.selection_factor,
+                }
+            )
+        )
+        if res == 0:
+            cls.modify_errors(validated_data)
+        if res > 1:
+            raise ValidationError("Multiple rows updated")
+        db.session.flush()
+        obj = Model_SelectionBenefitDuration.query.get(
+            validated_data["selection_benefit_duration_id"]
+        )
+        return cls.schema.dump(obj)

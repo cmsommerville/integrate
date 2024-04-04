@@ -255,47 +255,42 @@ class Selection_RPC_Benefit:
 
         Otherwise, it will create a new coverage and benefit.
         """
-        try:
-            # validate that the selection value adheres to configuration
-            cls.validate_benefit_amounts(
-                selection_value=validated_data["selection_value"],
-                config_benefit_variation_state_id=validated_data[
-                    "config_benefit_variation_state_id"
-                ],
-            )
-            bvs_mapper = cls.get_benefit_variation_state_mapper(
-                validated_data["config_benefit_variation_state_id"], plan_id
-            )
-            # create benefit duration and benefit instances
-            duration_sets = cls.create_benefit_durations(validated_data)
-            bnft = Model_SelectionBenefit(
-                selection_plan_id=plan_id,
-                config_benefit_variation_state_id=validated_data[
-                    "config_benefit_variation_state_id"
-                ],
-                selection_value=validated_data["selection_value"],
-                duration_sets=duration_sets,
-            )
+        # validate that the selection value adheres to configuration
+        cls.validate_benefit_amounts(
+            selection_value=validated_data["selection_value"],
+            config_benefit_variation_state_id=validated_data[
+                "config_benefit_variation_state_id"
+            ],
+        )
+        bvs_mapper = cls.get_benefit_variation_state_mapper(
+            validated_data["config_benefit_variation_state_id"], plan_id
+        )
+        # create benefit duration and benefit instances
+        duration_sets = cls.create_benefit_durations(validated_data)
+        bnft = Model_SelectionBenefit(
+            selection_plan_id=plan_id,
+            config_benefit_variation_state_id=validated_data[
+                "config_benefit_variation_state_id"
+            ],
+            selection_value=validated_data["selection_value"],
+            duration_sets=duration_sets,
+        )
 
-            # selection coverage already exists (due to some other benefit in the coverage being selected)
-            if bvs_mapper["selection_coverage_id"] is not None:
-                bnft.selection_coverage_id = bvs_mapper["selection_coverage_id"]
-                db.session.add(bnft)
+        # selection coverage already exists (due to some other benefit in the coverage being selected)
+        if bvs_mapper["selection_coverage_id"] is not None:
+            bnft.selection_coverage_id = bvs_mapper["selection_coverage_id"]
+            db.session.add(bnft)
 
-            # selection coverage does not exist
-            else:
-                cvg = Model_SelectionCoverage(
-                    selection_plan_id=plan_id,
-                    config_coverage_id=bvs_mapper["config_coverage_id"],
-                )
-                cvg.benefits.append(bnft)
-                db.session.add(cvg)
-        except Exception as e:
-            db.session.rollback()
-            raise e
+        # selection coverage does not exist
         else:
-            db.session.commit()
-            return bnft
+            cvg = Model_SelectionCoverage(
+                selection_plan_id=plan_id,
+                config_coverage_id=bvs_mapper["config_coverage_id"],
+            )
+            cvg.benefits.append(bnft)
+            db.session.add(cvg)
+        db.session.flush()
+        return bnft
 
     @classmethod
     def modify_errors(cls, validated_data, plan_id, *args, **kwargs):
@@ -319,44 +314,34 @@ class Selection_RPC_Benefit:
 
     @classmethod
     def update(cls, validated_data, plan_id):
-        try:
-            # validate that the selection value adheres to configuration
-            cls.validate_benefit_amounts(
-                selection_value=validated_data["selection_value"],
-                selection_benefit_id=validated_data["selection_benefit_id"],
-            )
-            qry = Model_SelectionBenefit.query.filter_by(
-                selection_plan_id=plan_id,
-                selection_benefit_id=validated_data["selection_benefit_id"],
-            )
-            res = qry.filter_by(
-                version_id=validated_data["version_id"],
-            ).update({"selection_value": validated_data["selection_value"]})
-            if res == 0:
-                cls.modify_errors(validated_data, plan_id)
-        except Exception as e:
-            db.session.rollback()
-            raise e
-        else:
-            db.session.commit()
-            return qry.first()
+        # validate that the selection value adheres to configuration
+        cls.validate_benefit_amounts(
+            selection_value=validated_data["selection_value"],
+            selection_benefit_id=validated_data["selection_benefit_id"],
+        )
+        qry = Model_SelectionBenefit.query.filter_by(
+            selection_plan_id=plan_id,
+            selection_benefit_id=validated_data["selection_benefit_id"],
+        )
+        res = qry.filter_by(
+            version_id=validated_data["version_id"],
+        ).update({"selection_value": validated_data["selection_value"]})
+        if res == 0:
+            cls.modify_errors(validated_data, plan_id)
+        db.session.flush()
+        return qry.first()
 
     @classmethod
     def delete(cls, validated_data, plan_id, *args, **kwargs):
-        try:
-            qry = Model_SelectionBenefit.query.filter_by(
-                selection_plan_id=plan_id,
-                selection_benefit_id=validated_data["selection_benefit_id"],
-                version_id=validated_data["version_id"],
-            )
-            res = qry.delete()
-            if res == 0:
-                cls.modify_errors(validated_data, plan_id)
-        except Exception as e:
-            db.session.rollback()
-            raise e
-        else:
-            db.session.commit()
+        qry = Model_SelectionBenefit.query.filter_by(
+            selection_plan_id=plan_id,
+            selection_benefit_id=validated_data["selection_benefit_id"],
+            version_id=validated_data["version_id"],
+        )
+        res = qry.delete()
+        if res == 0:
+            cls.modify_errors(validated_data, plan_id)
+        db.session.flush()
 
     @classmethod
     def upsert_benefit(cls, payload, plan_id, *args, **kwargs):
