@@ -273,7 +273,11 @@ def fn_provision_single(i):
         "states": fn_states("config_provision"),
         "factors": fn_factors(data_type, config_dropdown_set_label),
         "benefit_provisions": {
-            "exclude": [f"bnft{j:03}" for j in range(500) if (j + 1) % (75 + i) == 0]
+            "exclude": [
+                f"bnft{j:03}"
+                for j in range(500)
+                if np.random.choice([True, False], p=[0.1, 0.9])
+            ]
         },
     }
 
@@ -291,6 +295,7 @@ def fn_benefit_variation_states():
             "config_rate_table_set_label": "Standard Rates",
         }
         for state in STATES
+        if np.random.choice([True, False], p=[0.95, 0.05])
     ]
 
 
@@ -343,11 +348,11 @@ def fn_provisions(n=20):
     return [fn_provision_single(i) for i in range(n)]
 
 
-def fn_product_variations():
+def fn_product_variations(code: str, label: str):
     return [
         {
-            "config_product_variation_code": "base",
-            "config_product_variation_label": "Base Accident",
+            "config_product_variation_code": code,
+            "config_product_variation_label": label,
             "states": [
                 {**val, "default_config_age_band_set_label": None}
                 for val in fn_states("config_product_variation")
@@ -400,13 +405,19 @@ def fn_product():
         "voluntary_census_strategy_code": "required",
         "employer_paid_census_strategy_code": "required",
         "states": fn_states("config_product"),
-        "product_variations": fn_product_variations(),
+        "product_variations": [
+            *fn_product_variations("base", "Base Accident"),
+            *fn_product_variations("base2", "Base Accident 2"),
+        ],
         "rate_groups": fn_rate_groups(),
         "coverages": fn_coverages(n=n_coverage),
         "benefits": fn_benefits(n=n_benefits, n_coverage=n_coverage),
         "provisions": fn_provisions(),
         "rate_tables": fn_rate_tables(n=n_benefits),
-        "benefit_variations": fn_benefit_variations("base", n=n_benefits),
+        "benefit_variations": [
+            *fn_benefit_variations("base", n=n_benefits),
+            *fn_benefit_variations("base2", n=n_benefits),
+        ],
     }
 
 

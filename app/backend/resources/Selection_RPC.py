@@ -1,6 +1,7 @@
 from flask import request
 from flask_restx import Resource
 from sqlalchemy.exc import IntegrityError
+from marshmallow import ValidationError
 from app.auth import authorization_required, NotAuthorizedError
 from app.shared.errors import PlanInvalidError
 from app.extensions import db
@@ -10,6 +11,7 @@ from .Selection_RPC_Benefit import Selection_RPC_Benefit
 from .Selection_RPC_BenefitDuration import Selection_RPC_BenefitDuration
 from .Selection_RPC_PlanDesign import Selection_RPC_PlanDesign
 from .Selection_RPC_Plan import Selection_RPC_Plan
+from .Selection_RPC_ProductVariation import Selection_RPC_ProductVariation
 from .Selection_RPC_Provision import Selection_RPC_Provision
 from .Selection_RPC_RatingMapper import Selection_RPC_RatingMapper
 from ..schemas import Schema_EventLog
@@ -26,10 +28,10 @@ SELECTION_EVENT_MAPPER = {
     "update:rating_mapper": Selection_RPC_RatingMapper.update_rating_mapper,
     # plan design changes
     "update:product_plan_design": Selection_RPC_PlanDesign.update_product_plan_design,
-    "update:coverage_plan_design": Selection_RPC_PlanDesign.update_coverage_plan_design,
-    "remove:coverage_plan_design": None,
+    "upsert:coverage_plan_design": Selection_RPC_PlanDesign.upsert_coverage_plan_design,
+    "remove:coverage_plan_design": Selection_RPC_PlanDesign.remove_coverage_plan_design,
     # product variation changes
-    "update:product_variation": None,  # this is tricky because we need to port the benefits to different BVS's
+    "update:product_variation": Selection_RPC_ProductVariation.update_product_variation,  # this is tricky because we need to port the benefits to different BVS's
     # benefit changes
     "upsert:benefit": Selection_RPC_Benefit.upsert_benefit,  # this should update or create a benefit; should not require client to differentiate
     "remove:benefit": Selection_RPC_Benefit.remove_benefit,
@@ -80,7 +82,12 @@ class Resource_Selection_RPC_Dispatcher(Resource):
             cls.log_event(event, data)
             db.session.commit()
             return {"status": "success", "data": result}, 200
-        except (PayloadValidationError, PlanInvalidError, IntegrityError) as e:
+        except (
+            ValidationError,
+            PayloadValidationError,
+            PlanInvalidError,
+            IntegrityError,
+        ) as e:
             db.session.rollback()
             return {"status": "error", "msg": str(e)}, 400
         except NotAuthorizedError as e:

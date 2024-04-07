@@ -1,8 +1,5 @@
-import datetime
 from marshmallow import Schema, fields
-from sqlalchemy import text, and_
-from sqlalchemy.orm import joinedload
-from sqlalchemy.sql import func, desc
+from sqlalchemy.sql import func, desc, and_
 from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.sql.expression import literal_column
 from app.extensions import db
@@ -35,13 +32,10 @@ from ..models import (
     Model_SelectionBenefit,
     Model_SelectionBenefitDuration,
     Model_SelectionProvision,
-    Model_SelectionRatingMapperDetail,
     Model_SelectionRatingMapperSet,
 )
 from ..schemas import (
     Schema_SelectionPlan,
-    Schema_DefaultProductRatingMapperSet_For_Selection,
-    Schema_SelectionRatingMapperSet,
 )
 
 WITH_GRANT_OPTION = True
@@ -487,140 +481,6 @@ class SelectionBenefitMixin:
             ),
         )
 
-    @classmethod
-    def _default_coverage_benefits__plan_design(
-        cls, default_product_plan_design, plan: Model_SelectionPlan
-    ):
-        """
-        Create coverages and benefits based on the default product plan design.
-        """
-        default_coverage_plan_designs = (
-            default_product_plan_design.coverage_plan_designs
-        )
-        selection_coverages = []
-        for cpd in default_coverage_plan_designs:
-            coverage = Model_SelectionCoverage(
-                selection_plan_id=plan.selection_plan_id,
-                config_coverage_id=cpd.config_parent_id,
-                config_plan_design_set_id=cpd.config_plan_design_set_id,
-            )
-            coverage.benefits = cls.load_plan_design_to_selection_benefit(
-                cpd.config_plan_design_set_id, plan
-            )
-            selection_coverages.append(coverage)
-        return selection_coverages
-
-    @classmethod
-    def _default_coverage_benefits__config_benefit(cls, plan: Model_SelectionPlan):
-        quotable_benefits = Model_ConfigBenefitVariationState.find_quotable_benefits(
-            plan.config_product_variation_state_id,
-            plan.situs_state_id,
-            plan.selection_plan_effective_date,
-        )
-
-        selection_coverages_dict = {}
-        for bvs, bnft, cvg in quotable_benefits:
-            if cvg.config_coverage_id not in selection_coverages_dict:
-                selection_coverages_dict[cvg.config_coverage_id] = (
-                    Model_SelectionCoverage(
-                        selection_plan_id=plan.selection_plan_id,
-                        config_coverage_id=cvg.config_coverage_id,
-                    )
-                )
-            selection_coverages_dict[cvg.config_coverage_id].benefits.append(
-                Model_SelectionBenefit(
-                    selection_plan_id=plan.selection_plan_id,
-                    config_benefit_variation_state_id=bvs.config_benefit_variation_state_id,
-                    selection_value=bnft.default_value,
-                )
-            )
-        return selection_coverages_dict.values()
-
-    @classmethod
-    def _qry_plan_design_benefits(
-        cls,
-        config_plan_design_set_id: int,
-        product_variation_state_id: int,
-        effective_date: datetime.date,
-    ):
-        PDB = Model_ConfigPlanDesignDetail_Benefit
-        BVS = Model_ConfigBenefitVariationState
-        BD = Model_ConfigBenefitDurationSet
-        BDD = Model_ConfigBenefitDurationDetail
-        qry = (
-            db.session.query(
-                BVS.config_benefit_variation_state_id,
-                PDB.default_value,
-                BD.config_benefit_duration_set_id,
-                BD.default_config_benefit_duration_detail_id,
-                BDD.config_benefit_duration_factor,
-            )
-            .select_from(PDB)
-            .join(BVS, BVS.config_benefit_id == PDB.config_parent_id)
-            .join(BD, BD.config_benefit_id == BVS.config_benefit_id, isouter=True)
-            .join(
-                BDD,
-                BD.default_config_benefit_duration_detail_id
-                == BDD.config_benefit_duration_detail_id,
-                isouter=True,
-            )
-            .filter(
-                PDB.config_plan_design_set_id == config_plan_design_set_id,
-                BVS.config_product_variation_state_id == product_variation_state_id,
-                BVS.config_benefit_variation_state_effective_date <= effective_date,
-                BVS.config_benefit_variation_state_expiration_date >= effective_date,
-            )
-        )
-        return qry.all()
-
-    @classmethod
-    def load_plan_design_to_selection_benefit(
-        cls,
-        config_plan_design_set_id: int,
-        plan: Model_SelectionPlan,
-    ):
-        """
-        Set a plan's benefits (which are by benefit variation state ID)
-        based on a plan design selection (which are by benefit ID).
-        """
-        rows = cls._qry_plan_design_benefits(
-            config_plan_design_set_id,
-            plan.config_product_variation_state_id,
-            plan.selection_plan_effective_date,
-        )
-        objs_dict = {}
-        for row in rows:
-            (
-                config_benefit_variation_state_id,
-                default_benefit_value,
-                config_benefit_duration_set_id,
-                default_config_benefit_duration_detail_id,
-                config_benefit_duration_factor,
-            ) = row
-            bnft_key = (
-                plan.selection_plan_id,
-                config_benefit_variation_state_id,
-                float(default_benefit_value),
-            )
-            if bnft_key not in objs_dict:
-                objs_dict[bnft_key] = Model_SelectionBenefit(
-                    selection_plan_id=plan.selection_plan_id,
-                    config_benefit_variation_state_id=config_benefit_variation_state_id,
-                    selection_value=float(default_benefit_value),
-                )
-
-            if config_benefit_duration_set_id is not None:
-                objs_dict[bnft_key].duration_sets.append(
-                    Model_SelectionBenefitDuration(
-                        **{
-                            "config_benefit_duration_set_id": config_benefit_duration_set_id,
-                            "config_benefit_duration_detail_id": default_config_benefit_duration_detail_id,
-                            "selection_factor": float(config_benefit_duration_factor),
-                        }
-                    )
-                )
-        return list(objs_dict.values())
-
 
 class SelectionPlanMixin:
     @classmethod
@@ -641,80 +501,10 @@ class Selection_RPC_Plan(
     schema = Schema_SelectionPlan(exclude=("coverages",))
 
     @classmethod
-    def create_default_coverage_benefits(
-        cls, plan: Model_SelectionPlan, *args, **kwargs
-    ):
-        default_product_plan_design = (
-            plan.config_product_variation_state.default_product_plan_design
-        )
-        if default_product_plan_design is None:
-            return cls._default_coverage_benefits__config_benefit(plan)
-
-        return cls._default_coverage_benefits__plan_design(
-            default_product_plan_design, plan
-        )
-
-    @classmethod
-    def create_default_age_bands(cls, plan: Model_SelectionPlan, *args, **kwargs):
-        default_age_band_set = plan.config_product_variation_state.age_band_set
-        if default_age_band_set is None:
-            return [
-                Model_SelectionAgeBand(
-                    selection_plan_id=plan.selection_plan_id,
-                    age_band_lower=0,
-                    age_band_upper=999,
-                )
-            ]
-
-        return [
-            Model_SelectionAgeBand(
-                selection_plan_id=plan.selection_plan_id,
-                age_band_lower=ab.age_band_lower,
-                age_band_upper=ab.age_band_upper,
-            )
-            for ab in default_age_band_set.age_bands
-        ]
-
-    @classmethod
-    def create_default_rating_mappers(cls, plan: Model_SelectionPlan, *args, **kwargs):
-        schema = Schema_DefaultProductRatingMapperSet_For_Selection(many=True)
-        selection_schema = Schema_SelectionRatingMapperSet(many=True)
-        objs = Model_DefaultProductRatingMapperSet.find_by_parent(
-            plan.config_product_id
-        )
-        data = schema.dump(objs)
-        return selection_schema.load(
-            [{**row, "selection_plan_id": plan.selection_plan_id} for row in data]
-        )
-
-    @classmethod
-    def create_default_provisions(cls, plan: Model_SelectionPlan, *args, **kwargs):
-        provision_states = Model_ConfigProvisionState.get_provision_states_by_product(
-            plan.config_product_id,
-            plan.situs_state_id,
-            plan.selection_plan_effective_date,
-        )
-        selection_provisions = [
-            Model_SelectionProvision(
-                selection_plan_id=plan.selection_plan_id,
-                config_provision_state_id=ps.config_provision_state_id,
-                selection_value=ps.parent.default_value,
-            )
-            for ps in provision_states
-        ]
-        db.session.add_all(selection_provisions)
-        db.session.flush()
-
-        for selection_provision in selection_provisions:
-            factors = cls.get_selection_factors(
-                selection_provision.config_provision, selection_provision
-            )
-            selection_provision.factors = factors
-
-        return selection_provisions
-
-    @classmethod
-    def create_plan(cls, payload):
+    def _create_plan(cls, payload):
+        """
+        Create the plan object from the payload
+        """
         is_plan_valid = Model_ConfigProductVariationState.is_plan_valid(
             payload["config_product_variation_state_id"],
             payload["situs_state_id"],
@@ -751,28 +541,10 @@ class Selection_RPC_Plan(
         )
 
     @classmethod
-    def _create_default_plan(cls, payload, *args, **kwargs):
-        plan = cls.create_plan(payload)
-        db.session.add(plan)
-        db.session.flush()
-
-        selection_rating_mappers = cls.create_default_rating_mappers(plan)
-        db.session.add_all(selection_rating_mappers)
-
-        selection_age_bands = cls.create_default_age_bands(plan)
-        db.session.add_all(selection_age_bands)
-
-        selection_coverage_benefits = cls.create_default_coverage_benefits(plan)
-        db.session.add_all(selection_coverage_benefits)
-
-        selection_provisions = cls.create_default_provisions(plan)
-        db.session.add_all(selection_provisions)
-
-        db.session.flush()
-        return cls.schema.dump(plan)
-
-    @classmethod
     def watermark_fields(cls):
+        """
+        Standard watermark fields for all tables
+        """
         user = get_user()
         user_name = user.get("user_name")
         return [
@@ -784,6 +556,10 @@ class Selection_RPC_Plan(
 
     @classmethod
     def _create_rating_mappers(cls, plan: Model_SelectionPlan, *args, **kwargs):
+        """
+        Create the selection rating mappers. This is an insert query of data already in the database.
+        This is an INSERT from SELECT query
+        """
         tbl_DRMS = Model_DefaultProductRatingMapperSet.__table__
         tbl_RMS = Model_SelectionRatingMapperSet.__table__
         qry = tbl_RMS.insert().from_select(
@@ -810,6 +586,12 @@ class Selection_RPC_Plan(
 
     @classmethod
     def _create_age_bands(cls, plan: Model_SelectionPlan, *args, **kwargs):
+        """
+        Create the selection age bands. This is an insert query of data already in the database.
+        This is an INSERT from SELECT query.
+
+        If there are no default age bands, then a generic 0-999 single record age band is created.
+        """
         config_product_variation_state = plan.config_product_variation_state
         tbl_CABD = Model_ConfigAgeBandDetail.__table__
         tbl_SAB = Model_SelectionAgeBand.__table__
@@ -849,6 +631,12 @@ class Selection_RPC_Plan(
 
     @classmethod
     def _create_coverage_benefits(cls, plan: Model_SelectionPlan, *args, **kwargs):
+        """
+        Create the selection coverages, benefits, and benefit durations.
+        This is an insert query of data already in the database.
+
+        This is an INSERT from SELECT query
+        """
         STATS = {}
         config_product_variation_state = plan.config_product_variation_state
 
@@ -881,6 +669,10 @@ class Selection_RPC_Plan(
 
     @classmethod
     def _create_provisions(cls, plan: Model_SelectionPlan, *args, **kwargs):
+        """
+        Create the selection provisions and factors. This is an insert query of data already in the database.
+        This is an INSERT from SELECT query
+        """
         qry = cls._qry_insert_selection_provision(plan)
         res = db.session.execute(qry)
         STATS = {"provisions": res.rowcount}
@@ -900,7 +692,13 @@ class Selection_RPC_Plan(
 
     @classmethod
     def create_default_plan(cls, payload, plan_id, *args, **kwargs):
-        plan = cls.create_plan(payload)
+        """
+        Main method for creating a default plan.
+        This creates the plan, coverages, benefits, benefit durations, provisions, and factors.
+
+        All data is created without commit.
+        """
+        plan = cls._create_plan(payload)
         db.session.add(plan)
         db.session.flush()
 
