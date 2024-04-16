@@ -361,8 +361,92 @@ def fn_product_variations(code: str, label: str):
     ]
 
 
-def fn_plan_designs(benefits_data):
-    pass
+def _get_authorized_benefit_amounts(benefit_auth_list, auth_role_code="uw1000"):
+    benefit_auth = next(
+        (
+            benefit
+            for benefit in benefit_auth_list
+            if benefit["acl"][0]["auth_role_code"] == auth_role_code
+        ),
+        benefit_auth_list[0],
+    )
+    return {
+        "min_value": benefit_auth["min_value"],
+        "max_value": benefit_auth["max_value"],
+        "step_value": benefit_auth["step_value"],
+        "default_value": benefit_auth["default_value"],
+    }
+
+
+def fn_coverage_plan_designs(coverages_data, benefits_data, n_plan_designs=2):
+    plan_designs = []
+    for coverage in coverages_data:
+        include_coverage = np.random.choice([True, False], p=[0.9, 0.1])
+        if not include_coverage:
+            continue
+
+        benefits = [
+            {**benefit, **_get_authorized_benefit_amounts(benefit["benefit_auth"])}
+            for benefit in benefits_data
+            if benefit["config_coverage_code"] == coverage["config_coverage_code"]
+        ]
+        plan_designs.extend(
+            [
+                {
+                    "config_coverage_code": coverage["config_coverage_code"],
+                    "config_plan_design_set_label": f"Plan Design {pd:03} for {coverage['config_coverage_label']}",
+                    "config_plan_design_set_description": f"Plan Design {pd:03} for {coverage['config_coverage_label']}",
+                    "plan_design_details": [
+                        {
+                            "config_parent_type_code": "benefit",
+                            "config_benefit_code": benefit["config_benefit_code"],
+                            "default_value": float(
+                                np.random.choice(
+                                    range(
+                                        int(
+                                            benefit["min_value"]
+                                            // benefit["step_value"]
+                                            + 1
+                                        ),
+                                        int(
+                                            benefit["max_value"]
+                                            // benefit["step_value"]
+                                            + 1
+                                        ),
+                                    )
+                                )
+                                * benefit["step_value"]
+                            ),
+                        }
+                        for benefit in benefits
+                    ],
+                }
+                for pd in range(n_plan_designs)
+            ]
+        )
+    return plan_designs
+
+
+def fn_product_plan_designs(product_code, coverage_plan_designs, n_plan_designs=2):
+    plan_designs = [
+        {
+            "config_product_code": product_code,
+            "config_plan_design_set_label": f"Plan Design {pd:03} for {product_code}",
+            "config_plan_design_set_description": f"Plan Design {pd:03} for {product_code}",
+            "plan_design_details": [
+                {
+                    "config_parent_type_code": "plan_design",
+                    "config_plan_design_set_label": cpd["config_plan_design_set_label"],
+                    "default_value": None,
+                }
+                for cpd in coverage_plan_designs
+                if f"Plan Design {pd:03}" in cpd["config_plan_design_set_label"]
+                and np.random.choice([True, False], p=[0.9, 0.1])
+            ],
+        }
+        for pd in range(n_plan_designs)
+    ]
+    return plan_designs
 
 
 def fn_rate_groups():
@@ -385,7 +469,7 @@ def fn_rate_groups():
 def fn_product():
     n_benefits = 500
     n_coverage = 20
-    return {
+    data = {
         "config_product_code": "AC70000",
         "config_product_label": "Accident Series 70000",
         "config_product_effective_date": "2022-01-01",
@@ -419,6 +503,15 @@ def fn_product():
             *fn_benefit_variations("base2", n=n_benefits),
         ],
     }
+
+    data["coverage_plan_designs"] = fn_coverage_plan_designs(
+        data["coverages"], data["benefits"]
+    )
+    data["product_plan_designs"] = fn_product_plan_designs(
+        data["config_product_code"], data["coverage_plan_designs"]
+    )
+
+    return data
 
 
 if __name__ == "__main__":

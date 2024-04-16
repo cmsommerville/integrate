@@ -1,8 +1,9 @@
+from itertools import groupby
 from logger import logger
 from app.extensions import db
 from marshmallow import Schema, fields
 from app.shared.utils import system_temporal_hint
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import attributes
 from ..models import (
     Model_SelectionBenefit,
     Model_SelectionBenefitDuration,
@@ -99,60 +100,112 @@ class Schema_TemporalSelectionBenefits_Plan(Schema):
 
 class TemporalSelectionBenefits:
     @classmethod
-    def load_plan_asof_date(cls, selection_plan_id: int, t=None, *args, **kwargs):
-        """
-        This is a tricky method!
+    def load_plan(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        asof = system_temporal_hint(t)
+        PLAN = Model_SelectionPlan
+        return (
+            db.session.query(PLAN)
+            .filter(PLAN.selection_plan_id == selection_plan_id)
+            .with_hint(PLAN, asof)
+            .one()
+        )
 
-        The first query loads the relevant selection instances as of the correct point in time into the identity map.
-        The format of the output is difficult because it is a list of tuples.
+    @classmethod
+    def load_benefits(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        pass
 
-        The second query pulls the plan instance plus all relevant collections. This query must be designed
-        to eagerly pull from the identity map, which is why the first query is necessary.
-        """
+    @classmethod
+    def load_coverages(cls, selection_plan_id: int, t=None, *args, **kwargs):
         asof = system_temporal_hint(t)
         PLAN = Model_SelectionPlan
         CVG = Model_SelectionCoverage
         BNFT = Model_SelectionBenefit
         DUR = Model_SelectionBenefitDuration
-        PROV = Model_SelectionProvision
-        FCTR = Model_SelectionFactor
-        RMS = Model_SelectionRatingMapperSet
-        qry = (
-            db.session.query(PLAN, CVG, BNFT, DUR, PROV, FCTR, RMS)
+        objs = (
+            db.session.query(CVG, BNFT, DUR)
             .select_from(PLAN)
-            .join(CVG, PLAN.coverages, isouter=True)
-            .join(PROV, PLAN.provisions, isouter=True)
-            .join(BNFT, CVG.benefits, isouter=True)
+            .join(CVG, PLAN.coverages)
+            .join(BNFT, CVG.benefits)
             .join(DUR, BNFT.duration_sets, isouter=True)
-            .join(FCTR, PROV.factors, isouter=True)
-            .join(RMS, PLAN.rating_mapper_sets, isouter=True)
             .filter(PLAN.selection_plan_id == selection_plan_id)
             .with_hint(PLAN, asof)
             .with_hint(CVG, asof)
             .with_hint(BNFT, asof)
             .with_hint(DUR, asof)
-            .with_hint(PROV, asof)
-            .with_hint(FCTR, asof)
-            .with_hint(RMS, asof)
+            .all()
         )
-        _ = qry.all()
 
-        qry = (
-            db.session.query(Model_SelectionPlan)
-            .filter_by(selection_plan_id=selection_plan_id)
-            .options(
-                joinedload(Model_SelectionPlan.coverages)
-                .joinedload(Model_SelectionCoverage.benefits)
-                .joinedload(Model_SelectionBenefit.duration_sets, innerjoin=False),
-                joinedload(Model_SelectionPlan.situs_state),
-                joinedload(Model_SelectionPlan.provisions).joinedload(
-                    Model_SelectionProvision.factors
-                ),
-                joinedload(Model_SelectionPlan.rating_mapper_sets),
+        coverages = sorted(
+            list(set([cvg for cvg, _, _ in objs])),
+            key=lambda obj: obj.selection_coverage_id,
+        )
+        benefits = sorted(
+            list(set([bnft for _, bnft, _ in objs])),
+            key=lambda obj: obj.selection_coverage_id,
+        )
+        duration_sets = sorted(
+            list(set([dur for _, _, dur in objs if dur is not None])),
+            key=lambda obj: obj.selection_benefit_id,
+        )
+        duration_sets = dict(
+            (k, list(v))
+            for k, v in groupby(
+                duration_sets,
+                key=lambda obj: obj.selection_benefit_id,
             )
         )
-        plan = qry.one()
-        return plan
+        for benefit in benefits:
+            attributes.set_committed_value(
+                benefit,
+                "duration_sets",
+                duration_sets.get(benefit.selection_benefit_id, []),
+            )
+
+        benefits = dict(
+            (k, list(v))
+            for k, v in groupby(
+                benefits,
+                key=lambda obj: obj.selection_coverage_id,
+            )
+        )
+        for coverage in coverages:
+            attributes.set_committed_value(
+                coverage,
+                "benefits",
+                benefits.get(coverage.selection_coverage_id, []),
+            )
+
+        return coverages
+
+    @classmethod
+    def load_provisions(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        asof = system_temporal_hint(t)
+        PLAN = Model_SelectionPlan
+        PROV = Model_SelectionProvision
+        return (
+            db.session.query(PROV)
+            .select_from(PLAN)
+            .join(PROV, PROV.selection_plan_id == PLAN.selection_plan_id)
+            .filter(PLAN.selection_plan_id == selection_plan_id)
+            .with_hint(PLAN, asof)
+            .with_hint(PROV, asof)
+            .all()
+        )
+
+    @classmethod
+    def load_rating_mappers(cls, selection_plan_id: int, t=None, *args, **kwargs):
+        asof = system_temporal_hint(t)
+        PLAN = Model_SelectionPlan
+        RMS = Model_SelectionRatingMapperSet
+        return (
+            db.session.query(RMS)
+            .select_from(PLAN)
+            .join(RMS, RMS.selection_plan_id == PLAN.selection_plan_id)
+            .filter(PLAN.selection_plan_id == selection_plan_id)
+            .with_hint(RMS, asof)
+            .with_hint(RMS, asof)
+            .all()
+        )
 
     @classmethod
     def get_plan_asof_date(cls, selection_plan_id: int, t=None, *args, **kwargs):
@@ -160,4 +213,13 @@ class TemporalSelectionBenefits:
         Fetch plan + coverages + benefits + duration_sets for a given `selection_plan_id` as of time `t`.
         If no time is provided, fetch the latest data.
         """
-        return cls.load_plan_asof_date(selection_plan_id, t, *args, **kwargs)
+        plan = cls.load_plan(selection_plan_id, t)
+        provisions = cls.load_provisions(selection_plan_id, t)
+        coverages = cls.load_coverages(selection_plan_id, t)
+        rating_mappers = cls.load_rating_mappers(selection_plan_id, t)
+
+        attributes.set_committed_value(plan, "provisions", provisions)
+        attributes.set_committed_value(plan, "coverages", coverages)
+        attributes.set_committed_value(plan, "rating_mapper_sets", rating_mappers)
+
+        return plan

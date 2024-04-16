@@ -1,14 +1,18 @@
+import datetime
 from marshmallow import Schema, fields, validates_schema, ValidationError
-from sqlalchemy import func, and_, or_
+from sqlalchemy import func, and_, or_, desc
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError, AppValidationError
+from app.shared.utils import system_temporal_hint
 from ..models import (
     Model_ConfigBenefit,
+    Model_ConfigBenefitAuth,
     Model_ConfigBenefitDurationSet,
     Model_ConfigBenefitDurationDetail,
     Model_ConfigBenefitVariationState,
     Model_SelectionCoverage,
     Model_SelectionBenefit,
+    Model_SelectionPlan,
 )
 from ..schemas import Schema_SelectionBenefit, Schema_SelectionBenefitDuration
 
@@ -63,9 +67,42 @@ class Schema_RemoveBenefit(Schema):
 class Selection_RPC_Benefit:
     schema = Schema_SelectionBenefit()
 
-    @classmethod
+    def __init__(self, payload, plan_id, *args, **kwargs):
+        self.payload = payload
+        self.plan_id = plan_id
+        self.plan = Model_SelectionPlan.find_one(plan_id)
+        if self.plan is None:
+            raise RowNotFoundError("Plan not found")
+        self.t = self.plan.plan_as_of_dts
+
+    def _qry_benefit_auth_temporal(self):
+        """
+        Get min/max/step values for benefits as of the time `t`
+        """
+        AUTH = Model_ConfigBenefitAuth
+
+        row_number_column = (
+            func.row_number()
+            .over(
+                partition_by=AUTH.config_benefit_id,
+                order_by=desc(AUTH.priority),
+            )
+            .label("rn")
+        )
+        return (
+            db.session.query(
+                AUTH.config_benefit_id,
+                AUTH.min_value,
+                AUTH.max_value,
+                AUTH.step_value,
+                row_number_column,
+            )
+            .with_hint(AUTH, system_temporal_hint(self.t))
+            .subquery()
+        )
+
     def validate_benefit_amounts(
-        cls,
+        self,
         selection_value: float,
         config_benefit_variation_state_id: int = None,
         selection_benefit_id: int = None,
@@ -76,11 +113,19 @@ class Selection_RPC_Benefit:
         Validate that the provided selection value adheres to the min/max/step values
         configured on the benefit record
         """
+        AUTH = self._qry_benefit_auth_temporal()
         BVS = Model_ConfigBenefitVariationState
         BNFT = Model_ConfigBenefit
         SEL = Model_SelectionBenefit
-        qry = db.session.query(BNFT).join(
-            BVS, BNFT.config_benefit_id == BVS.config_benefit_id
+        qry = (
+            db.session.query(
+                BNFT, AUTH.c.min_value, AUTH.c.max_value, AUTH.c.step_value
+            )
+            .join(BVS, BNFT.config_benefit_id == BVS.config_benefit_id)
+            .join(AUTH, AUTH.c.config_benefit_id == BNFT.config_benefit_id)
+            .with_hint(BNFT, system_temporal_hint(self.t))
+            .with_hint(BVS, system_temporal_hint(self.t))
+            .filter(AUTH.c.rn == 1)
         )
 
         if selection_benefit_id is not None:
@@ -98,27 +143,26 @@ class Selection_RPC_Benefit:
             raise AppValidationError(
                 "Either config_benefit_variation_state_id or selection_benefit_id must be provided"
             )
-        config_benefit = qry.one_or_none()
+        config_benefit, min_value, max_value, step_value = qry.one_or_none()
 
         if not config_benefit:
             raise AppValidationError("Cannot find benefit")
 
-        if float(config_benefit.min_value) > selection_value:
+        if float(min_value) > selection_value:
             raise AppValidationError(
                 "Selection must be greater than minimum permissible value"
             )
-        if float(config_benefit.max_value) < selection_value:
+        if float(max_value) < selection_value:
             raise AppValidationError(
                 "Selection must be less than maximum permissible value"
             )
-        if selection_value % float(config_benefit.step_value) != 0:
+        if selection_value % float(step_value) != 0:
             raise AppValidationError(
                 "Selection must be a multiple of the permissible step value"
             )
 
-    @classmethod
     def get_benefit_variation_state_mapper(
-        cls, config_benefit_variation_state_id: int, selection_plan_id: int
+        self, config_benefit_variation_state_id: int, selection_plan_id: int
     ):
         """
         Returns a dictionary containing:
@@ -146,6 +190,8 @@ class Selection_RPC_Benefit:
                 SCOV.config_coverage_id == BNFT.config_coverage_id,
                 isouter=True,
             )
+            .with_hint(BVS, system_temporal_hint(self.t))
+            .with_hint(BNFT, system_temporal_hint(self.t))
             .filter(
                 BVS.config_benefit_variation_state_id
                 == config_benefit_variation_state_id,
@@ -161,9 +207,9 @@ class Selection_RPC_Benefit:
             "selection_coverage_id": data.selection_coverage_id,
         }
 
-    @classmethod
     def get_required_benefit_duration_set_ids(
-        cls, config_benefit_variation_state_id: int
+        self,
+        config_benefit_variation_state_id: int,
     ):
         """
         Get a list of required benefit duration set IDs for a given benefit variation state.
@@ -177,6 +223,8 @@ class Selection_RPC_Benefit:
             db.session.query(BDS.config_benefit_duration_set_id)
             .select_from(BVS)
             .join(BDS, BVS.config_benefit_id == BDS.config_benefit_id)
+            .with_hint(BVS, system_temporal_hint(self.t))
+            .with_hint(BDS, system_temporal_hint(self.t))
             .filter(
                 BVS.config_benefit_variation_state_id
                 == config_benefit_variation_state_id
@@ -186,13 +234,14 @@ class Selection_RPC_Benefit:
 
         return [r for (r,) in required_benefit_duration_sets]
 
-    @classmethod
-    def get_benefit_duration_details(cls, duration_sets):
+    def get_benefit_duration_details(self, duration_sets):
         """
         Get the benefit duration details for the provided duration sets.
 
         Query by the pair of detail and set IDs
         """
+        if not duration_sets:
+            return []
         BDD = Model_ConfigBenefitDurationDetail
         filters = [
             and_(
@@ -203,9 +252,13 @@ class Selection_RPC_Benefit:
             )
             for item in duration_sets
         ]
-        return db.session.query(BDD).filter(or_(*filters)).all()
+        return (
+            db.session.query(BDD)
+            .with_hint(BDD, system_temporal_hint(self.t))
+            .filter(or_(*filters))
+            .all()
+        )
 
-    @classmethod
     def create_benefit_durations(cls, validated_data):
         """
         Returns an array of instances of new selection benefit durations
@@ -222,16 +275,22 @@ class Selection_RPC_Benefit:
             item["config_benefit_duration_set_id"] for item in duration_sets
         }
         if set(required_benefit_duration_sets) != provided_duration_set_ids:
-            req_diff = list(
-                set(required_benefit_duration_sets).difference(
-                    provided_duration_set_ids
+            req_diff = [
+                str(i)
+                for i in list(
+                    set(required_benefit_duration_sets).difference(
+                        provided_duration_set_ids
+                    )
                 )
-            )
-            prov_diff = list(
-                provided_duration_set_ids.difference(
-                    set(required_benefit_duration_sets)
+            ]
+            prov_diff = [
+                str(i)
+                for i in list(
+                    provided_duration_set_ids.difference(
+                        set(required_benefit_duration_sets)
+                    )
                 )
-            )
+            ]
             raise ValidationError(
                 f"Benefit duration sets ({', '.join(req_diff) or '-'}) are required but not provided. Benefit duration sets ({', '.join(prov_diff) or '-'}) are provided but not required."
             )
@@ -248,25 +307,26 @@ class Selection_RPC_Benefit:
         )
         return Schema_SelectionBenefitDuration(many=True).load(duration_detail_data)
 
-    @classmethod
-    def insert(cls, validated_data, plan_id):
+    def insert(self, validated_data, plan_id):
         """
         This will insert a new benefit if the selection coverage ID already exists.
 
         Otherwise, it will create a new coverage and benefit.
         """
+
         # validate that the selection value adheres to configuration
-        cls.validate_benefit_amounts(
+        self.validate_benefit_amounts(
             selection_value=validated_data["selection_value"],
             config_benefit_variation_state_id=validated_data[
                 "config_benefit_variation_state_id"
             ],
+            t=self.t,
         )
-        bvs_mapper = cls.get_benefit_variation_state_mapper(
+        bvs_mapper = self.get_benefit_variation_state_mapper(
             validated_data["config_benefit_variation_state_id"], plan_id
         )
         # create benefit duration and benefit instances
-        duration_sets = cls.create_benefit_durations(validated_data)
+        duration_sets = self.create_benefit_durations(validated_data)
         bnft = Model_SelectionBenefit(
             selection_plan_id=plan_id,
             config_benefit_variation_state_id=validated_data[
@@ -312,10 +372,9 @@ class Selection_RPC_Benefit:
             "The benefit you are trying to update has been modified by another user"
         )
 
-    @classmethod
-    def update(cls, validated_data, plan_id):
+    def update(self, validated_data, plan_id):
         # validate that the selection value adheres to configuration
-        cls.validate_benefit_amounts(
+        self.validate_benefit_amounts(
             selection_value=validated_data["selection_value"],
             selection_benefit_id=validated_data["selection_benefit_id"],
         )
@@ -327,7 +386,7 @@ class Selection_RPC_Benefit:
             version_id=validated_data["version_id"],
         ).update({"selection_value": validated_data["selection_value"]})
         if res == 0:
-            cls.modify_errors(validated_data, plan_id)
+            self.modify_errors(validated_data, plan_id)
         db.session.flush()
         return qry.first()
 
@@ -343,21 +402,19 @@ class Selection_RPC_Benefit:
             cls.modify_errors(validated_data, plan_id)
         db.session.flush()
 
-    @classmethod
-    def upsert_benefit(cls, payload, plan_id, *args, **kwargs):
+    def upsert_benefit(self, *args, **kwargs):
         """
         Update the existing selection benefit if it exists, otherwise create a new one.
         """
-        validated_data = PolymorphicSchema.load(payload)
+        validated_data = PolymorphicSchema.load(self.payload)
         if validated_data.get("selection_benefit_id") is not None:
-            obj = cls.update(validated_data, plan_id)
+            obj = self.update(validated_data, self.plan_id)
         else:
-            obj = cls.insert(validated_data, plan_id)
-        return cls.schema.dump(obj)
+            obj = self.insert(validated_data, self.plan_id)
+        return self.schema.dump(obj)
 
-    @classmethod
-    def remove_benefit(cls, payload, plan_id, *args, **kwargs):
+    def remove_benefit(self, *args, **kwargs):
         validation_schema = Schema_RemoveBenefit()
-        validated_data = validation_schema.load(payload)
-        cls.delete(validated_data, plan_id)
+        validated_data = validation_schema.load(self.payload)
+        self.delete(validated_data, self.plan_id)
         return None

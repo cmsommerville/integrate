@@ -1,42 +1,80 @@
-from logger import logger
-from flask import request
-from flask_restx import Resource
-from sqlalchemy import event
-from sqlalchemy.orm import Session
+import time
+from sqlalchemy.sql import text
+from sqlalchemy.dialects.mssql import DATETIME2
 from app.extensions import db
-from ..classes.TemporalSelectionQueries import (
-    TemporalSelectionBenefits,
-    Schema_TemporalSelectionBenefits_Plan,
-)
-from ..models import Model_SelectionPlan
+from flask_restx import Resource
 
 
-@event.listens_for(Session, "do_orm_execute")
-def receive_do_orm_execute(orm_execute_state):
-    x = str(orm_execute_state.statement.compile(compile_kwargs={"literal_binds": True}))
+class TestModel(db.Model):
+    __tablename__ = "testtbl"
 
-    print("intercepted")
+    id = db.Column(db.Integer, primary_key=True)
+    asofdts = db.Column(DATETIME2, nullable=False)
+
+    @classmethod
+    def add_system_versioning(
+        cls,
+        row_eff_dts="row_eff_dts",
+        row_exp_dts="row_exp_dts",
+        *args,
+        **kwargs,
+    ):
+        """
+        Enable system versioning on this table. First, add the row eff/exp dates. Then, add a history table.
+        """
+        HISTORY_TABLE_NAME = f"dbo.{cls.__tablename__}_history"
+
+        sql = f"""
+        ALTER TABLE {cls.__tablename__}
+        ADD 
+            {row_eff_dts} DATETIME2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT GETUTCDATE(),
+            {row_exp_dts} DATETIME2 GENERATED ALWAYS AS ROW END NOT NULL DEFAULT CONVERT(DATETIME2, '9999-12-31 00:00:00.0000000'),
+        PERIOD FOR SYSTEM_TIME ({row_eff_dts}, {row_exp_dts})
+        """
+        try:
+            db.session.execute(text(sql))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        sql = f"""
+        ALTER TABLE {cls.__tablename__}
+        SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE={HISTORY_TABLE_NAME}))
+        """
+        try:
+            db.session.execute(text(sql))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
 
 class TestResource(Resource):
-    schema = Schema_TemporalSelectionBenefits_Plan()
+    def get(self, *args, **kwargs):
+        # setup the table
+        db.create_all()
+        TestModel.add_system_versioning()
+        return {"hello": "world"}
 
-    @classmethod
-    def _get(cls, parent_id: int, *args, **kwargs):
-        plan = TemporalSelectionBenefits.get_plan_asof_date(
-            parent_id, t=request.args.get("t")
-        )
-        data = cls.schema.dump(plan)
-        return data, 200
+    def post(self, *args, **kwargs):
+        # get the current UTC datetime from the database (which is what the row_eff_dts should use too!)
+        with db.session.begin():
+            asofdts, transaction_id = db.session.execute(
+                text(
+                    "SELECT CAST(GETUTCDATE() AS DATETIME2) AS asofdts, CURRENT_TRANSACTION_ID() AS transaction_id"
+                )
+            ).first()
+            print(transaction_id)
 
-    @classmethod
-    def get(cls, *args, **kwargs):
-        qry = (
-            db.session.query(Model_SelectionPlan)
-            # .with_hint(
-            #     Model_SelectionPlan, "FOR SYSTEM_TIME AS OF '2024-04-05 00:00:00'"
-            # )
-            .filter(Model_SelectionPlan.selection_plan_id == 3136)
-            .first()
-        )
-        return {"hello": "world"}, 200
+        # with db.session.begin():
+        _, transaction_id = db.session.execute(
+            text(
+                "SELECT CAST(GETUTCDATE() AS DATETIME2) AS asofdts, CURRENT_TRANSACTION_ID() AS transaction_id"
+            )
+        ).first()
+        print(transaction_id)
+        # create a new row
+        obj = TestModel(asofdts=asofdts)
+        db.session.add(obj)
+        db.session.commit()
+
+        return {"hello": "world"}

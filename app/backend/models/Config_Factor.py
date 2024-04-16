@@ -1,5 +1,8 @@
 from app.extensions import db
 from app.shared import BaseModel, BaseRuleset
+from app.shared.utils import system_temporal_hint
+from sqlalchemy.ext.hybrid import hybrid_method
+from .Config_FactorRule import Model_ConfigFactorRule
 
 from ..tables import TBL_NAMES
 
@@ -31,8 +34,30 @@ class Model_ConfigFactorSet(BaseModel, BaseRuleset):
     factor_rules = db.relationship("Model_ConfigFactorRule", lazy="joined")
     factor_values = db.relationship("Model_ConfigFactor", lazy="joined")
 
-    def apply_ruleset(self, selection_provision: BaseModel):
-        return all([rule.apply_rule(selection_provision) for rule in self.factor_rules])
+    @hybrid_method
+    def get_factor_values(self, t=None):
+        CF = Model_ConfigFactor
+        qry = db.session.query(CF).filter(
+            CF.config_factor_set_id == self.config_factor_set_id
+        )
+        if t is not None:
+            qry = qry.with_hint(CF, system_temporal_hint(t))
+        return qry.all()
+
+    @hybrid_method
+    def get_factor_rules(self, t=None):
+        FR = Model_ConfigFactorRule
+        qry = db.session.query(FR).filter(
+            FR.config_factor_set_id == self.config_factor_set_id
+        )
+        if t is not None:
+            qry = qry.with_hint(FR, system_temporal_hint(t))
+        return qry.all()
+
+    def apply_ruleset(self, selection_provision: BaseModel, t=None):
+        return all(
+            [rule.apply_rule(selection_provision) for rule in self.get_factor_rules(t)]
+        )
 
 
 class Model_ConfigFactor(BaseModel, BaseRuleset):

@@ -24,7 +24,7 @@ class BaseTemporalTable:
         sql = f"""
         ALTER TABLE {self._q_table_name}
         ADD 
-            {row_eff_dts} DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL DEFAULT GETUTCDATE(),
+            {row_eff_dts} DATETIME2 GENERATED ALWAYS AS ROW START HIDDEN NOT NULL DEFAULT SYSUTCDATETIME(),
             {row_exp_dts} DATETIME2 GENERATED ALWAYS AS ROW END HIDDEN  NOT NULL DEFAULT CONVERT(DATETIME2, '9999-12-31 00:00:00.0000000'),
         PERIOD FOR SYSTEM_TIME ({row_eff_dts}, {row_exp_dts})
         """

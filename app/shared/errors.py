@@ -8,3 +8,7 @@ class PlanInvalidError(Exception):
 
 class AppValidationError(Exception):
     pass
+
+
+class RowNotFoundError(Exception):
+    pass

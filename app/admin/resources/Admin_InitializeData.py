@@ -12,7 +12,7 @@ class Resource_AdminLoadData(Resource):
         if not hostname:
             return {"error": "Could not find HOSTNAME environment variable"}, 400
         load_generic(hostname, headers=request.headers)
-        return {"status": "success", "msg": "Reference tables successfully loaded"}
+        return {"status": "success", "msg": "Tests complete"}
 
 
 class Resource_AdminInitRefData(Resource):

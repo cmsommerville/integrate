@@ -1,10 +1,14 @@
+import datetime
+from typing import List
 from marshmallow import Schema, fields
-from sqlalchemy.sql import func, desc, and_
+from sqlalchemy.sql import func, desc, and_, text
 from sqlalchemy.sql.functions import coalesce
 from sqlalchemy.sql.expression import literal_column
 from app.extensions import db
 from app.auth import get_user, NotAuthorizedError
+from app.shared.utils import system_temporal_hint
 from app.shared.errors import PlanInvalidError
+from ..classes import FactorRulesetApplicator
 from ..models import (
     Model_ConfigAgeBandDetail,
     Model_ConfigBenefitDurationDetailAuth_ACL,
@@ -14,6 +18,7 @@ from ..models import (
     Model_ConfigBenefitDurationDetail,
     Model_ConfigBenefitDurationSet,
     Model_ConfigBenefitVariationState,
+    Model_ConfigFactorSet,
     Model_ConfigFactor,
     Model_ConfigPlanDesignSet_Product,
     Model_ConfigPlanDesignSet_Coverage,
@@ -57,53 +62,13 @@ class Schema_RevokePlanACL(Schema):
 
 
 class SelectionProvisionMixin:
-    @staticmethod
-    def config_to_selection_factor(
-        config_factor: Model_ConfigFactor,
-    ):
-        return Model_SelectionFactor(
-            config_factor_set_id=config_factor.config_factor_set_id,
-            config_factor_id=config_factor.config_factor_id,
-            selection_rate_table_age_value=config_factor.rate_table_age_value,
-            selection_rating_attr_id1=config_factor.rating_attr_id1,
-            selection_rating_attr_id2=config_factor.rating_attr_id2,
-            selection_rating_attr_id3=config_factor.rating_attr_id3,
-            selection_rating_attr_id4=config_factor.rating_attr_id4,
-            selection_rating_attr_id5=config_factor.rating_attr_id5,
-            selection_rating_attr_id6=config_factor.rating_attr_id6,
-            selection_factor_value=config_factor.factor_value,
-        )
-
     @classmethod
-    def get_selection_factors(
-        cls,
-        config_provision: Model_ConfigProvision,
-        selection_provision: Model_SelectionProvision,
-    ):
-        # find first ruleset
-        validated_factor_ruleset = next(
-            (
-                ruleset
-                for ruleset in config_provision.factors
-                if ruleset.apply_ruleset(selection_provision)
-            ),
-            None,
-        )
-
-        if validated_factor_ruleset is None:
-            return []
-
-        return [
-            cls.config_to_selection_factor(val)
-            for val in validated_factor_ruleset.factor_values
-        ]
-
-    @classmethod
-    def _qry_insert_selection_provision(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_provision(cls, plan: Model_SelectionPlan, t=None):
         tbl_SP = Model_SelectionProvision.__table__
-        tbl_PS = Model_ConfigProvisionState.__table__.alias("PS")
-        tbl_P = Model_ConfigProvision.__table__.alias("P")
+        tbl_PS = Model_ConfigProvisionState.__table__
+        tbl_P = Model_ConfigProvision.__table__
 
+        hint = system_temporal_hint(t)
         return (
             tbl_SP.insert()
             .from_select(
@@ -128,6 +93,8 @@ class SelectionProvisionMixin:
                 .join(
                     tbl_P, tbl_P.c.config_provision_id == tbl_PS.c.config_provision_id
                 )
+                .with_hint(tbl_PS, hint)
+                .with_hint(tbl_P, hint)
                 .filter(
                     tbl_PS.c.state_id == plan.situs_state_id,
                     tbl_P.c.config_product_id == plan.config_product_id,
@@ -152,12 +119,13 @@ class SelectionProvisionMixin:
 
 class SelectionBenefitMixin:
     @classmethod
-    def _qry_get_default_benefit_amounts(cls, plan: Model_SelectionPlan):
-        tbl_BVS = Model_ConfigBenefitVariationState.__table__.alias("BVS")
-        tbl_BNFT = Model_ConfigBenefit.__table__.alias("BNFT")
-        tbl_BA = Model_ConfigBenefitAuth.__table__.alias("BA")
-        tbl_BACL = Model_ConfigBenefitAuth_ACL.__table__.alias("BACL")
+    def _qry_get_default_benefit_amounts(cls, plan: Model_SelectionPlan, t=None):
+        tbl_BVS = Model_ConfigBenefitVariationState.__table__
+        tbl_BNFT = Model_ConfigBenefit.__table__
+        tbl_BA = Model_ConfigBenefitAuth.__table__
+        tbl_BACL = Model_ConfigBenefitAuth_ACL.__table__
 
+        hint = system_temporal_hint(t)
         row_number_column = (
             func.row_number()
             .over(
@@ -181,6 +149,10 @@ class SelectionBenefitMixin:
                 tbl_BACL,
                 tbl_BACL.c.config_benefit_auth_id == tbl_BA.c.config_benefit_auth_id,
             )
+            .with_hint(tbl_BVS, hint)
+            .with_hint(tbl_BNFT, hint)
+            .with_hint(tbl_BA, hint)
+            .with_hint(tbl_BACL, hint)
             .filter(
                 tbl_BVS.c.config_product_variation_state_id
                 == plan.config_product_variation_state_id,
@@ -196,10 +168,12 @@ class SelectionBenefitMixin:
         return db.session.query(qry).filter(qry.c.rn == 1).subquery()
 
     @classmethod
-    def _qry_insert_selection_coverage__no_plan_design(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_coverage__no_plan_design(
+        cls, plan: Model_SelectionPlan, t=None
+    ):
         tbl_SC = Model_SelectionCoverage.__table__
 
-        benefit_amount_qry = cls._qry_get_default_benefit_amounts(plan)
+        benefit_amount_qry = cls._qry_get_default_benefit_amounts(plan, t)
         distinct_coverage_qry = (
             db.session.query(benefit_amount_qry.c.config_coverage_id)
             .distinct()
@@ -223,11 +197,13 @@ class SelectionBenefitMixin:
         )
 
     @classmethod
-    def _qry_insert_selection_benefit__no_plan_design(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_benefit__no_plan_design(
+        cls, plan: Model_SelectionPlan, t=None
+    ):
         tbl_SB = Model_SelectionBenefit.__table__
-        tbl_SC = Model_SelectionCoverage.__table__.alias("SC")
+        tbl_SC = Model_SelectionCoverage.__table__
 
-        benefit_amount_qry = cls._qry_get_default_benefit_amounts(plan)
+        benefit_amount_qry = cls._qry_get_default_benefit_amounts(plan, t)
 
         return tbl_SB.insert().from_select(
             [
@@ -256,17 +232,20 @@ class SelectionBenefitMixin:
         )
 
     @classmethod
-    def _qry_insert_selection_coverage__plan_design(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_coverage__plan_design(
+        cls, plan: Model_SelectionPlan, t=None
+    ):
         """
         Returns an insert query for the default coverages of a new plan based on the default product plan design
         """
 
-        tbl_PVS = Model_ConfigProductVariationState.__table__.alias("PVS")
-        tbl_PPDS = Model_ConfigPlanDesignSet_Product.__table__.alias("PPDS")
-        tbl_PPDD = Model_ConfigPlanDesignDetail_PlanDesign.__table__.alias("PPDD")
-        tbl_CPDS = Model_ConfigPlanDesignSet_Coverage.__table__.alias("CPDS")
+        tbl_PVS = Model_ConfigProductVariationState.__table__
+        tbl_PPDS = Model_ConfigPlanDesignSet_Product.__table__
+        tbl_PPDD = Model_ConfigPlanDesignDetail_PlanDesign.__table__
+        tbl_CPDS = Model_ConfigPlanDesignSet_Coverage.__table__
         tbl_SC = Model_SelectionCoverage.__table__
 
+        hint = system_temporal_hint(t)
         return tbl_SC.insert().from_select(
             [
                 "selection_plan_id",
@@ -298,6 +277,10 @@ class SelectionBenefitMixin:
                 tbl_CPDS,
                 tbl_CPDS.c.config_plan_design_set_id == tbl_PPDD.c.config_parent_id,
             )
+            .with_hint(tbl_PVS, hint)
+            .with_hint(tbl_PPDS, hint)
+            .with_hint(tbl_PPDD, hint)
+            .with_hint(tbl_CPDS, hint)
             .filter(
                 tbl_PVS.c.config_product_variation_state_id
                 == plan.config_product_variation_state_id,
@@ -308,15 +291,18 @@ class SelectionBenefitMixin:
         )
 
     @classmethod
-    def _qry_insert_selection_benefit__plan_design(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_benefit__plan_design(
+        cls, plan: Model_SelectionPlan, t=None
+    ):
         """
         Returns an insert query for the default coverages of a new plan based on the default product plan design
         """
 
-        tbl_BVS = Model_ConfigBenefitVariationState.__table__.alias("BVS")
-        tbl_CPDD = Model_ConfigPlanDesignDetail_Benefit.__table__.alias("CPDD")
+        tbl_BVS = Model_ConfigBenefitVariationState.__table__
+        tbl_CPDD = Model_ConfigPlanDesignDetail_Benefit.__table__
         tbl_SB = Model_SelectionBenefit.__table__
-        tbl_SC = Model_SelectionCoverage.__table__.alias("SC")
+        tbl_SC = Model_SelectionCoverage.__table__
+        hint = system_temporal_hint(t)
 
         return tbl_SB.insert().from_select(
             [
@@ -354,6 +340,8 @@ class SelectionBenefitMixin:
                     >= plan.selection_plan_effective_date,
                 ),
             )
+            .with_hint(tbl_CPDD, hint)
+            .with_hint(tbl_BVS, hint)
             .filter(
                 tbl_SC.c.selection_plan_id == plan.selection_plan_id,
                 tbl_CPDD.c.config_parent_type_code == "benefit",
@@ -361,12 +349,18 @@ class SelectionBenefitMixin:
         )
 
     @classmethod
-    def _qry_get_first_benefit_duration_detail(cls, plan: Model_SelectionPlan):
-        tbl_BDD = Model_ConfigBenefitDurationDetail.__table__.alias("BDD")
-        tbl_BDD2 = Model_ConfigBenefitDurationDetail.__table__.alias("BDD2")
-        tbl_BDS = Model_ConfigBenefitDurationSet.__table__.alias("BDS")
-        tbl_BVS = Model_ConfigBenefitVariationState.__table__.alias("BVS")
-        tbl_BDACL = Model_ConfigBenefitDurationDetailAuth_ACL.__table__.alias("BDACL")
+    def _qry_get_first_benefit_duration_detail(cls, plan: Model_SelectionPlan, t=None):
+        hint = system_temporal_hint(t)
+        tbl_BDD = Model_ConfigBenefitDurationDetail.__table__
+        tbl_BDS = Model_ConfigBenefitDurationSet.__table__
+        tbl_BVS = Model_ConfigBenefitVariationState.__table__
+        tbl_BDACL = Model_ConfigBenefitDurationDetailAuth_ACL.__table__
+
+        tbl_BDD2 = (
+            db.session.query(Model_ConfigBenefitDurationDetail.__table__)
+            .with_hint(Model_ConfigBenefitDurationDetail.__table__, hint)
+            .subquery()
+        )
 
         qry = (
             db.session.query(
@@ -390,6 +384,10 @@ class SelectionBenefitMixin:
                 tbl_BVS,
                 tbl_BVS.c.config_benefit_id == tbl_BDS.c.config_benefit_id,
             )
+            .with_hint(tbl_BDD, hint)
+            .with_hint(tbl_BDACL, hint)
+            .with_hint(tbl_BDS, hint)
+            .with_hint(tbl_BVS, hint)
             .filter(
                 tbl_BVS.c.config_product_variation_state_id
                 == plan.config_product_variation_state_id,
@@ -415,19 +413,19 @@ class SelectionBenefitMixin:
         return qry
 
     @classmethod
-    def _qry_insert_selection_benefit_duration(cls, plan: Model_SelectionPlan):
+    def _qry_insert_selection_benefit_duration(cls, plan: Model_SelectionPlan, t=None):
         """
         Returns an insert query for the default coverages of a new plan based on the default product plan design
         """
 
-        tbl_BVS = Model_ConfigBenefitVariationState.__table__.alias("BVS")
-        tbl_BDS = Model_ConfigBenefitDurationSet.__table__.alias("BDS")
-        tbl_BDD = Model_ConfigBenefitDurationDetail.__table__.alias("BDD")
-        tbl_SB = Model_SelectionBenefit.__table__.alias("SB")
+        tbl_BVS = Model_ConfigBenefitVariationState.__table__
+        tbl_BDS = Model_ConfigBenefitDurationSet.__table__
+        tbl_BDD = Model_ConfigBenefitDurationDetail.__table__
+        tbl_SB = Model_SelectionBenefit.__table__
         tbl_SBD = Model_SelectionBenefitDuration.__table__
-
+        hint = system_temporal_hint(t)
         qry_min_benefit_duration_detail = cls._qry_get_first_benefit_duration_detail(
-            plan
+            plan, t
         )
 
         return tbl_SBD.insert().from_select(
@@ -476,6 +474,9 @@ class SelectionBenefitMixin:
                 == tbl_BDS.c.config_benefit_duration_set_id,
                 isouter=True,
             )
+            .with_hint(tbl_BVS, hint)
+            .with_hint(tbl_BDS, hint)
+            .with_hint(tbl_BDD, hint)
             .filter(
                 tbl_SB.c.selection_plan_id == plan.selection_plan_id,
             ),
@@ -496,12 +497,33 @@ class SelectionPlanMixin:
 
 
 class Selection_RPC_Plan(
-    SelectionProvisionMixin, SelectionBenefitMixin, SelectionPlanMixin
+    FactorRulesetApplicator,
+    SelectionProvisionMixin,
+    SelectionBenefitMixin,
+    SelectionPlanMixin,
 ):
     schema = Schema_SelectionPlan(exclude=("coverages",))
 
+    def __init__(self, payload, *args, **kwargs):
+        self.payload = payload
+        self.t = kwargs.get("t")
+        self.hint = system_temporal_hint(self.t)
+
     @classmethod
-    def _create_plan(cls, payload):
+    def watermark_fields(cls):
+        """
+        Standard watermark fields for all tables
+        """
+        user = get_user()
+        user_name = user.get("user_name")
+        return [
+            literal_column("dbo.ulidstr()").label("version_id"),
+            literal_column("CURRENT_TIMESTAMP").label("created_dts"),
+            literal_column("CURRENT_TIMESTAMP").label("updated_dts"),
+            literal_column(f"'{user_name}'").label("updated_by"),
+        ]
+
+    def _create_plan(self, payload):
         """
         Create the plan object from the payload
         """
@@ -518,6 +540,8 @@ class Selection_RPC_Plan(
                     Model_ConfigProductVariationState.config_product_variation_id
                     == Model_ConfigProductVariation.config_product_variation_id,
                 )
+                .with_hint(Model_ConfigProductVariation, self.hint)
+                .with_hint(Model_ConfigProductVariationState, self.hint)
                 .filter(
                     Model_ConfigProductVariationState.config_product_variation_state_id
                     == payload["config_product_variation_state_id"]
@@ -529,9 +553,10 @@ class Selection_RPC_Plan(
                 "user_name": user.get("user_name"),
                 "with_grant_option": WITH_GRANT_OPTION,
             }
-            return cls.schema.load(
+            return self.schema.load(
                 {
                     **payload,
+                    "plan_as_of_dts": self.t.strftime("%Y-%m-%d %H:%M:%S.%f"),
                     "config_product_id": variation.config_product_id,
                     "acl": [default_acl],
                 }
@@ -540,22 +565,7 @@ class Selection_RPC_Plan(
             "Situs state, product variation, and effective date are incompatible"
         )
 
-    @classmethod
-    def watermark_fields(cls):
-        """
-        Standard watermark fields for all tables
-        """
-        user = get_user()
-        user_name = user.get("user_name")
-        return [
-            literal_column("dbo.ulidstr()").label("version_id"),
-            literal_column("CURRENT_TIMESTAMP").label("created_dts"),
-            literal_column("CURRENT_TIMESTAMP").label("updated_dts"),
-            literal_column(f"'{user_name}'").label("updated_by"),
-        ]
-
-    @classmethod
-    def _create_rating_mappers(cls, plan: Model_SelectionPlan, *args, **kwargs):
+    def _create_rating_mappers(self, plan: Model_SelectionPlan, *args, **kwargs):
         """
         Create the selection rating mappers. This is an insert query of data already in the database.
         This is an INSERT from SELECT query
@@ -578,14 +588,13 @@ class Selection_RPC_Plan(
                 tbl_DRMS.c.selection_rating_mapper_set_type,
                 tbl_DRMS.c.default_config_rating_mapper_set_id,
                 literal_column(str(int(False))).label("has_custom_weights"),
-                *cls.watermark_fields(),
+                *self.watermark_fields(),
             ).filter(tbl_DRMS.c.config_product_id == plan.config_product_id),
         )
 
         db.session.execute(qry)
 
-    @classmethod
-    def _create_age_bands(cls, plan: Model_SelectionPlan, *args, **kwargs):
+    def _create_age_bands(self, plan: Model_SelectionPlan, *args, **kwargs):
         """
         Create the selection age bands. This is an insert query of data already in the database.
         This is an INSERT from SELECT query.
@@ -620,8 +629,10 @@ class Selection_RPC_Plan(
                     ),
                     tbl_CABD.c.age_band_lower,
                     tbl_CABD.c.age_band_upper,
-                    *cls.watermark_fields(),
-                ).filter(
+                    *self.watermark_fields(),
+                )
+                .with_hint(tbl_CABD, self.hint)
+                .filter(
                     tbl_CABD.c.config_age_band_set_id
                     == config_product_variation_state.default_config_age_band_set_id
                 ),
@@ -629,8 +640,7 @@ class Selection_RPC_Plan(
 
             db.session.execute(qry)
 
-    @classmethod
-    def _create_coverage_benefits(cls, plan: Model_SelectionPlan, *args, **kwargs):
+    def _create_coverage_benefits(self, plan: Model_SelectionPlan, *args, **kwargs):
         """
         Create the selection coverages, benefits, and benefit durations.
         This is an insert query of data already in the database.
@@ -642,38 +652,37 @@ class Selection_RPC_Plan(
 
         if config_product_variation_state.default_plan_design_set_id is None:
             # create coverages based on benefit-defined defaults
-            qry = cls._qry_insert_selection_coverage__no_plan_design(plan)
+            qry = self._qry_insert_selection_coverage__no_plan_design(plan, t=self.t)
             res = db.session.execute(qry)
             STATS["coverages"] = res.rowcount
 
             # create benefits based on benefit-defined defaults
-            qry = cls._qry_insert_selection_benefit__no_plan_design(plan)
+            qry = self._qry_insert_selection_benefit__no_plan_design(plan, t=self.t)
             res = db.session.execute(qry)
             STATS["benefits"] = res.rowcount
         else:
             # create coverages from default plan design
-            qry = cls._qry_insert_selection_coverage__plan_design(plan)
+            qry = self._qry_insert_selection_coverage__plan_design(plan, t=self.t)
             res = db.session.execute(qry)
             STATS["coverages"] = res.rowcount
 
             # create benefits from default plan design
-            qry = cls._qry_insert_selection_benefit__plan_design(plan)
+            qry = self._qry_insert_selection_benefit__plan_design(plan, t=self.t)
             res = db.session.execute(qry)
             STATS["benefits"] = res.rowcount
 
         # create benefit durations
         # this doesn't depend on plan design selection
-        qry = cls._qry_insert_selection_benefit_duration(plan)
+        qry = self._qry_insert_selection_benefit_duration(plan, t=self.t)
         res = db.session.execute(qry)
         STATS["benefit_durations"] = res.rowcount
 
-    @classmethod
-    def _create_provisions(cls, plan: Model_SelectionPlan, *args, **kwargs):
+    def _create_provisions(self, plan: Model_SelectionPlan, *args, **kwargs):
         """
         Create the selection provisions and factors. This is an insert query of data already in the database.
         This is an INSERT from SELECT query
         """
-        qry = cls._qry_insert_selection_provision(plan)
+        qry = self._qry_insert_selection_provision(plan, t=self.t)
         res = db.session.execute(qry)
         STATS = {"provisions": res.rowcount}
         columns = list(res.keys())
@@ -683,37 +692,36 @@ class Selection_RPC_Plan(
         ]
 
         for selection_provision in selection_provisions:
-            factors = cls.get_selection_factors(
-                selection_provision.config_provision, selection_provision
+            config_factor_sets = self.get_config_factors(selection_provision, t=self.t)
+            factors = self.get_first_valid_ruleset(
+                config_factor_sets, selection_provision, t=self.t
             )
             selection_provision.factors = factors
 
         return selection_provisions
 
-    @classmethod
-    def create_default_plan(cls, payload, plan_id, *args, **kwargs):
+    def create_default_plan(self, *args, **kwargs):
         """
         Main method for creating a default plan.
         This creates the plan, coverages, benefits, benefit durations, provisions, and factors.
 
         All data is created without commit.
         """
-        plan = cls._create_plan(payload)
+        plan = self._create_plan(self.payload)
         db.session.add(plan)
         db.session.flush()
 
-        cls._create_rating_mappers(plan)
-        cls._create_age_bands(plan)
-        cls._create_coverage_benefits(plan)
-        cls._create_provisions(plan)
-        return cls.schema.dump(plan)
+        self._create_rating_mappers(plan)
+        self._create_age_bands(plan)
+        self._create_coverage_benefits(plan)
+        self._create_provisions(plan)
+        return self.schema.dump(plan)
 
-    @classmethod
-    def grant_plan(cls, payload, plan_id, *args, **kwargs):
+    def grant_plan(self, plan_id, *args, **kwargs):
         schema = Schema_GrantPlanACL()
-        validated_data = schema.load(payload)
+        validated_data = schema.load(self.payload)
         user = get_user()
-        plan, with_grant_option = cls.query_plan_acl_with_grant_option(
+        plan, with_grant_option = self.query_plan_acl_with_grant_option(
             plan_id, user.get("user_name", None)
         )
         if not plan:
@@ -729,14 +737,13 @@ class Selection_RPC_Plan(
         )
         db.session.add(plan_acl)
         db.session.flush()
-        return cls.schema.dump(plan)
+        return self.schema.dump(plan)
 
-    @classmethod
-    def revoke_plan(cls, payload, plan_id, *args, **kwargs):
+    def revoke_plan(self, plan_id, *args, **kwargs):
         schema = Schema_RevokePlanACL()
-        validated_data = schema.load(payload)
+        validated_data = schema.load(self.payload)
         user = get_user()
-        plan, with_grant_option = cls.query_plan_acl_with_grant_option(
+        plan, with_grant_option = self.query_plan_acl_with_grant_option(
             plan_id, user.get("user_name", None)
         )
         if not plan:

@@ -1,5 +1,20 @@
 from typing import Union
 import datetime
+from sqlalchemy.sql import text
+from app.extensions import db
+
+
+def get_db_current_timestamp():
+    """
+    This method is used to get the current timestamp from the database.
+    This is used primarily for the `plan_as_of_dts` field in the `Model_SelectionPlan` table.
+    """
+
+    with db.session.begin():
+        t = db.session.execute(
+            text("SELECT DATEADD(MCS, -1, SYSUTCDATETIME())")
+        ).scalar()
+    return t
 
 
 def system_temporal_hint(

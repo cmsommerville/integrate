@@ -17,6 +17,10 @@ class Schema_SelectionPlan(BaseSchema):
         model = Model_SelectionPlan
         load_instance = True
         include_fk = True
+        dump_only = (
+            "row_eff_dts",
+            "row_exp_dts",
+        )
 
     coverages = ma.Nested("Schema_SelectionCoverage", many=True)
     acl = ma.Nested("Schema_SelectionPlan_ACL", many=True, load_only=True)

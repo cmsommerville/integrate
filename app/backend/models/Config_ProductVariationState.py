@@ -3,6 +3,7 @@ from sqlalchemy.sql import func
 from sqlalchemy.ext.hybrid import hybrid_property
 from app.extensions import db
 from app.shared import BaseModel
+from app.shared.utils import system_temporal_hint
 
 from .Config_ProductVariation import Model_ConfigProductVariation
 from .Config_PlanDesignSet import Model_ConfigPlanDesignSet_Product
@@ -110,12 +111,15 @@ class Model_ConfigProductVariationState(BaseModel):
         config_product_variation_state_id: int,
         situs_state_id: int,
         effective_date: datetime.date,
+        t=None,
     ) -> bool:
         """
         Validates if the plan effective date is valid for the config_product_variation_state_id.
         """
+        hint = system_temporal_hint(t)
         return (
             db.session.query(func.count(cls.config_product_variation_state_id))
+            .with_hint(cls, hint)
             .filter(
                 cls.config_product_variation_state_id
                 == config_product_variation_state_id,

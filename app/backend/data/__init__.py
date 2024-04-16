@@ -43,6 +43,7 @@ from . import (
     Selection_Provision,
     Selection_RatingMappers,
     Random_Selection,
+    Selection_RPC,
 )
 
 
@@ -90,7 +91,37 @@ def load_config(hostname: str, *args, **kwargs):
 
 
 def load_generic(hostname, *args, **kwargs):
-    pass
+    instance = Selection_RPC.TestSelectionRPC_CreateDefaultPlan()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_Plan()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_Benefit()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_BenefitDuration()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_Provision()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_RatingMapper()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_AgeBands()
+    instance.execute()
+    instance.rollback()
+
+    instance = Selection_RPC.TestSelectionRPC_ProductVariation()
+    instance.execute()
+    instance.rollback()
 
 
 def load_selection(hostname, *args, **kwargs):

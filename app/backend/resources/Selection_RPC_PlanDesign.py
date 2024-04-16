@@ -1,6 +1,7 @@
-from typing import List, Union
+from typing import List
 from marshmallow import Schema, fields
 from sqlalchemy.orm import joinedload
+from app.shared.utils import system_temporal_hint
 from app.extensions import db
 from ..models import (
     Model_ConfigPlanDesignSet_Product,
@@ -16,6 +17,10 @@ from ..models import (
     Model_SelectionBenefitDuration,
 )
 from ..schemas import Schema_SelectionCoverage
+
+
+class RowNotFoundError(Exception):
+    pass
 
 
 class Schema_UpdateProductPlanDesign(Schema):
@@ -38,13 +43,16 @@ class Schema_ExtractPlanDesignBenefits(Schema):
 class Selection_RPC_PlanDesign:
     schema_selection_benefit_list = Schema_SelectionCoverage(many=True)
 
-    @classmethod
-    def get_plan(cls, plan_id):
-        return Model_SelectionPlan.find_one(plan_id)
+    def __init__(self, payload, plan_id, *args, **kwargs):
+        self.payload = payload
+        self.plan_id = plan_id
+        self.plan = Model_SelectionPlan.find_one(plan_id)
+        if self.plan is None:
+            raise RowNotFoundError("Plan not found")
+        self.t = self.plan.plan_as_of_dts
 
-    @classmethod
     def extract_plan_design_benefits(
-        cls,
+        self,
         coverage_plan_designs: List[Model_ConfigPlanDesignSet_Coverage],
         plan: Model_SelectionPlan,
         *args,
@@ -62,6 +70,7 @@ class Selection_RPC_PlanDesign:
                     coverage_plan_design.get_plan_design_benefit_variation_states(
                         coverage_plan_design.config_plan_design_set_id,
                         plan.config_product_variation_state_id,
+                        t=self.t,
                     )
                 )
             )
@@ -141,9 +150,10 @@ class Selection_RPC_PlanDesign:
         cls.merge_new_benefit_durations(selection_coverage.benefits, plan)
         return selection_coverage
 
-    @classmethod
     def merge_new_benefit_durations(
-        cls, selection_benefits: List[Model_SelectionBenefit], plan: Model_SelectionPlan
+        self,
+        selection_benefits: List[Model_SelectionBenefit],
+        plan: Model_SelectionPlan,
     ):
         """
         For each benefit in the selection_benefits list, this method adds the benefit duration details that are not already selected.
@@ -176,7 +186,7 @@ class Selection_RPC_PlanDesign:
         )
 
         # this query is all the required benefit duration sets that are not selected yet
-        rows = (
+        qry = (
             db.session.query(
                 BVS.config_benefit_variation_state_id,
                 BDD.config_benefit_duration_detail_id,
@@ -206,9 +216,19 @@ class Selection_RPC_PlanDesign:
                 BVS.config_benefit_variation_state_id.in_(selection_mapper.keys()),
                 existing_benefit_durations.c.selection_benefit_duration_id == None,
             )
-            .distinct()
-            .all()
         )
+
+        if self.t is not None:
+            hint = system_temporal_hint(self.t)
+            qry = (
+                qry.with_hint(BDD, hint)
+                .with_hint(BDS, hint)
+                .with_hint(BVS, hint)
+                .with_hint(BNFT, hint)
+                .with_hint(BDDACL, hint)
+            )
+
+        rows = qry.distinct().all()
 
         # these are required, but unselected, benefit durations
         # loop over and create the duration records
@@ -228,8 +248,7 @@ class Selection_RPC_PlanDesign:
             db.session.add(selection_benefit_duration)
         db.session.flush()
 
-    @classmethod
-    def update_product_plan_design(cls, payload, plan_id: int, *args, **kwargs):
+    def update_product_plan_design(self, *args, **kwargs):
         """
         Main callable for upsert:product_plan_design event.
         1. Fetches the product plan design and associated coverage plan designs.
@@ -237,30 +256,31 @@ class Selection_RPC_PlanDesign:
         3. Merges the new benefit variation state selections with previous selections (add/update/delete).
         """
         schema = Schema_UpdateProductPlanDesign()
+        PPDS = Model_ConfigPlanDesignSet_Product
 
-        plan = cls.get_plan(plan_id)
-        validated_data = schema.dump(payload)
-        product_plan_design = Model_ConfigPlanDesignSet_Product.find_one(
-            validated_data["config_plan_design_set_id"]
+        validated_data = schema.dump(self.payload)
+        qry = db.session.query(PPDS).filter(
+            PPDS.config_plan_design_set_id
+            == validated_data["config_plan_design_set_id"]
         )
+        if self.t is not None:
+            qry = qry.with_hint(PPDS, system_temporal_hint(self.t))
 
-        if product_plan_design is None:
-            raise Exception("Product plan design not found")
+        product_plan_design = qry.one()
 
-        plan_design_benefits = cls.extract_plan_design_benefits(
-            product_plan_design.coverage_plan_designs, plan
+        plan_design_benefits = self.extract_plan_design_benefits(
+            product_plan_design.get_coverage_plan_designs(self.t), self.plan
         )
         coverages = []
         for cvg in plan_design_benefits:
             coverages.append(
-                cls.merge_new_benefits_by_coverage(
-                    plan, cvg["benefits"], cvg["config_coverage_id"]
+                self.merge_new_benefits_by_coverage(
+                    self.plan, cvg["benefits"], cvg["config_coverage_id"]
                 )
             )
-        return cls.schema_selection_benefit_list.dump(coverages)
+        return self.schema_selection_benefit_list.dump(coverages)
 
-    @classmethod
-    def upsert_coverage_plan_design(cls, payload, plan_id, *args, **kwargs):
+    def upsert_coverage_plan_design(self, *args, **kwargs):
         """
         Main callable for update:coverage_plan_design event.
         1. Fetches the coverage plan design.
@@ -268,28 +288,31 @@ class Selection_RPC_PlanDesign:
         3. Merges the new benefit variation state selections with previous selections (add/update/delete).
         """
         schema = Schema_UpdateCoveragePlanDesign()
+        CPDS = Model_ConfigPlanDesignSet_Coverage
 
-        plan = cls.get_plan(plan_id)
-        validated_data = schema.dump(payload)
-        coverage_plan_design = Model_ConfigPlanDesignSet_Coverage.find_one_by_attr(
-            validated_data
+        validated_data = schema.dump(self.payload)
+
+        # get coverage plan designs in effect at time t
+        qry = db.session.query(CPDS).filter(
+            CPDS.config_plan_design_set_id
+            == validated_data["config_plan_design_set_id"]
         )
+        if self.t is not None:
+            qry = qry.with_hint(CPDS, system_temporal_hint(self.t))
+        coverage_plan_design = qry.one()
 
-        if coverage_plan_design is None:
-            raise Exception("Coverage plan design not found")
-
-        plan_design_benefits = cls.extract_plan_design_benefits(
-            [coverage_plan_design], plan
+        # get the benefits for the coverage plan design
+        plan_design_benefits = self.extract_plan_design_benefits(
+            [coverage_plan_design], self.plan
         )[0]
-        selected_benefits = cls.merge_new_benefits_by_coverage(
-            plan,
+        selected_benefits = self.merge_new_benefits_by_coverage(
+            self.plan,
             plan_design_benefits["benefits"],
             config_coverage_id=coverage_plan_design.config_parent_id,
         )
-        return cls.schema_selection_benefit_list.dump(selected_benefits, many=False)
+        return self.schema_selection_benefit_list.dump(selected_benefits, many=False)
 
-    @classmethod
-    def remove_coverage_plan_design(cls, payload, plan_id, *args, **kwargs):
+    def remove_coverage_plan_design(self, payload, plan_id, *args, **kwargs):
         """
         Main callable for remove:coverage_plan_design event.
         1. Fetches the coverage.
@@ -307,4 +330,4 @@ class Selection_RPC_PlanDesign:
 
         coverage.benefits = []
         db.session.flush()
-        return cls.schema_selection_benefit_list.dump(coverage, many=False)
+        return self.schema_selection_benefit_list.dump(coverage, many=False)

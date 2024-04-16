@@ -3,6 +3,7 @@ from flask_restx import Resource
 from sqlalchemy.exc import IntegrityError
 from marshmallow import ValidationError
 from app.auth import authorization_required, NotAuthorizedError
+from app.shared.utils import get_db_current_timestamp
 from app.shared.errors import PlanInvalidError
 from app.extensions import db
 
@@ -20,27 +21,45 @@ from ..schemas import Schema_EventLog
 # Do not commit/rollback in the event handlers; just flush results
 SELECTION_EVENT_MAPPER = {
     # plan changes
-    "create:plan-default": Selection_RPC_Plan.create_default_plan,
-    "grant:plan": Selection_RPC_Plan.grant_plan,
-    "revoke:plan": Selection_RPC_Plan.revoke_plan,
+    "create:plan-default": (Selection_RPC_Plan, "create_default_plan"),
+    "grant:plan": (Selection_RPC_Plan, "grant_plan"),
+    "revoke:plan": (Selection_RPC_Plan, "revoke_plan"),
     "update:plan": None,
     # mapper changes
-    "update:rating_mapper": Selection_RPC_RatingMapper.update_rating_mapper,
+    "update:rating_mapper": (Selection_RPC_RatingMapper, "update_rating_mapper"),
     # plan design changes
-    "update:product_plan_design": Selection_RPC_PlanDesign.update_product_plan_design,
-    "upsert:coverage_plan_design": Selection_RPC_PlanDesign.upsert_coverage_plan_design,
-    "remove:coverage_plan_design": Selection_RPC_PlanDesign.remove_coverage_plan_design,
+    "update:product_plan_design": (
+        Selection_RPC_PlanDesign,
+        "update_product_plan_design",
+    ),
+    "upsert:coverage_plan_design": (
+        Selection_RPC_PlanDesign,
+        "upsert_coverage_plan_design",
+    ),
+    "remove:coverage_plan_design": (
+        Selection_RPC_PlanDesign,
+        "remove_coverage_plan_design",
+    ),
     # product variation changes
-    "update:product_variation": Selection_RPC_ProductVariation.update_product_variation,  # this is tricky because we need to port the benefits to different BVS's
+    "update:product_variation": (
+        Selection_RPC_ProductVariation,
+        "update_product_variation",
+    ),  # this is tricky because we need to port the benefits to different BVS's
     # benefit changes
-    "upsert:benefit": Selection_RPC_Benefit.upsert_benefit,  # this should update or create a benefit; should not require client to differentiate
-    "remove:benefit": Selection_RPC_Benefit.remove_benefit,
+    "upsert:benefit": (
+        Selection_RPC_Benefit,
+        "upsert_benefit",
+    ),  # this should update or create a benefit; should not require client to differentiate
+    "remove:benefit": (Selection_RPC_Benefit, "remove_benefit"),
     # benefit duration changes
-    "update:benefit_duration": Selection_RPC_BenefitDuration.update_benefit_duration,
+    "update:benefit_duration": (
+        Selection_RPC_BenefitDuration,
+        "update_benefit_duration",
+    ),
     # age band changes
-    "update:age_bands": Selection_RPC_AgeBands.update_age_bands,
+    "update:age_bands": (Selection_RPC_AgeBands, "update_age_bands"),
     # provision changes
-    "update:provision": Selection_RPC_Provision.update_provision,
+    "update:provision": (Selection_RPC_Provision, "update_provision"),
 }
 
 
@@ -68,31 +87,40 @@ class Resource_Selection_RPC_Dispatcher(Resource):
     @authorization_required
     def post(cls, event: str, *args, **kwargs):
         try:
+            t = get_db_current_timestamp()
             if event not in cls.events:
                 raise PayloadValidationError("Invalid event")
             data = request.get_json()
-            event_handler = cls.events[event]
-            if event_handler is None:
+            event_class, event_method = cls.events[event]
+            if event_class is None:
                 raise ValueError("Event handler not implemented")
+
             # the event handlers should not commit/rollback; the dispatcher should handle that
             # just flush results in the handlers
-            result = event_handler(
-                payload=data, plan_id=kwargs.get("parent_id"), **kwargs
-            )
-            cls.log_event(event, data)
-            db.session.commit()
-            return {"status": "success", "data": result}, 200
-        except (
-            ValidationError,
-            PayloadValidationError,
-            PlanInvalidError,
-            IntegrityError,
-        ) as e:
-            db.session.rollback()
-            return {"status": "error", "msg": str(e)}, 400
-        except NotAuthorizedError as e:
-            db.session.rollback()
-            return {"status": "error", "msg": str(e)}, 403
+            with db.session.begin():
+                try:
+                    instance = event_class(
+                        payload=data, plan_id=kwargs.get("parent_id"), t=t, **kwargs
+                    )
+                    fn = getattr(instance, event_method)
+                    result = fn(payload=data, plan_id=kwargs.get("parent_id"), **kwargs)
+                    cls.log_event(event, data)
+                    db.session.commit()
+                    return {"status": "success", "data": result}, 200
+                except (
+                    ValidationError,
+                    PayloadValidationError,
+                    PlanInvalidError,
+                    IntegrityError,
+                ) as e:
+                    db.session.rollback()
+                    return {"status": "error", "msg": str(e)}, 400
+                except NotAuthorizedError as e:
+                    db.session.rollback()
+                    return {"status": "error", "msg": str(e)}, 403
+                except Exception as e:
+                    db.session.rollback()
+                    return {"status": "error", "msg": str(e)}, 500
         except Exception as e:
             db.session.rollback()
             return {"status": "error", "msg": str(e)}, 500

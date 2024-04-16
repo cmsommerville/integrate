@@ -1,9 +1,11 @@
 from marshmallow import Schema, fields, ValidationError
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
+from app.shared.utils import system_temporal_hint
 from ..models import (
     Model_ConfigBenefitDurationDetail,
     Model_SelectionBenefitDuration,
+    Model_SelectionPlan,
 )
 from ..schemas import Schema_SelectionBenefitDuration
 
@@ -20,6 +22,14 @@ class Schema_UpdateBenefitDuration(Schema):
 
 class Selection_RPC_BenefitDuration:
     schema = Schema_SelectionBenefitDuration()
+
+    def __init__(self, payload, plan_id, *args, **kwargs):
+        self.payload = payload
+        self.plan_id = plan_id
+        self.plan = Model_SelectionPlan.find_one(plan_id)
+        if self.plan is None:
+            raise RowNotFoundError("Plan not found")
+        self.t = self.plan.plan_as_of_dts
 
     @classmethod
     def modify_errors(cls, validated_data, *args, **kwargs):
@@ -44,9 +54,8 @@ class Selection_RPC_BenefitDuration:
             "The benefit you are trying to update has been modified by another user"
         )
 
-    @classmethod
     def get_duration_detail(
-        cls,
+        self,
         selection_benefit_duration_id: int,
         config_benefit_duration_detail_id: int,
         *args,
@@ -66,6 +75,7 @@ class Selection_RPC_BenefitDuration:
                 BDD.config_benefit_duration_set_id
                 == SBD.config_benefit_duration_set_id,
             )
+            .with_hint(BDD, system_temporal_hint(self.t))
             .filter(
                 SBD.selection_benefit_duration_id == selection_benefit_duration_id,
                 BDD.config_benefit_duration_detail_id
@@ -74,13 +84,12 @@ class Selection_RPC_BenefitDuration:
             .one()
         )
 
-    @classmethod
-    def update_benefit_duration(cls, payload, plan_id, *args, **kwargs):
+    def update_benefit_duration(self, *args, **kwargs):
         """
         Update the existing selection benefit if it exists, otherwise create a new one.
         """
-        validated_data = Schema_UpdateBenefitDuration().load(payload)
-        config_duration_detail = cls.get_duration_detail(**validated_data)
+        validated_data = Schema_UpdateBenefitDuration().load(self.payload)
+        config_duration_detail = self.get_duration_detail(**validated_data)
         res = (
             db.session.query(Model_SelectionBenefitDuration)
             .filter_by(
@@ -91,16 +100,18 @@ class Selection_RPC_BenefitDuration:
             .update(
                 {
                     "config_benefit_duration_detail_id": config_duration_detail.config_benefit_duration_detail_id,
-                    "selection_factor": config_duration_detail.selection_factor,
+                    "selection_factor": float(
+                        config_duration_detail.config_benefit_duration_factor
+                    ),
                 }
             )
         )
         if res == 0:
-            cls.modify_errors(validated_data)
+            self.modify_errors(validated_data)
         if res > 1:
             raise ValidationError("Multiple rows updated")
         db.session.flush()
         obj = Model_SelectionBenefitDuration.query.get(
             validated_data["selection_benefit_duration_id"]
         )
-        return cls.schema.dump(obj)
+        return self.schema.dump(obj)

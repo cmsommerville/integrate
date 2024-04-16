@@ -37,22 +37,6 @@ class Model_SelectionProvision(BaseModel):
     )
     selection_value = db.Column(db.String(100), nullable=True)
 
-    @hybrid_property
-    def config_provision(self):
-        return (
-            db.session.query(Model_ConfigProvision)
-            .join(
-                Model_ConfigProvisionState,
-                Model_ConfigProvisionState.config_provision_id
-                == Model_ConfigProvision.config_provision_id,
-            )
-            .filter(
-                Model_ConfigProvisionState.config_provision_state_id
-                == self.config_provision_state_id
-            )
-            .first()
-        )
-
     parent = db.relationship("Model_SelectionPlan")
     config_provision_state = db.relationship("Model_ConfigProvisionState")
     factors = db.relationship("Model_SelectionFactor")

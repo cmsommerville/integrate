@@ -33,7 +33,7 @@ class Resource_AdminCreateTables(Resource):
 
                 # add row level security rules
                 if issubclass(model, BaseRowLevelSecurityTable):
-                    BaseRowLevelSecurityTable.add_rls(model)
+                    model.add_rls(model)
 
                 # drop system versioning if supported
                 if current_app.config.get("SUPPORT_TEMPORAL_TABLES", False):

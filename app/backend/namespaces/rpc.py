@@ -9,6 +9,7 @@ ns_selection_rpc = Namespace(
 
 SELECTION_RPC_ROUTES = {
     "/plan/<int:parent_id>/<string:event>": res.Resource_Selection_RPC_Dispatcher,
+    "/plan/<int:parent_id>/dd/<string:event>": res.Resource_Selection_RPC_Dropdown_Dispatcher,
     "/plan/<string:event>": res.Resource_Selection_RPC_Dispatcher,
 }
 

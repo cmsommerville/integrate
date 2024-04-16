@@ -3,6 +3,8 @@ import pandas as pd
 from marshmallow import Schema, fields, ValidationError
 from sqlalchemy.sql import and_
 from app.extensions import db
+from app.shared.utils import system_temporal_hint
+from app.shared.errors import RowNotFoundError
 from ..models import (
     Model_SelectionPlan,
     Model_SelectionBenefit,
@@ -12,11 +14,7 @@ from ..models import (
     Model_ConfigProductVariationState,
     Model_ConfigProduct,
 )
-from ..schemas import Schema_SelectionPlan
-
-
-class RowNotFoundError(Exception):
-    pass
+from ..schemas import Schema_SelectionPlan, Schema_SelectionBenefit
 
 
 class Schema_UpdateProductVariation(Schema):
@@ -26,11 +24,20 @@ class Schema_UpdateProductVariation(Schema):
 class Selection_RPC_ProductVariation:
     schema = Schema_SelectionPlan(exclude=("coverages",))
 
+    def __init__(self, payload, plan_id, *args, **kwargs):
+        self.payload = payload
+        self.plan_id = plan_id
+        self.plan = Model_SelectionPlan.find_one(plan_id)
+        if self.plan is None:
+            raise RowNotFoundError("Plan not found")
+        self.t = self.plan.plan_as_of_dts
+
     @classmethod
     def _qry_benefit_mapper(
         cls,
         config_product_variation_id: int,
         plan: Model_SelectionPlan,
+        t: datetime.datetime = None,
     ):
         """
         Returns a mapping table. The table is unique two ways:
@@ -43,7 +50,7 @@ class Selection_RPC_ProductVariation:
         PV = Model_ConfigProductVariation
         PROD = Model_ConfigProduct
 
-        return (
+        qry = (
             db.session.query(
                 BVS.config_benefit_variation_state_id,
                 PROD.config_product_id,
@@ -60,11 +67,6 @@ class Selection_RPC_ProductVariation:
             )
             .join(PV, PV.config_product_variation_id == PVS.config_product_variation_id)
             .join(PROD, PROD.config_product_id == PV.config_product_id)
-            .with_hint(BVS, "FOR SYSTEM_TIME AS OF '2024-04-06 00:00:00'")
-            .with_hint(BNFT, "FOR SYSTEM_TIME AS OF '2024-04-06 00:00:00'")
-            .with_hint(PVS, "FOR SYSTEM_TIME AS OF '2024-04-06 00:00:00'")
-            .with_hint(PV, "FOR SYSTEM_TIME AS OF '2024-04-06 00:00:00'")
-            .with_hint(PROD, "FOR SYSTEM_TIME AS OF '2024-04-06 00:00:00'")
             .filter(
                 PROD.config_product_id == plan.config_product_id,
                 PV.config_product_variation_id == config_product_variation_id,
@@ -77,35 +79,45 @@ class Selection_RPC_ProductVariation:
                 PVS.config_product_variation_state_expiration_date
                 >= plan.selection_plan_effective_date,
             )
-            .subquery()
         )
-
-    @classmethod
-    def get_product_variation_state(
-        cls, config_product_variation_id, plan: Model_SelectionPlan
-    ):
-        PVS = Model_ConfigProductVariationState
-        return (
-            db.session.query(PVS)
-            .filter(
-                PVS.config_product_variation_id == config_product_variation_id,
-                PVS.state_id == plan.situs_state_id,
-                PVS.config_product_variation_state_effective_date
-                <= plan.selection_plan_effective_date,
-                PVS.config_product_variation_state_expiration_date
-                >= plan.selection_plan_effective_date,
+        if t is not None:
+            asof_hint = system_temporal_hint(t)
+            qry = (
+                qry.with_hint(BVS, asof_hint)
+                .with_hint(BNFT, asof_hint)
+                .with_hint(PVS, asof_hint)
+                .with_hint(PV, asof_hint)
+                .with_hint(PROD, asof_hint)
             )
-            .one()
-        )
+        return qry.subquery()
 
-    @classmethod
+    def get_product_variation_state(self, config_product_variation_id):
+        PVS = Model_ConfigProductVariationState
+        qry = db.session.query(PVS).filter(
+            PVS.config_product_variation_id == config_product_variation_id,
+            PVS.state_id == self.plan.situs_state_id,
+            PVS.config_product_variation_state_effective_date
+            <= self.plan.selection_plan_effective_date,
+            PVS.config_product_variation_state_expiration_date
+            >= self.plan.selection_plan_effective_date,
+        )
+        if self.t is not None:
+            asof_hint = system_temporal_hint(self.t)
+            qry = qry.with_hint(PVS, asof_hint)
+
+        return qry.one()
+
     def available_benefit_handler(
-        cls, from_config_product_variation_id, to_config_product_variation_id, plan
+        self,
+        from_config_product_variation_id,
+        to_config_product_variation_id,
     ):
         SB = Model_SelectionBenefit
 
-        FROM = cls._qry_benefit_mapper(from_config_product_variation_id, plan)
-        TO = cls._qry_benefit_mapper(to_config_product_variation_id, plan)
+        FROM = self._qry_benefit_mapper(
+            from_config_product_variation_id, self.plan, self.t
+        )
+        TO = self._qry_benefit_mapper(to_config_product_variation_id, self.plan, self.t)
 
         qry = (
             db.session.query(SB, TO.c.config_benefit_variation_state_id)
@@ -124,7 +136,7 @@ class Selection_RPC_ProductVariation:
                 ),
             )
             .filter(
-                SB.selection_plan_id == plan.selection_plan_id,
+                SB.selection_plan_id == self.plan.selection_plan_id,
             )
         )
 
@@ -136,17 +148,20 @@ class Selection_RPC_ProductVariation:
 
         db.session.flush()
 
-    @classmethod
     def unavailable_benefit_handler(
-        cls, from_config_product_variation_id, to_config_product_variation_id, plan
+        self,
+        from_config_product_variation_id,
+        to_config_product_variation_id,
     ):
         """
         This method handles the case where previously selected benefits are unavailable under the new product variation.
         """
         SB = Model_SelectionBenefit
 
-        FROM = cls._qry_benefit_mapper(from_config_product_variation_id, plan)
-        TO = cls._qry_benefit_mapper(to_config_product_variation_id, plan)
+        FROM = self._qry_benefit_mapper(
+            from_config_product_variation_id, self.plan, self.t
+        )
+        TO = self._qry_benefit_mapper(to_config_product_variation_id, self.plan, self.t)
 
         unavailable_selection_benefits_qry = (
             db.session.query(SB)
@@ -166,7 +181,7 @@ class Selection_RPC_ProductVariation:
                 isouter=True,
             )
             .filter(
-                SB.selection_plan_id == plan.selection_plan_id,
+                SB.selection_plan_id == self.plan.selection_plan_id,
                 TO.c.config_benefit_variation_state_id == None,
             )
         )
@@ -197,9 +212,15 @@ class Selection_RPC_ProductVariation:
         df_from = pd.DataFrame(
             db.session.query(FROM.c.config_product_variation_id).distinct().all()
         )
+        if df_from.empty:
+            raise RowNotFoundError("Cannot find existing product variation")
+
         df_to = pd.DataFrame(
             db.session.query(TO.c.config_product_variation_id).distinct().all()
         )
+        if df_to.empty:
+            raise RowNotFoundError("New product variation not found")
+
         df = pd.concat([df_from, df_to], ignore_index=True)
 
         if df.empty:
@@ -207,37 +228,38 @@ class Selection_RPC_ProductVariation:
         if df["config_product_variation_id"].unique().size != 2:
             raise ValidationError("Invalid product variation selection")
 
-    @classmethod
-    def update_product_variation(cls, payload, plan_id, *args, **kwargs):
-        validated_data = Schema_UpdateProductVariation().load(payload)
-
-        plan = Model_SelectionPlan.query.get(plan_id)
-        if not plan:
-            raise RowNotFoundError("Plan not found")
+    def update_product_variation(self, *args, **kwargs):
+        validated_data = Schema_UpdateProductVariation().load(self.payload)
 
         from_config_product_variation_id = (
-            plan.config_product_variation_state.config_product_variation_id
+            self.plan.config_product_variation_state.config_product_variation_id
         )
         to_config_product_variation_id = validated_data["config_product_variation_id"]
 
-        cls.validate(
-            from_config_product_variation_id, to_config_product_variation_id, plan
+        self.validate(
+            from_config_product_variation_id, to_config_product_variation_id, self.plan
         )
 
-        cls.available_benefit_handler(
-            from_config_product_variation_id, to_config_product_variation_id, plan
+        self.available_benefit_handler(
+            from_config_product_variation_id,
+            to_config_product_variation_id,
         )
 
-        unavailable_benefits = cls.unavailable_benefit_handler(
-            from_config_product_variation_id, to_config_product_variation_id, plan
+        unavailable_benefits = self.unavailable_benefit_handler(
+            from_config_product_variation_id, to_config_product_variation_id
         )
 
-        new_product_variation_state = cls.get_product_variation_state(
-            to_config_product_variation_id, plan
+        new_product_variation_state = self.get_product_variation_state(
+            to_config_product_variation_id
         )
-        plan.config_product_variation_state_id = (
+        self.plan.config_product_variation_state_id = (
             new_product_variation_state.config_product_variation_state_id
         )
-        db.session.add(plan)
+        db.session.add(self.plan)
         db.session.flush()
-        return cls.schema.dump(plan)
+
+        benefit_schema = Schema_SelectionBenefit(many=True, exclude=("duration_sets",))
+        return {
+            **self.schema.dump(self.plan),
+            "unavailable_benefits": benefit_schema.dump(unavailable_benefits),
+        }

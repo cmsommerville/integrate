@@ -1,6 +1,7 @@
 from typing import List
 from app.extensions import db
 from app.shared import BaseModel
+from app.shared.utils import system_temporal_hint
 from sqlalchemy import and_
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from .Config_PlanDesignDetail import (
@@ -50,7 +51,7 @@ class Model_ConfigPlanDesignSet_Coverage(Model_ConfigPlanDesignSet):
 
     @classmethod
     def get_plan_design_benefit_variation_states(
-        self, config_plan_design_set_id: int, product_variation_state_id: int
+        self, config_plan_design_set_id: int, product_variation_state_id: int, t=None
     ):
         """
         Return the default plan design selection value for a given product variation state.
@@ -69,6 +70,10 @@ class Model_ConfigPlanDesignSet_Coverage(Model_ConfigPlanDesignSet):
                 BVS.config_product_variation_state_id == product_variation_state_id,
             )
         )
+        if t is not None:
+            qry = qry.with_hint(PDB, system_temporal_hint(t)).with_hint(
+                BVS, system_temporal_hint(t)
+            )
         return [
             {
                 "config_benefit_variation_state_id": row[0],
@@ -108,20 +113,32 @@ class Model_ConfigPlanDesignSet_Product(Model_ConfigPlanDesignSet):
         lazy="joined",
     )
 
-    @hybrid_property
-    def coverage_plan_designs(self):
+    @hybrid_method
+    def get_coverage_plan_designs(self, t=None):
         """
         A product-level plan design set is composed of multiple coverage-level plan designs at the detail level.
         This property returns all the coverage-level plan designs that are part of this product-level plan design set.
         """
         PD = Model_ConfigPlanDesignDetail_PlanDesign
         CVG = Model_ConfigPlanDesignSet_Coverage
-        return (
+        qry = (
             db.session.query(CVG)
             .join(PD, PD.config_parent_id == CVG.config_plan_design_set_id)
             .filter(PD.config_plan_design_set_id == self.config_plan_design_set_id)
-            .all()
         )
+        if t is not None:
+            qry = qry.with_hint(PD, system_temporal_hint(t)).with_hint(
+                CVG, system_temporal_hint(t)
+            )
+        return qry.all()
+
+    @hybrid_property
+    def coverage_plan_designs(self):
+        """
+        A product-level plan design set is composed of multiple coverage-level plan designs at the detail level.
+        This property returns all the coverage-level plan designs that are part of this product-level plan design set.
+        """
+        return self.get_coverage_plan_designs()
 
     @classmethod
     def find_by_parent(cls, parent_id, limit=1000, offset=0, *args, **kwargs):
