@@ -27,6 +27,7 @@ class Model_SelectionPlan_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = SELECTION_PLAN_ACL
     __table_args__ = (
         db.CheckConstraint("NOT (user_name IS NULL AND role_name IS NULL)"),
+        {"info": {"rls": "user_name"}},
     )
 
     selection_plan_acl_id = db.Column(db.Integer, primary_key=True)

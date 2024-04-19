@@ -12,6 +12,7 @@ CONFIG_BENEFIT_DURATION_SET = TBL_NAMES["CONFIG_BENEFIT_DURATION_SET"]
 
 class Model_ConfigBenefitDurationDetailAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = CONFIG_BENEFIT_DURATION_DETAIL_AUTH_ACL
+    __table_args__ = ({"info": {"rls": "user_role"}},)
 
     config_benefit_duration_detail_auth_acl_id = db.Column(db.Integer, primary_key=True)
     config_benefit_duration_detail_id = db.Column(

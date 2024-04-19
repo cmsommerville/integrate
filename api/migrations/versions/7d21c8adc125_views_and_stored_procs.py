@@ -1,7 +1,7 @@
 """views and stored procs
 
 Revision ID: 7d21c8adc125
-Revises: 03bcf4f5967b
+Revises: 0aa0729135db
 Create Date: 2024-04-18 16:20:12.109228
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "7d21c8adc125"
-down_revision = "03bcf4f5967b"
+down_revision = "0aa0729135db"
 branch_labels = None
 depends_on = None
 

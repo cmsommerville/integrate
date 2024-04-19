@@ -16,6 +16,7 @@ REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 class Model_ConfigEntityCovarianceSet_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = CONFIG_ENTITY_COVARIANCE_SET_ACL
+    __table_args__ = ({"info": {"rls": "user_role"}},)
 
     config_entity_covariance_set_acl_id = db.Column(db.Integer, primary_key=True)
     config_entity_covariance_set_id = db.Column(

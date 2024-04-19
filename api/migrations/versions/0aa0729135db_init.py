@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 03bcf4f5967b
+Revision ID: 0aa0729135db
 Revises: 1b5af7ba2dd1
-Create Date: 2024-04-19 15:24:08.534227
+Create Date: 2024-04-19 16:56:25.792660
 
 """
 
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import mssql
 
 # revision identifiers, used by Alembic.
-revision = "03bcf4f5967b"
+revision = "0aa0729135db"
 down_revision = "1b5af7ba2dd1"
 branch_labels = None
 depends_on = None
@@ -531,12 +531,16 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("config_dropdown_detail_acl_id"),
         schema="dbo",
+        info={"rls": "user_role"},
     )
     op.execute(
         "ALTER TABLE dbo.config_dropdown_detail_acl ADD PERIOD FOR SYSTEM_TIME (row_eff_dts, row_exp_dts)"
     )
     op.execute(
         "ALTER TABLE dbo.config_dropdown_detail_acl SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE=dbo.config_dropdown_detail_acl_history))"
+    )
+    op.execute(
+        "CREATE SECURITY POLICY rls.policy_rls__config_dropdown_detail_acl\n                ADD FILTER PREDICATE rls.fn_rls__user_role(auth_role_code) ON dbo.config_dropdown_detail_acl\n                WITH (STATE = ON)"
     )
     op.create_table(
         "config_product",
@@ -1676,12 +1680,16 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("config_benefit_auth_acl_id"),
         schema="dbo",
+        info={"rls": "user_role"},
     )
     op.execute(
         "ALTER TABLE dbo.config_benefit_auth_acl ADD PERIOD FOR SYSTEM_TIME (row_eff_dts, row_exp_dts)"
     )
     op.execute(
         "ALTER TABLE dbo.config_benefit_auth_acl SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE=dbo.config_benefit_auth_acl_history))"
+    )
+    op.execute(
+        "CREATE SECURITY POLICY rls.policy_rls__config_benefit_auth_acl\n                ADD FILTER PREDICATE rls.fn_rls__user_role(auth_role_code) ON dbo.config_benefit_auth_acl\n                WITH (STATE = ON)"
     )
     op.create_table(
         "config_benefit_duration_detail",
@@ -1992,12 +2000,16 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("selection_plan_acl_id"),
         schema="dbo",
+        info={"rls": "user_name"},
     )
     op.execute(
         "ALTER TABLE dbo.selection_plan_acl ADD PERIOD FOR SYSTEM_TIME (row_eff_dts, row_exp_dts)"
     )
     op.execute(
         "ALTER TABLE dbo.selection_plan_acl SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE=dbo.selection_plan_acl_history))"
+    )
+    op.execute(
+        "CREATE SECURITY POLICY rls.policy_rls__selection_plan_acl\n                ADD FILTER PREDICATE rls.fn_rls__user_name(user_name) ON dbo.selection_plan_acl\n                WITH (STATE = ON)"
     )
     with op.batch_alter_table("selection_plan_acl", schema=None) as batch_op:
         batch_op.create_index(
@@ -2130,12 +2142,16 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("config_benefit_duration_detail_auth_acl_id"),
         schema="dbo",
+        info={"rls": "user_role"},
     )
     op.execute(
         "ALTER TABLE dbo.config_benefit_duration_detail_auth_acl ADD PERIOD FOR SYSTEM_TIME (row_eff_dts, row_exp_dts)"
     )
     op.execute(
         "ALTER TABLE dbo.config_benefit_duration_detail_auth_acl SET (SYSTEM_VERSIONING = ON (HISTORY_TABLE=dbo.config_benefit_duration_detail_auth_acl_history))"
+    )
+    op.execute(
+        "CREATE SECURITY POLICY rls.policy_rls__config_benefit_duration_detail_auth_acl\n                ADD FILTER PREDICATE rls.fn_rls__user_role(auth_role_code) ON dbo.config_benefit_duration_detail_auth_acl\n                WITH (STATE = ON)"
     )
     op.create_table(
         "selection_benefit",
@@ -2480,6 +2496,9 @@ def downgrade():
         "ALTER TABLE dbo.config_benefit_duration_detail_auth_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_benefit_duration_detail_auth_acl_history")
+    op.execute(
+        "DROP SECURITY POLICY rls.policy_rls__config_benefit_duration_detail_auth_acl"
+    )
     op.drop_table("config_benefit_duration_detail_auth_acl", schema="dbo")
     with op.batch_alter_table("selection_rating_mapper_set", schema=None) as batch_op:
         batch_op.drop_index(
@@ -2502,6 +2521,7 @@ def downgrade():
 
     op.execute("ALTER TABLE dbo.selection_plan_acl SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.selection_plan_acl_history")
+    op.execute("DROP SECURITY POLICY rls.policy_rls__selection_plan_acl")
     op.drop_table("selection_plan_acl", schema="dbo")
     with op.batch_alter_table("selection_coverage", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_dbo_selection_coverage_selection_plan_id"))
@@ -2532,6 +2552,7 @@ def downgrade():
         "ALTER TABLE dbo.config_benefit_auth_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_benefit_auth_acl_history")
+    op.execute("DROP SECURITY POLICY rls.policy_rls__config_benefit_auth_acl")
     op.drop_table("config_benefit_auth_acl", schema="dbo")
     op.execute("ALTER TABLE dbo.selection_plan SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.selection_plan_history")
@@ -2627,6 +2648,7 @@ def downgrade():
         "ALTER TABLE dbo.config_dropdown_detail_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_dropdown_detail_acl_history")
+    op.execute("DROP SECURITY POLICY rls.policy_rls__config_dropdown_detail_acl")
     op.drop_table("config_dropdown_detail_acl", schema="dbo")
     op.execute(
         "ALTER TABLE dbo.config_rating_mapper_collection SET ( SYSTEM_VERSIONING = OFF )"

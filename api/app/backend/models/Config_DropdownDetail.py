@@ -11,6 +11,7 @@ CONFIG_DROPDOWN_SET = TBL_NAMES["CONFIG_DROPDOWN_SET"]
 
 class Model_ConfigDropdownDetail_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = CONFIG_DROPDOWN_DETAIL_ACL
+    __table_args__ = ({"info": {"rls": "user_role"}},)
 
     config_dropdown_detail_acl_id = db.Column(db.Integer, primary_key=True)
     config_dropdown_detail_id = db.Column(

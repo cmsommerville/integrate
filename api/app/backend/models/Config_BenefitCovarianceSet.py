@@ -13,6 +13,7 @@ REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 class Model_ConfigBenefitCovarianceSet_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = CONFIG_BENEFIT_COVARIANCE_SET_ACL
+    __table_args__ = ({"info": {"rls": "user_role"}},)
 
     config_benefit_covariance_set_acl_id = db.Column(db.Integer, primary_key=True)
     config_benefit_covariance_set_id = db.Column(

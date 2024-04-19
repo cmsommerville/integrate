@@ -28,6 +28,39 @@ def is_temporal_table(op):
     return has_row_eff_dts and has_row_exp_dts
 
 
+def add_security_policy(op: CreateTableOp):
+    table_name = op.table_name
+    schema = op.schema
+    if schema is None:
+        schema = "dbo"
+    if op.info.get("rls") is None:
+        return None
+
+    rls_rule = op.info.get("rls")
+    if rls_rule == "user_role":
+        return ExecuteSQLOp(
+            sqltext=f"""CREATE SECURITY POLICY rls.policy_rls__{table_name}
+                ADD FILTER PREDICATE rls.fn_rls__user_role(auth_role_code) ON {schema}.{table_name}
+                WITH (STATE = ON)"""
+        )
+    if rls_rule == "user_name":
+        return ExecuteSQLOp(
+            sqltext=f"""CREATE SECURITY POLICY rls.policy_rls__{table_name}
+                ADD FILTER PREDICATE rls.fn_rls__user_name(user_name) ON {schema}.{table_name}
+                WITH (STATE = ON)"""
+        )
+    raise ValueError(f"Unknown RLS rule: {rls_rule}")
+
+
+def drop_security_policy(op: DropTableOp):
+    if op.info.get("rls") is None:
+        return None
+    table_name = op.table_name
+    return ExecuteSQLOp(
+        sqltext=f"""DROP SECURITY POLICY rls.policy_rls__{table_name}"""
+    )
+
+
 def create_temporal_table(op: CreateTableOp):
     table_name = op.table_name
     temporal_table_name = get_temporal_table_name(table_name)
@@ -75,6 +108,11 @@ def process_upgrade_ops(script):
         if isinstance(op, CreateTableOp):
             newops = create_temporal_table(op)
             new_upgrade_ops.extend(newops)
+
+            rls = add_security_policy(op)
+            if rls is not None:
+                new_upgrade_ops.append(rls)
+
     script.upgrade_ops.ops = new_upgrade_ops
     return script
 
@@ -88,6 +126,9 @@ def process_downgrade_ops(script):
         if isinstance(op, DropTableOp):
             newops = drop_temporal_table(op)
             new_downgrade_ops.extend(newops)
+            rls = drop_security_policy(op)
+            if rls is not None:
+                new_downgrade_ops.append(rls)
 
         # this original drop operation needs to be after the temporal alters
         new_downgrade_ops.append(op)

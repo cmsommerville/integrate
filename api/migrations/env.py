@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from flask import current_app
 
 from alembic import context
-from migrations.temporal import process_upgrade_ops, process_downgrade_ops
+from migrations.utils import process_upgrade_ops, process_downgrade_ops
 
 
 # this is the Alembic Config object, which provides

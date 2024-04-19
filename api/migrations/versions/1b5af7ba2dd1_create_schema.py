@@ -16,11 +16,22 @@ branch_labels = None
 depends_on = None
 
 
+with open("migrations/rls/fn_rls__user_name.sql", "r") as f:
+    fn_rls__user_name = f.read()
+
+with open("migrations/rls/fn_rls__user_role.sql", "r") as f:
+    fn_rls__user_role = f.read()
+
+
 def upgrade():
     op.execute("CREATE SCHEMA auth")
     op.execute("CREATE SCHEMA rls")
+    op.execute(fn_rls__user_name)
+    op.execute(fn_rls__user_role)
 
 
 def downgrade():
     op.execute("DROP SCHEMA auth")
     op.execute("DROP SCHEMA rls")
+    op.execute("DROP FUNCTION rls.fn_rls__user_name")
+    op.execute("DROP FUNCTION rls.fn_rls__user_role")

@@ -15,6 +15,7 @@ REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 class Model_ConfigBenefitAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
     __tablename__ = CONFIG_BENEFIT_AUTH_ACL
+    __table_args__ = ({"info": {"rls": "user_role"}},)
 
     config_benefit_auth_acl_id = db.Column(db.Integer, primary_key=True)
     config_benefit_auth_id = db.Column(
