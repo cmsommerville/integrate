@@ -4,7 +4,7 @@ from logging.config import fileConfig
 from flask import current_app
 
 from alembic import context
-from temporal import process_upgrade_ops, process_downgrade_ops
+from migrations.temporal import process_upgrade_ops, process_downgrade_ops
 
 
 # this is the Alembic Config object, which provides
@@ -16,6 +16,12 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 logger = logging.getLogger("alembic.env")
+
+
+def include_object(object, name, type_, reflected, compare_to):
+    if object.info.get("skip_autogenerate", False):
+        return False
+    return True
 
 
 def get_engine():
@@ -108,6 +114,7 @@ def run_migrations_online():
             connection=connection,
             target_metadata=get_metadata(),
             include_schemas=True,
+            include_object=include_object,
             **conf_args,
         )
 

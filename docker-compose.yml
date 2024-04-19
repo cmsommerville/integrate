@@ -10,7 +10,7 @@ services:
   #     - db
   #   volumes:
   #     - ./webapp:/opt/webapp
-  db:
+  database:
     build: ./db
     ports:
       - "1434:1433"
@@ -20,5 +20,3 @@ services:
     ports:
       - "6380:6379"
     env_file: ./redis/.env
-    volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
