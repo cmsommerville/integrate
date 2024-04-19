@@ -1,5 +1,4 @@
-venv/
-*.env
+.env
 /**/*sqlite
 Pipfile.lock
 files/*

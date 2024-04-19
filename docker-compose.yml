@@ -1,0 +1,24 @@
+version: '3.7'
+name: integrate
+services:
+  # web:
+  #   build: .
+  #   ports:
+  #     - "5000:5000"
+  #   env_file: .env
+  #   depends_on:
+  #     - db
+  #   volumes:
+  #     - ./webapp:/opt/webapp
+  db:
+    build: ./db
+    ports:
+      - "1434:1433"
+    env_file: ./db/.env
+  redis:
+    build: ./redis
+    ports:
+      - "6380:6379"
+    env_file: ./redis/.env
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
