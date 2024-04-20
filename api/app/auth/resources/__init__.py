@@ -6,3 +6,4 @@ from .Auth_Roles import Resource_AuthRoles
 from .Auth_RolePermission import Resource_AuthManageRolePermissions
 from .Auth_UserRoles import Resource_AuthManageUserRole
 from .Auth_GetUser import Resource_AuthGetUser
+from .Auth_EditUserRole import Resource_AssignUserRole, Resource_RemoveUserRole

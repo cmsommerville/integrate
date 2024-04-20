@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseRule
+from app.shared import BaseModel
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..tables import TBL_NAMES
@@ -9,7 +9,7 @@ CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 
-class Model_ConfigFactorRule(BaseModel, BaseRule):
+class Model_ConfigFactorRule(BaseModel):
     __tablename__ = CONFIG_FACTOR_RULE
 
     config_factor_rule_id = db.Column(db.Integer, primary_key=True)

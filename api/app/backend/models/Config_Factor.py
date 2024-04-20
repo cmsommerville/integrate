@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseRuleset
+from app.shared import BaseModel
 from app.shared.utils import system_temporal_hint
 from sqlalchemy.ext.hybrid import hybrid_method
 from .Config_FactorRule import Model_ConfigFactorRule
@@ -11,7 +11,7 @@ CONFIG_FACTOR_SET = TBL_NAMES["CONFIG_FACTOR_SET"]
 CONFIG_PROVISION = TBL_NAMES["CONFIG_PROVISION"]
 
 
-class Model_ConfigFactorSet(BaseModel, BaseRuleset):
+class Model_ConfigFactorSet(BaseModel):
     __tablename__ = CONFIG_FACTOR_SET
 
     config_factor_set_id = db.Column(db.Integer, primary_key=True)
@@ -60,7 +60,7 @@ class Model_ConfigFactorSet(BaseModel, BaseRuleset):
         )
 
 
-class Model_ConfigFactor(BaseModel, BaseRuleset):
+class Model_ConfigFactor(BaseModel):
     __tablename__ = CONFIG_FACTOR
 
     config_factor_id = db.Column(db.Integer, primary_key=True)

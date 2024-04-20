@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseRowLevelSecurityTable
+from app.shared import BaseModel
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..tables import TBL_NAMES
@@ -13,7 +13,7 @@ CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 
-class Model_ConfigBenefitAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
+class Model_ConfigBenefitAuth_ACL(BaseModel):
     __tablename__ = CONFIG_BENEFIT_AUTH_ACL
     __table_args__ = ({"info": {"rls": "user_role"}},)
 

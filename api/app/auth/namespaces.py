@@ -12,5 +12,6 @@ ns_auth.add_resource(
 ns_auth.add_resource(res.Resource_AuthLogin, *["/user/login"])
 ns_auth.add_resource(res.Resource_AuthSetPassword, *["/user/password/set"])
 ns_auth.add_resource(res.Resource_AuthRegister, *["/user/register"])
-ns_auth.add_resource(res.Resource_AuthManageUserRole, *["/user/roles"])
 ns_auth.add_resource(res.Resource_AuthGetUser, *["/user"])
+ns_auth.add_resource(res.Resource_AssignUserRole, *["/user/roles:add"])
+ns_auth.add_resource(res.Resource_RemoveUserRole, *["/user/roles:remove"])

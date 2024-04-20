@@ -1,5 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseRowLevelSecurityTable
+from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
@@ -10,7 +10,7 @@ CONFIG_BENEFIT_DURATION_DETAIL = TBL_NAMES["CONFIG_BENEFIT_DURATION_DETAIL"]
 CONFIG_BENEFIT_DURATION_SET = TBL_NAMES["CONFIG_BENEFIT_DURATION_SET"]
 
 
-class Model_ConfigBenefitDurationDetailAuth_ACL(BaseModel, BaseRowLevelSecurityTable):
+class Model_ConfigBenefitDurationDetailAuth_ACL(BaseModel):
     __tablename__ = CONFIG_BENEFIT_DURATION_DETAIL_AUTH_ACL
     __table_args__ = ({"info": {"rls": "user_role"}},)
 

@@ -1,5 +1,4 @@
 from app.extensions import db
-from app.shared import BaseTemporalTable
 from sqlalchemy.types import VARBINARY
 
 from ..tables import TBL_NAMES
@@ -10,7 +9,7 @@ SELECTION_BENEFIT_RATE = TBL_NAMES["SELECTION_BENEFIT_RATE"]
 SELECTION_PLAN = TBL_NAMES["SELECTION_PLAN"]
 
 
-class Model_SelectionBenefitRate(BaseTemporalTable, db.Model):
+class Model_SelectionBenefitRate(db.Model):
     __tablename__ = SELECTION_BENEFIT_RATE
 
     selection_benefit_rate_id = db.Column(db.Integer, primary_key=True)

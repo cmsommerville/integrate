@@ -1,22 +1,14 @@
 from __future__ import annotations
-import os
 from ulid import ULID
-from functools import reduce
 from typing import List
-from sqlalchemy import text, schema
+from sqlalchemy import text
 from sqlalchemy.orm import joinedload
-from sqlalchemy.sql import text as text_sql
 from sqlalchemy.dialects.mssql import DATETIME2
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.inspection import inspect
 from app.extensions import db
 from app.shared.errors import ExpiredRowVersionError
 from app.auth import get_user
-
-
-class BaseReflectedModel(db.Model):
-    __abstract__ = True
 
 
 class BaseModel(db.Model):
@@ -196,112 +188,3 @@ class BaseModel(db.Model):
         except Exception:
             db.session.rollback()
             raise
-
-
-class BaseRuleModel(BaseModel):
-    __abstract__ = True
-
-    def nested_getattr(self, obj, nested_attr):
-        """
-        Returns a deeply nested relationship expressed as a string with dot notation.
-
-        An example, `plan.group.group_label`, will return the group_label attribute from the
-        group class from the plan class.
-        """
-        _attrs = nested_attr.split(".")
-        return reduce(lambda o, next_attr: getattr(o, next_attr, None), _attrs, obj)
-
-
-class BaseRowLevelSecurityTable:
-    RLS_RESTRICTED_ROLE = "rls_restricted"
-    RLS_SCHEMA = os.getenv("ROW_LEVEL_SECURITY_DB_SCHEMA", "rls")
-    FN_NAME = "fn_rls__standard"
-
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @classmethod
-    def create_standard_policy(cls):
-        sql = f"""
-            SELECT COUNT(1)
-            FROM   sys.objects
-            WHERE  object_id = OBJECT_ID(N'{cls.RLS_SCHEMA}.{cls.FN_NAME}')
-            AND type IN ( N'FN', N'IF', N'TF', N'FS', N'FT' )
-        """
-
-        rls_function_exists = db.session.execute(text_sql(sql)).fetchone()[0]
-        if rls_function_exists != 0:
-            return
-
-        sql = f"""
-            CREATE FUNCTION {cls.RLS_SCHEMA}.{cls.FN_NAME}(@user_role VARCHAR(30))
-                RETURNS TABLE
-            WITH SCHEMABINDING
-            AS
-            RETURN SELECT 1 AS {cls.FN_NAME}_output
-            WHERE 
-                COALESCE(IS_MEMBER('{cls.RLS_RESTRICTED_ROLE}'), 1) = 0 OR (
-                    @user_role IN (
-                        SELECT value AS user_role 
-                        FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
-                    )
-                    OR 'superuser' IN (
-                        SELECT value AS user_role 
-                        FROM STRING_SPLIT(CAST(SESSION_CONTEXT(N'user_roles') AS VARCHAR(8000)), ';')
-                    )
-                )
-        """
-        db.session.execute(text_sql(sql))
-        db.session.commit()
-
-    @classmethod
-    def add_rls(cls, model):
-        table_schema = model.__table__.schema
-        _schema = "dbo" if table_schema is None else f"{table_schema}"
-        _tablename = model.__tablename__
-        _policy_name = f"policy_rls__{_schema}_{_tablename}"
-
-        cls.create_standard_policy()
-
-        sql = f"""
-            SELECT COUNT(1)
-            FROM   sys.objects
-            WHERE  object_id = OBJECT_ID(N'{cls.RLS_SCHEMA}.{_policy_name}')
-        """
-
-        security_policy_exists = db.session.execute(text_sql(sql)).fetchone()[0]
-        if security_policy_exists != 0:
-            return
-
-        sql = f"""
-            CREATE SECURITY POLICY {cls.RLS_SCHEMA}.{_policy_name}
-            ADD FILTER PREDICATE {cls.RLS_SCHEMA}.{cls.FN_NAME}(auth_role_code) ON {_schema}.{_tablename}
-            WITH (STATE = ON)
-        """
-        db.session.execute(text_sql(sql))
-        db.session.commit()
-
-    @classmethod
-    def drop_rls(cls, model):
-        table_schema = model.__table__.schema
-        _schema = "dbo" if table_schema is None else f"{table_schema}"
-        _tablename = model.__tablename__
-        _policy_name = f"policy_rls__{_schema}_{_tablename}"
-
-        sql = f"""
-            DROP SECURITY POLICY {cls.RLS_SCHEMA}.{_policy_name};
-        """
-        try:
-            db.session.execute(text_sql(sql))
-            db.session.commit()
-        except Exception:
-            pass
-
-        sql = f"""
-            DROP FUNCTION {cls.RLS_SCHEMA}.{cls.FN_NAME};
-        """
-        try:
-            db.session.execute(text_sql(sql))
-            db.session.commit()
-        except Exception:
-            pass

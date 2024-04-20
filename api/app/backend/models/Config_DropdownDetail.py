@@ -1,6 +1,5 @@
-import datetime
 from app.extensions import db
-from app.shared import BaseModel, BaseRowLevelSecurityTable
+from app.shared import BaseModel
 
 from ..tables import TBL_NAMES
 
@@ -9,7 +8,7 @@ CONFIG_DROPDOWN_DETAIL = TBL_NAMES["CONFIG_DROPDOWN_DETAIL"]
 CONFIG_DROPDOWN_SET = TBL_NAMES["CONFIG_DROPDOWN_SET"]
 
 
-class Model_ConfigDropdownDetail_ACL(BaseModel, BaseRowLevelSecurityTable):
+class Model_ConfigDropdownDetail_ACL(BaseModel):
     __tablename__ = CONFIG_DROPDOWN_DETAIL_ACL
     __table_args__ = ({"info": {"rls": "user_role"}},)
 

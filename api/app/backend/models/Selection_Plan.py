@@ -1,7 +1,5 @@
-import os
-import datetime
 from app.extensions import db
-from app.shared import BaseModel, BaseRowLevelSecurityTable
+from app.shared import BaseModel
 from app.shared.utils import system_temporal_hint
 from sqlalchemy.ext.hybrid import hybrid_method
 from sqlalchemy.orm import validates
@@ -21,7 +19,7 @@ SELECTION_PLAN_ACL = TBL_NAMES["SELECTION_PLAN_ACL"]
 SELECTION_RATING_MAPPER_SET = TBL_NAMES["SELECTION_RATING_MAPPER_SET"]
 
 
-class Model_SelectionPlan_ACL(BaseModel, BaseRowLevelSecurityTable):
+class Model_SelectionPlan_ACL(BaseModel):
     FN_NAME = "fn_rls__selection_plan_acl"
 
     __tablename__ = SELECTION_PLAN_ACL

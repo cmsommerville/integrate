@@ -1,6 +1,5 @@
 from app.extensions import db
-from app.shared import BaseModel, BaseRowLevelSecurityTable
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from app.shared import BaseModel
 from .Selection_Benefit import Model_SelectionBenefit
 from .Selection_Provision import Model_SelectionProvision
 
@@ -14,7 +13,7 @@ CONFIG_PRODUCT = TBL_NAMES["CONFIG_PRODUCT"]
 REF_MASTER = TBL_NAMES["REF_MASTER"]
 
 
-class Model_ConfigEntityCovarianceSet_ACL(BaseModel, BaseRowLevelSecurityTable):
+class Model_ConfigEntityCovarianceSet_ACL(BaseModel):
     __tablename__ = CONFIG_ENTITY_COVARIANCE_SET_ACL
     __table_args__ = ({"info": {"rls": "user_role"}},)
 
