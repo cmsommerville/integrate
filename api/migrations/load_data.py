@@ -3,11 +3,11 @@ from logger import logger
 from app.backend.classes.ConfigProductLoader import ConfigProductLoader
 
 
-def initialize():
+def initialize(hostname, **kwargs):
     logger.debug("Loading reference data...")
-    data.load_refdata()
+    data.load_refdata(hostname=hostname, **kwargs)
     logger.debug("Loading configuration data...")
-    data.load_config()
+    data.load_config(hostname=hostname, **kwargs)
     logger.debug("Product loader...")
     loader = ConfigProductLoader(data)
     loader.save_to_db()

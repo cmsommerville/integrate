@@ -11,25 +11,25 @@ GO
 IF NOT EXISTS 
     (SELECT name  
      FROM master.sys.server_principals
-     WHERE name = 'dba')
+     WHERE name = '$(UID_ADMIN)')
 BEGIN
-    CREATE LOGIN dba WITH PASSWORD = '$(PWD_DBA)'
+    CREATE LOGIN $(UID_ADMIN) WITH PASSWORD = '$(PWD_ADMIN)'
 END
 
 IF NOT EXISTS 
     (SELECT name  
      FROM master.sys.server_principals
-     WHERE name = 'analyst')
+     WHERE name = '$(UID_ANALYST)')
 BEGIN
-CREATE LOGIN analyst WITH PASSWORD = '$(PWD_ANALYST)'
+CREATE LOGIN $(UID_ANALYST) WITH PASSWORD = '$(PWD_ANALYST)'
 END
 
 IF NOT EXISTS 
     (SELECT name  
      FROM master.sys.server_principals
-     WHERE name = 'app_integrate')
+     WHERE name = '$(UID_APPLICATION)')
 BEGIN
-CREATE LOGIN app_integrate WITH PASSWORD = '$(PWD_APP_INTEGRATE)'
+CREATE LOGIN $(UID_APPLICATION) WITH PASSWORD = '$(PWD_APPLICATION)'
 END
 
 
@@ -48,29 +48,30 @@ END
 
 
 
-IF NOT EXISTS (SELECT [name]
-                FROM [sys].[database_principals]
-                WHERE [type] = N'S' AND [name] = N'dba')
+IF NOT EXISTS (SELECT name
+                FROM sys.database_principals
+                WHERE type = N'S' AND name = N'$(UID_ADMIN)')
 BEGIN
-    CREATE USER dba FOR LOGIN dba
-    ALTER ROLE db_owner ADD MEMBER dba
+    CREATE USER $(UID_ADMIN) FOR LOGIN $(UID_ADMIN)
+    ALTER ROLE db_owner ADD MEMBER $(UID_ADMIN)
 END
 
-IF NOT EXISTS (SELECT [name]
-                FROM [sys].[database_principals]
-                WHERE [type] = N'S' AND [name] = N'analyst')
+IF NOT EXISTS (SELECT name
+                FROM sys.database_principals
+                WHERE type = N'S' AND name = N'$(UID_ANALYST)')
 BEGIN
-    CREATE USER analyst FOR LOGIN analyst
-    ALTER ROLE db_owner ADD MEMBER analyst
+    CREATE USER $(UID_ANALYST) FOR LOGIN $(UID_ANALYST)
+    ALTER ROLE db_owner ADD MEMBER $(UID_ANALYST)
 END
 
-IF NOT EXISTS (SELECT [name]
-                FROM [sys].[database_principals]
-                WHERE [type] = N'S' AND [name] = N'app_integrate')
+IF NOT EXISTS (SELECT name
+                FROM sys.database_principals
+                WHERE type = N'S' AND name = N'$(UID_APPLICATION)')
 BEGIN
-    CREATE USER app_integrate FOR LOGIN app_integrate
-    ALTER ROLE rls_restricted ADD MEMBER app_integrate
-    ALTER ROLE db_owner ADD MEMBER app_integrate
+    CREATE USER $(UID_APPLICATION) FOR LOGIN $(UID_APPLICATION)
+    ALTER ROLE rls_restricted ADD MEMBER $(UID_APPLICATION)
+    ALTER ROLE db_owner ADD MEMBER $(UID_APPLICATION)
 END
 
 
+PRINT 'Base users, logins, and roles created'

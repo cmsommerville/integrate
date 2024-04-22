@@ -16,10 +16,10 @@ branch_labels = None
 depends_on = None
 
 
-with open("migrations/rls/fn_rls__user_name.sql", "r") as f:
+with open("migrations/functions/fn_rls__user_name.sql", "r") as f:
     fn_rls__user_name = f.read()
 
-with open("migrations/rls/fn_rls__user_role.sql", "r") as f:
+with open("migrations/functions/fn_rls__user_role.sql", "r") as f:
     fn_rls__user_role = f.read()
 
 

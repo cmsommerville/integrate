@@ -1,3 +1,4 @@
+import os
 from flask import Flask
 from sqlalchemy import event
 from dotenv import load_dotenv
@@ -27,4 +28,5 @@ def create_app(env="DEV"):
         event.listens_for(db.session, "after_begin")(set_db_user_id)
         db.metadata.reflect(bind=db.engine)
 
+    print("Successfully started app...")
     return app

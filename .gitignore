@@ -1,5 +1,9 @@
 venv/
 *.env
+*.env.development 
+*.env.dev
+*.env.test
+*.env.prod
 /**/*sqlite
 Pipfile.lock
 files/*

@@ -23,4 +23,6 @@ fi
 
 # Run the setup script to create the DB and the schema in the DB
 /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P $MSSQL_SA_PASSWORD -d master -i setup.sql
-/opt/mssql-tools/bin/sqlcmd -S localhost -U dba -P $PWD_DBA -d integrate -i ulid.sql
+# /opt/mssql-tools/bin/sqlcmd -S localhost -U dba -P $PWD_DBA -d integrate -i ulid.sql
+
+echo "SQL Server setup completed"

@@ -230,3 +230,5 @@ GO
 
 GRANT EXECUTE ON [dbo].[ulid_seeded] TO PUBLIC
 GO
+
+PRINT 'ULID functions and view created successfully.'

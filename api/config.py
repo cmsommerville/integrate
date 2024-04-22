@@ -15,7 +15,7 @@ connection_url = URL.create(
     database=os.getenv("DATABASE_DB"),
     query={
         "driver": "ODBC Driver 17 for SQL Server",
-        "TrustServerCertificate": "yes",
+        # "TrustServerCertificate": "yes",
     },
 )
 
@@ -25,7 +25,11 @@ class BaseConfig:
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")
     SESSION_TYPE = os.getenv("SESSION_TYPE")
-    SESSION_REDIS = Redis(host="127.0.0.1", port=os.getenv("REDIS_PORT", 6379), db=0)
+    SESSION_REDIS = Redis(
+        host=os.getenv("REDIS_HOST", "127.0.0.1"),
+        port=os.getenv("REDIS_PORT", 6379),
+        db=0,
+    )
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "None"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -43,4 +47,9 @@ class TestConfig(BaseConfig):
     DB_USER_NAME = os.getenv("DATABASE_UID")
 
 
-CONFIG = {"DEV": DevConfig(), "TEST": TestConfig()}
+class ProdConfig(BaseConfig):
+    SQLALCHEMY_DATABASE_URI = connection_url
+    DB_USER_NAME = os.getenv("DATABASE_UID")
+
+
+CONFIG = {"DEV": DevConfig(), "TEST": TestConfig(), "PROD": ProdConfig()}
