@@ -50,4 +50,4 @@ COPY . .
 COPY .env.prod .env
 ENV HOST=0.0.0.0
 EXPOSE 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()", "--timeout", "120", "--workers", "2"]
