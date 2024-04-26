@@ -1,9 +1,6 @@
 import os
-from dotenv import load_dotenv
 from redis import Redis
 from sqlalchemy.engine import URL
-
-load_dotenv()
 
 
 connection_url = URL.create(

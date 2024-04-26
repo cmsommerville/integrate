@@ -3,7 +3,7 @@ from flask import request
 from flask_restx import Resource
 from ..models import Model_AuthUser
 from ..schemas import Schema_AuthUser_Output
-from ..auth import login_user, logout, is_authenticated
+from ..auth import login_user, logout
 
 
 _schema = Schema_AuthUser_Output()
@@ -23,9 +23,8 @@ class Resource_AuthLogin(Resource):
             if is_valid_password:
                 user_data = _schema.dump(user)
                 login_user(user_data)
-
-            if is_authenticated():
                 return {"status": "success", "msg": "Successfully logged in"}, 200
+            logout()
             return {"status": "error", "msg": "Password incorrect"}, 401
 
         except Exception:

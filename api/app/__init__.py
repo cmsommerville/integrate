@@ -1,18 +1,16 @@
 import os
 from flask import Flask
 from sqlalchemy import event
-from dotenv import load_dotenv
 from config import CONFIG
 
 from app.extensions import init_extensions
 from app.shared import bind_namespaces
 from app.auth import set_db_user_id
 
-load_dotenv()
 
-
-def create_app(env="DEV"):
-    config = CONFIG.get(env)
+def create_app():
+    ENV = os.environ.get("ENV", "DEV")
+    config = CONFIG.get(ENV)
     app = Flask(__name__)
     app.config.from_object(config)
 

@@ -1,5 +1,6 @@
 from flask import request
 from flask_restx import Resource
+from app.auth.auth import authorization_required
 from ..models import Model_AuthPermission, Model_AuthRole, Model_AuthRolePermission
 from ..schemas import Schema_AuthRolePermission
 
@@ -7,7 +8,10 @@ _schema_list = Schema_AuthRolePermission(many=True)
 
 
 class Resource_AuthManageRolePermissions(Resource):
+    permissions = {"post": ["admin"]}
+
     @classmethod
+    @authorization_required
     def post(cls, id):
         try:
             data = request.get_json()

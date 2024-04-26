@@ -2,24 +2,29 @@ version: '3.7'
 name: integrate
 services:
   api:
+    container_name: api
     build: ./api
     ports:
-      - "8000:${API_PORT}"
+      - "5001:${API_PORT}"
     env_file: 
       - .env
-      - ./api/.env.prod
     depends_on:
       db: 
         condition: service_healthy
       redis:
         condition: service_started
+    volumes: 
+      - ./api:/api
   db:
+    container_name: db
+    user: root
     build: ./db
     ports:
       - "1434:${DATABASE_PORT}"
     env_file: 
       - .env
-      - ./db/.env
+    volumes:
+      - integrate-mssql:/var/opt/mssql/data
     healthcheck:
       test: /opt/mssql-tools/bin/sqlcmd -S localhost -U $UID_APPLICATION -P $PWD_APPLICATION -Q "SELECT 1" || exit 1
       interval: 10s
@@ -27,9 +32,11 @@ services:
       retries: 10
       start_period: 10s
   redis:
+    container_name: redis
     build: ./redis
-    ports:
+    ports: 
       - "6380:${REDIS_PORT}"
     env_file: 
       - .env
-      - ./redis/.env
+volumes:
+  integrate-mssql:

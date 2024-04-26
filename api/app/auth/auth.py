@@ -1,6 +1,18 @@
+import bcrypt
+import random
 import functools
 from flask import session
 from sqlalchemy.sql import text
+from app.extensions import db
+from app.auth.models import Model_AuthUser, Model_AuthRole, Model_AuthUserRole
+from app.auth import constants
+from app.auth.errors import AuthenticationError
+from app.auth.constants import (
+    DIGITS,
+    UPPERCASE_CHARACTERS,
+    LOWERCASE_CHARACTERS,
+    SYMBOLS,
+)
 from datetime import datetime, timezone
 
 UNKNOWN_USER = {
@@ -13,8 +25,123 @@ UNKNOWN_USER = {
 }
 
 
-class AuthenticationError(Exception):
-    pass
+def check_login_credentials(user_name: str, password: str):
+    """
+    Checks if the password is correct for the given user name.
+
+    Returns True if the password is correct, False otherwise.
+    """
+    if not isinstance(user_name, str):
+        raise ValueError("Invalid user name")
+    if not isinstance(password, str):
+        raise ValueError("Invalid password")
+    user = Model_AuthUser.find_by_user_name(user_name)
+
+    if user is None:
+        return False
+    return bcrypt.checkpw(bytes(password, "utf-8"), user.hashed_password)
+
+
+def validate_password(password: str):
+    if password is None:
+        raise ValueError("Must provide a password")
+    if not isinstance(password, str):
+        raise ValueError("Password must be a string")
+    if len(password) < constants.PASSWORD_MIN_LENGTH:
+        raise ValueError("Password must be at least 8 characters long")
+    if constants.PASSWORD_REQUIRES_NUMBER and not any(
+        char.isdigit() for char in password
+    ):
+        raise ValueError("Password must contain at least one number")
+    if constants.PASSWORD_REQUIRES_UPPERCASE and not any(
+        char.isupper() for char in password
+    ):
+        raise ValueError("Password must contain at least one uppercase letter")
+    if constants.PASSWORD_REQUIRES_LOWERCASE and not any(
+        char.islower() for char in password
+    ):
+        raise ValueError("Password must contain at least one lowercase letter")
+    if constants.PASSWORD_REQUIRES_SPECIAL_CHAR and not any(
+        char in "!@#$%^&*()-_+=~`[]{}|;:,.<>?/" for char in password
+    ):
+        raise ValueError("Password must contain at least one special character")
+
+
+def generate_password(password_length=12):
+    """
+    Generate a random password of the given length.
+    """
+    VALID_CHARACTERS = DIGITS + UPPERCASE_CHARACTERS + LOWERCASE_CHARACTERS + SYMBOLS
+    new_password = "".join(
+        [random.choice(VALID_CHARACTERS) for _ in range(password_length)]
+    )
+    try:
+        validate_password(new_password)
+    except ValueError:
+        new_password = generate_password(password_length)
+    return new_password
+
+
+def register_user(user_name: str, password: str, roles: list = []):
+    """
+    This function registers a new user with the given user name and password.
+    It performs all password validation, hashing, and accepts a list of roles too.
+    """
+    check_existing_user = Model_AuthUser.find_by_user_name(user_name)
+    if check_existing_user is not None:
+        raise ValueError("User name already exists")
+
+    validate_password(password)
+    bytes_password = bytes(password, "utf-8")
+    hashed_password = bcrypt.hashpw(
+        bytes_password, bcrypt.gensalt(constants.BCRYPT_ROUNDS_WORK_FACTOR)
+    )
+
+    role_objs = Model_AuthRole.find_by_code(roles)
+    user_roles = [
+        Model_AuthUserRole(auth_role_id=role.auth_role_id) for role in role_objs
+    ]
+
+    user = Model_AuthUser(
+        user_name=user_name, hashed_password=hashed_password, roles=user_roles
+    )
+    try:
+        db.session.add(user)
+    except:
+        db.session.rollback()
+        raise
+    else:
+        db.session.commit()
+    return user
+
+
+def update_password(
+    user_name: str, password: str, confirm_password: str
+) -> Model_AuthUser:
+    """
+    This function registers a new user with the given user name and password.
+    It performs all password validation, hashing, and accepts a list of roles too.
+    """
+    user = Model_AuthUser.find_by_user_name(user_name)
+    if user is None:
+        raise ValueError("User name does not exist")
+
+    if password != confirm_password:
+        raise ValueError("Passwords do not match")
+
+    validate_password(password)
+    bytes_password = bytes(password, "utf-8")
+    hashed_password = bcrypt.hashpw(
+        bytes_password, bcrypt.gensalt(constants.BCRYPT_ROUNDS_WORK_FACTOR)
+    )
+    try:
+        user.hashed_password = hashed_password
+    except:
+        db.session.rollback()
+        raise
+    else:
+        db.session.commit()
+    return user
 
 
 def validate_user(user):

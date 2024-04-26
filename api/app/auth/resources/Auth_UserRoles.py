@@ -1,22 +1,26 @@
 from flask import request
 from flask_restx import Resource
+from app.auth.auth import authorization_required
 from ..models import Model_AuthUser, Model_AuthRole, Model_AuthUserRole
 from ..schemas import Schema_AuthUserRole
 
 _schema_list = Schema_AuthUserRole(many=True)
 
-class Resource_AuthManageUserRole(Resource): 
-    
+
+class Resource_AuthManageUserRole(Resource):
+    permissions = {"post": ["admin"]}
+
     @classmethod
+    @authorization_required
     def post(cls):
-        try: 
+        try:
             data = request.get_json()
-            user_name = data.get('user_name')
-            if user_name is None: 
+            user_name = data.get("user_name")
+            if user_name is None:
                 return {"status": "error", "msg": "Please send a user name"}, 400
 
-            _roles = data.get('roles')
-            if _roles is None: 
+            _roles = data.get("roles")
+            if _roles is None:
                 return {"status": "error", "msg": "Please send a list of roles"}, 400
             try:
                 roles = Model_AuthRole.find_by_code(_roles)
@@ -28,10 +32,10 @@ class Resource_AuthManageUserRole(Resource):
                 existing_role_ids = [r.auth_role_id for r in user.roles]
                 new_user_roles = [
                     {
-                        "auth_user_id": user.auth_user_id, 
-                        "auth_role_id": r.auth_role_id, 
-                    } 
-                    for r in roles 
+                        "auth_user_id": user.auth_user_id,
+                        "auth_role_id": r.auth_role_id,
+                    }
+                    for r in roles
                     if r.auth_role_id not in existing_role_ids
                 ]
                 user_roles = _schema_list.load(new_user_roles)

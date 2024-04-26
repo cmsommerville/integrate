@@ -44,11 +44,15 @@ class BaseModel(db.Model):
 
     @declared_attr
     def row_eff_dts(cls):
-        return db.Column(DATETIME2, nullable=False)
+        return db.Column(
+            DATETIME2, nullable=False, server_default=db.func.current_timestamp()
+        )
 
     @declared_attr
     def row_exp_dts(cls):
-        return db.Column(DATETIME2, nullable=False)
+        return db.Column(
+            DATETIME2, nullable=False, server_default=text("'9999-12-31 23:59:59'")
+        )
 
     def __repr__(self):
         """

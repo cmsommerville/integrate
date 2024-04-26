@@ -47,7 +47,8 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir --upgrade -r requirements.txt
 RUN pip install gunicorn
 COPY . .
-COPY .env.prod .env
+RUN rm .env
 ENV HOST=0.0.0.0
-EXPOSE 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()", "--timeout", "120", "--workers", "2"]
+EXPOSE ${API_PORT}
+CMD ["python", "run.py"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:create_app()", "--timeout", "120", "--workers", "2"]
