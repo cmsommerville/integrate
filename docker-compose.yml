@@ -1,20 +1,6 @@
 version: '3.7'
 name: integrate
 services:
-  api:
-    container_name: api
-    build: ./api
-    ports:
-      - "5001:${API_PORT}"
-    env_file: 
-      - .env
-    depends_on:
-      db: 
-        condition: service_healthy
-      redis:
-        condition: service_started
-    volumes: 
-      - ./api:/api
   db:
     container_name: db
     user: root
@@ -38,5 +24,52 @@ services:
       - "6380:${REDIS_PORT}"
     env_file: 
       - .env
+  api:
+    container_name: api
+    build: ./api
+    ports:
+      - "5001:${API_PORT}"
+    env_file: 
+      - .env
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes: 
+      - ./api:/api
+  celery_worker:
+    container_name: celery_worker
+    build:
+      context: ./api
+    entrypoint: celery
+    command: -A app.celery_app.celery worker --loglevel=info
+    env_file: 
+      - .env
+    volumes:
+      - ./api:/app
+    links:
+      - redis
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis:
+        condition: service_started
+  celery_dashboard:
+    container_name: celery_dashboard
+    build:
+      context: ./api
+    command: celery --app app.celery_app.celery flower --port=5555 --broker=$CELERY_BROKER_URL
+    ports:
+      - 5556:5555
+    env_file: 
+      - .env
+    depends_on:
+      api: 
+        condition: service_started
+      celery_worker:
+        condition: service_started
+      redis:
+        condition: service_started
 volumes:
   integrate-mssql:
