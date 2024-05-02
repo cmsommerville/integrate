@@ -5,10 +5,10 @@ from app.backend.classes.ConfigProductLoader import ConfigProductLoader
 
 
 def initialize(hostname, **kwargs):
-    try:
-        loaders.load_roles_permissions(hostname=hostname, **kwargs)
-    except Exception:
-        pass
+    # try:
+    #     loaders.load_roles_permissions(hostname=hostname, **kwargs)
+    # except Exception:
+    #     pass
 
     logger.debug("Loading reference data...")
     loaders.load_refdata(hostname=hostname, **kwargs)

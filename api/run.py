@@ -10,4 +10,5 @@ if __name__ == "__main__":
     host = os.getenv("API_HOST", "127.0.0.1")
     port = os.environ.get("API_PORT", 5000)
     app = create_app()
+    celery = app.extensions["celery"]
     app.run(host=host, port=port, debug=True)

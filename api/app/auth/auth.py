@@ -4,7 +4,12 @@ import functools
 from flask import session
 from sqlalchemy.sql import text
 from app.extensions import db
-from app.auth.models import Model_AuthUser, Model_AuthRole, Model_AuthUserRole
+from app.auth.models import (
+    Model_AuthUser,
+    Model_AuthRole,
+    Model_AuthUserRole,
+    Model_AuthUserPasswordHistory,
+)
 from app.auth import constants
 from app.auth.errors import AuthenticationError
 from app.auth.constants import (
@@ -42,7 +47,7 @@ def check_login_credentials(user_name: str, password: str):
     return bcrypt.checkpw(bytes(password, "utf-8"), user.hashed_password)
 
 
-def validate_password(password: str):
+def validate_unhashed_password(password: str, user: Model_AuthUser = None):
     if password is None:
         raise ValueError("Must provide a password")
     if not isinstance(password, str):
@@ -62,9 +67,21 @@ def validate_password(password: str):
     ):
         raise ValueError("Password must contain at least one lowercase letter")
     if constants.PASSWORD_REQUIRES_SPECIAL_CHAR and not any(
-        char in "!@#$%^&*()-_+=~`[]{}|;:,.<>?/" for char in password
+        char in SYMBOLS for char in password
     ):
         raise ValueError("Password must contain at least one special character")
+
+    # validate password against user's password history
+    if user is not None and getattr(user, "password_list", []):
+        if next(
+            (
+                True
+                for pw in user.password_list
+                if bcrypt.checkpw(bytes(password, "utf-8"), pw)
+            ),
+            False,
+        ):
+            raise ValueError("Password cannot be the same as the last 5 passwords")
 
 
 def generate_password(password_length=12):
@@ -76,7 +93,7 @@ def generate_password(password_length=12):
         [random.choice(VALID_CHARACTERS) for _ in range(password_length)]
     )
     try:
-        validate_password(new_password)
+        validate_unhashed_password(new_password)
     except ValueError:
         new_password = generate_password(password_length)
     return new_password
@@ -91,7 +108,7 @@ def register_user(user_name: str, password: str, roles: list = []):
     if check_existing_user is not None:
         raise ValueError("User name already exists")
 
-    validate_password(password)
+    validate_unhashed_password(password)
     bytes_password = bytes(password, "utf-8")
     hashed_password = bcrypt.hashpw(
         bytes_password, bcrypt.gensalt(constants.BCRYPT_ROUNDS_WORK_FACTOR)
@@ -104,6 +121,11 @@ def register_user(user_name: str, password: str, roles: list = []):
 
     user = Model_AuthUser(
         user_name=user_name, hashed_password=hashed_password, roles=user_roles
+    )
+    user.password_history.append(
+        Model_AuthUserPasswordHistory(
+            auth_user_id=user.auth_user_id, hashed_password=hashed_password
+        )
     )
     try:
         db.session.add(user)
@@ -129,13 +151,20 @@ def update_password(
     if password != confirm_password:
         raise ValueError("Passwords do not match")
 
-    validate_password(password)
+    validate_unhashed_password(password, user=user)
     bytes_password = bytes(password, "utf-8")
     hashed_password = bcrypt.hashpw(
         bytes_password, bcrypt.gensalt(constants.BCRYPT_ROUNDS_WORK_FACTOR)
     )
+
     try:
         user.hashed_password = hashed_password
+        user.password_last_changed_dt = db.func.current_timestamp()
+        user.password_history.append(
+            Model_AuthUserPasswordHistory(
+                auth_user_id=user.auth_user_id, hashed_password=hashed_password
+            )
+        )
     except:
         db.session.rollback()
         raise

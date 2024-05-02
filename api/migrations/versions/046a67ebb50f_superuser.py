@@ -1,4 +1,4 @@
-"""message
+"""superuser
 
 Revision ID: 046a67ebb50f
 Revises: 7d21c8adc125

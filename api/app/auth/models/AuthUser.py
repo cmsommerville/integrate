@@ -1,8 +1,26 @@
 from app.extensions import db
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..tables import TBL_NAMES, SCHEMA_NAME
 
 AUTH_USER = TBL_NAMES["AUTH_USER"]
+AUTH_USER_PASSWORD_HISTORY = TBL_NAMES["AUTH_USER_PASSWORD_HISTORY"]
+
+
+class Model_AuthUserPasswordHistory(db.Model):
+    __tablename__ = AUTH_USER_PASSWORD_HISTORY
+    __table_args__ = {"schema": SCHEMA_NAME}
+
+    auth_user_password_history_id = db.Column(db.Integer, primary_key=True)
+    auth_user_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_USER}.auth_user_id"),
+        nullable=False,
+    )
+    hashed_password = db.Column(db.LargeBinary, nullable=False)
+    created_dts = db.Column(
+        db.DateTime, nullable=False, default=db.func.current_timestamp()
+    )
 
 
 class Model_AuthUser(db.Model):
@@ -12,8 +30,40 @@ class Model_AuthUser(db.Model):
     auth_user_id = db.Column(db.Integer, primary_key=True)
     user_name = db.Column(db.String(100), nullable=False)
     hashed_password = db.Column(db.LargeBinary, nullable=False)
+    password_last_changed_dt = db.Column(
+        db.DateTime, nullable=False, default=db.func.current_timestamp()
+    )
+    manager_id = db.Column(
+        db.Integer,
+        db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_USER}.auth_user_id"),
+        nullable=True,
+    )
 
     roles = db.relationship("Model_AuthUserRole")
+    password_history = db.relationship(
+        "Model_AuthUserPasswordHistory",
+        order_by="desc(Model_AuthUserPasswordHistory.created_dts)",
+    )
+
+    @hybrid_property
+    def password_list(self):
+        return [pw.hashed_password for pw in self.password_history][:5]
+
+    def get_direct_reports(self):
+        """
+        Return a list of direct reports for the user. This list includes the user herself.
+        """
+        beginning_getter = (
+            db.session.query(Model_AuthUser)
+            .filter(Model_AuthUser.auth_user_id == self.auth_user_id)
+            .cte(name="children_for", recursive=True)
+        )
+        with_recursive = beginning_getter.union_all(
+            db.session.query(Model_AuthUser).filter(
+                Model_AuthUser.manager_id == beginning_getter.c.id
+            )
+        )
+        return db.session.query(with_recursive)
 
     def __repr__(self):
         """

@@ -43,8 +43,27 @@ def upgrade():
         sa.Column("auth_user_id", sa.Integer(), nullable=False),
         sa.Column("user_name", sa.String(length=100), nullable=False),
         sa.Column("hashed_password", sa.LargeBinary(), nullable=False),
+        sa.Column("password_last_changed_dt", sa.DateTime(), nullable=False),
+        sa.Column("manager_id", sa.Integer(), nullable=True),
         sa.PrimaryKeyConstraint("auth_user_id"),
         sa.UniqueConstraint("user_name"),
+        sa.ForeignKeyConstraint(
+            ["manager_id"],
+            ["auth.auth_user.auth_user_id"],
+        ),
+        schema="auth",
+    )
+    op.create_table(
+        "auth_user_password_history",
+        sa.Column("auth_user_password_history_id", sa.Integer(), nullable=False),
+        sa.Column("auth_user_id", sa.Integer(), nullable=False),
+        sa.Column("hashed_password", sa.LargeBinary(), nullable=False),
+        sa.Column("created_dts", sa.DateTime(), nullable=False),
+        sa.PrimaryKeyConstraint("auth_user_password_history_id"),
+        sa.ForeignKeyConstraint(
+            ["auth_user_id"],
+            ["auth.auth_user.auth_user_id"],
+        ),
         schema="auth",
     )
     op.create_table(
@@ -2493,12 +2512,12 @@ def downgrade():
     op.execute("DROP TABLE dbo.selection_benefit_history")
     op.drop_table("selection_benefit", schema="dbo")
     op.execute(
+        "DROP SECURITY POLICY rls.policy_rls__config_benefit_duration_detail_auth_acl"
+    )
+    op.execute(
         "ALTER TABLE dbo.config_benefit_duration_detail_auth_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_benefit_duration_detail_auth_acl_history")
-    op.execute(
-        "DROP SECURITY POLICY rls.policy_rls__config_benefit_duration_detail_auth_acl"
-    )
     op.drop_table("config_benefit_duration_detail_auth_acl", schema="dbo")
     with op.batch_alter_table("selection_rating_mapper_set", schema=None) as batch_op:
         batch_op.drop_index(
@@ -2519,9 +2538,9 @@ def downgrade():
     with op.batch_alter_table("selection_plan_acl", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_dbo_selection_plan_acl_selection_plan_id"))
 
+    op.execute("DROP SECURITY POLICY rls.policy_rls__selection_plan_acl")
     op.execute("ALTER TABLE dbo.selection_plan_acl SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.selection_plan_acl_history")
-    op.execute("DROP SECURITY POLICY rls.policy_rls__selection_plan_acl")
     op.drop_table("selection_plan_acl", schema="dbo")
     with op.batch_alter_table("selection_coverage", schema=None) as batch_op:
         batch_op.drop_index(batch_op.f("ix_dbo_selection_coverage_selection_plan_id"))
@@ -2548,11 +2567,11 @@ def downgrade():
     )
     op.execute("DROP TABLE dbo.config_benefit_duration_detail_history")
     op.drop_table("config_benefit_duration_detail", schema="dbo")
+    op.execute("DROP SECURITY POLICY rls.policy_rls__config_benefit_auth_acl")
     op.execute(
         "ALTER TABLE dbo.config_benefit_auth_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_benefit_auth_acl_history")
-    op.execute("DROP SECURITY POLICY rls.policy_rls__config_benefit_auth_acl")
     op.drop_table("config_benefit_auth_acl", schema="dbo")
     op.execute("ALTER TABLE dbo.selection_plan SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.selection_plan_history")
@@ -2644,11 +2663,11 @@ def downgrade():
     op.execute("ALTER TABLE dbo.config_product SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.config_product_history")
     op.drop_table("config_product", schema="dbo")
+    op.execute("DROP SECURITY POLICY rls.policy_rls__config_dropdown_detail_acl")
     op.execute(
         "ALTER TABLE dbo.config_dropdown_detail_acl SET ( SYSTEM_VERSIONING = OFF )"
     )
     op.execute("DROP TABLE dbo.config_dropdown_detail_acl_history")
-    op.execute("DROP SECURITY POLICY rls.policy_rls__config_dropdown_detail_acl")
     op.drop_table("config_dropdown_detail_acl", schema="dbo")
     op.execute(
         "ALTER TABLE dbo.config_rating_mapper_collection SET ( SYSTEM_VERSIONING = OFF )"
@@ -2701,6 +2720,7 @@ def downgrade():
     op.execute("ALTER TABLE dbo.config_age_band_set SET ( SYSTEM_VERSIONING = OFF )")
     op.execute("DROP TABLE dbo.config_age_band_set_history")
     op.drop_table("config_age_band_set", schema="dbo")
+    op.drop_table("auth_user_password_history", schema="auth")
     op.drop_table("auth_user", schema="auth")
     op.drop_table("auth_role", schema="auth")
     op.drop_table("auth_permission", schema="auth")

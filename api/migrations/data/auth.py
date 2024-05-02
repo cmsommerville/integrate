@@ -42,12 +42,28 @@ AUTH_PERMISSIONS = [
         "auth_permission_description": "Writer permissions to provision configurator",
     },
     {
-        "auth_permission_code": "read:selection",
-        "auth_permission_description": "Read permissions to selection RPC modeules",
+        "auth_permission_code": "read:selection:all",
+        "auth_permission_description": "Read permissions to selection RPC modules for all plans",
     },
     {
-        "auth_permission_code": "write:selection",
-        "auth_permission_description": "Write/edit permissions to selection RPC modules",
+        "auth_permission_code": "read:selection:hierarchy",
+        "auth_permission_description": "Read permissions to selection RPC modules for plans belonging to the user and her direct reports",
+    },
+    {
+        "auth_permission_code": "read:selection:self",
+        "auth_permission_description": "Read permissions to selection RPC modules for plans belonging to the user",
+    },
+    {
+        "auth_permission_code": "write:selection:all",
+        "auth_permission_description": "Write/edit permissions to selection RPC modules for all plans",
+    },
+    {
+        "auth_permission_code": "write:selection:hierarchy",
+        "auth_permission_description": "Write/edit permissions to selection RPC modules for plans belonging to the user and her direct reports",
+    },
+    {
+        "auth_permission_code": "write:selection:self",
+        "auth_permission_description": "Write/edit permissions to selection RPC modules for plans belonging to the user",
     },
 ]
 

@@ -57,25 +57,25 @@ def load_roles_permissions(hostname: str, *args, **kwargs):
 
 
 def load_refdata(hostname: str, *args, **kwargs):
-    res = Auth_Superuser.login(hostname, **kwargs)
-    headers = res.headers
-    kwargs["headers"] = headers
+    # res = Auth_Superuser.login(hostname, **kwargs)
+    # headers = res.headers
+    # kwargs["headers"] = headers
 
     Ref_AttrMapperType.load(hostname, **kwargs)
-    Ref_Benefit.load(hostname, **kwargs)
-    Ref_CensusStrategy.load(hostname, **kwargs)
-    Ref_ComparisonOperator.load(hostname, **kwargs)
-    Ref_DataTypes.load(hostname, **kwargs)
-    Ref_InputType.load(hostname, **kwargs)
-    Ref_Optionality.load(hostname, **kwargs)
-    Ref_PlanStatus.load(hostname, **kwargs)
-    Ref_PremiumFrequency.load(hostname, **kwargs)
-    Ref_ProductVariation.load(hostname, **kwargs)
-    Ref_Provision.load(hostname, **kwargs)
-    Ref_RateFrequency.load(hostname, **kwargs)
-    Ref_RatingStrategy.load(hostname, **kwargs)
-    Ref_States.load(hostname, **kwargs)
-    Ref_UnitType.load(hostname, **kwargs)
+    # Ref_Benefit.load(hostname, **kwargs)
+    # Ref_CensusStrategy.load(hostname, **kwargs)
+    # Ref_ComparisonOperator.load(hostname, **kwargs)
+    # Ref_DataTypes.load(hostname, **kwargs)
+    # Ref_InputType.load(hostname, **kwargs)
+    # Ref_Optionality.load(hostname, **kwargs)
+    # Ref_PlanStatus.load(hostname, **kwargs)
+    # Ref_PremiumFrequency.load(hostname, **kwargs)
+    # Ref_ProductVariation.load(hostname, **kwargs)
+    # Ref_Provision.load(hostname, **kwargs)
+    # Ref_RateFrequency.load(hostname, **kwargs)
+    # Ref_RatingStrategy.load(hostname, **kwargs)
+    # Ref_States.load(hostname, **kwargs)
+    # Ref_UnitType.load(hostname, **kwargs)
 
 
 def load_config(hostname: str, *args, **kwargs):

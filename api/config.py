@@ -1,6 +1,7 @@
 import os
 from redis import Redis
 from sqlalchemy.engine import URL
+from app.tasks import BEAT_SCHEDULE
 
 
 connection_url = URL.create(
@@ -18,8 +19,12 @@ connection_url = URL.create(
 
 
 class BaseConfig:
-    CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
-    CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
+    CELERY = dict(
+        broker_url=os.getenv("CELERY_BROKER_URL"),
+        result_backend=os.getenv("CELERY_RESULT_BACKEND"),
+        beat_schedule=BEAT_SCHEDULE,
+        task_ignore_result=True,
+    )
     PROPAGATE_EXCEPTIONS = True
     PERMANENT_SESSION_LIFETIME = 3600
     SECRET_KEY = os.getenv("SESSION_SECRET_KEY")

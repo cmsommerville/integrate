@@ -38,7 +38,9 @@ class BaseCRUDResource(Resource):
     @authorization_required
     def put(cls, id, *args, **kwargs):
         try:
-            data = cls.replace(id, *args, **kwargs)
+            req = request.get_json()
+            queryparams = request.args
+            data = cls.replace(id, data=req, queryparams=queryparams, *args, **kwargs)
             return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
@@ -49,7 +51,9 @@ class BaseCRUDResource(Resource):
     @authorization_required
     def patch(cls, id, *args, **kwargs):
         try:
-            data = cls.update(id, *args, **kwargs)
+            req = request.get_json()
+            queryparams = request.args
+            data = cls.update(id, data=req, queryparams=queryparams, *args, **kwargs)
             return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
@@ -73,21 +77,21 @@ class BaseCRUDResource(Resource):
         return cls.schema.dump(obj)
 
     @classmethod
-    def replace(cls, id, *args, **kwargs):
-        req = request.get_json()
-        queryparams = request.args
+    def replace(cls, id, data, *args, **kwargs):
+        queryparams = kwargs.get("queryparams")
         if cls.validator:
-            req = cls.validator.replace(req, id=id, *args, **{**queryparams, **kwargs})
-        obj = cls.model.replace_one(id, req)
+            data = cls.validator.replace(
+                data, id=id, *args, **{**queryparams, **kwargs}
+            )
+        obj = cls.model.replace_one(id, data)
         return cls.schema.dump(obj)
 
     @classmethod
-    def update(cls, id, *args, **kwargs):
-        req = request.get_json()
-        queryparams = request.args
+    def update(cls, id, data, *args, **kwargs):
+        queryparams = kwargs.get("queryparams")
         if cls.validator:
-            req = cls.validator.update(req, id=id, *args, **{**queryparams, **kwargs})
-        obj = cls.model.update_one(id, req)
+            data = cls.validator.update(data, id=id, *args, **{**queryparams, **kwargs})
+        obj = cls.model.update_one(id, data)
         return cls.schema.dump(obj)
 
     @classmethod
@@ -123,7 +127,9 @@ class BaseCRUDResourceList(Resource):
     @authorization_required
     def post(cls, *args, **kwargs):
         try:
-            data = cls.bulk_create(*args, **kwargs)
+            req = request.get_json()
+            queryparams = request.args
+            data = cls.bulk_create(data=req, queryparams=queryparams, *args, **kwargs)
             return {"status": "success", "data": data}, 201
         except NotImplementedError as e:
             return {"status": "error", "msg": str(e)}, 405
@@ -139,12 +145,11 @@ class BaseCRUDResourceList(Resource):
         return cls.schema.dump(objs)
 
     @classmethod
-    def bulk_create(cls, *args, **kwargs):
-        req = request.get_json()
-        queryparams = request.args
+    def bulk_create(cls, data, *args, **kwargs):
+        queryparams = kwargs.get("queryparams")
         if cls.validator:
-            req = cls.validator.bulk_create(req, *args, **{**queryparams, **kwargs})
-        objs = cls.schema.load(req)
+            data = cls.validator.bulk_create(data, *args, **{**queryparams, **kwargs})
+        objs = cls.schema.load(data)
         cls.model.save_all_to_db(objs)
         return cls.schema.dump(objs)
 

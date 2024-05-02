@@ -30,5 +30,6 @@ class Schema_AuthUser(BaseSchema):
     auth_user_id = ma.Integer()
     user_name = ma.String()
     hashed_password = ma.Raw(load_only=True)
+    password_last_changed_dt = ma.DateTime(load_only=True)
 
     roles = ma.Nested(Schema_AuthUserRole, many=True)
