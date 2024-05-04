@@ -60,10 +60,10 @@ class Model_AuthUser(db.Model):
         )
         with_recursive = beginning_getter.union_all(
             db.session.query(Model_AuthUser).filter(
-                Model_AuthUser.manager_id == beginning_getter.c.id
+                Model_AuthUser.manager_id == beginning_getter.c.auth_user_id
             )
         )
-        return db.session.query(with_recursive)
+        return db.session.query(with_recursive).all()
 
     def __repr__(self):
         """

@@ -3,7 +3,7 @@ import random
 import functools
 from flask import session
 from sqlalchemy.sql import text
-from app.extensions import db
+from app.extensions import db, ma
 from app.auth.models import (
     Model_AuthUser,
     Model_AuthRole,
@@ -28,6 +28,17 @@ UNKNOWN_USER = {
     "is_authenticated": False,
     "timestamp": datetime.now(timezone.utc).timestamp() * 1000,
 }
+
+
+class Schema_User_SessionStore(ma.Schema):
+    auth_user_id = ma.Integer()
+    user_name = ma.String()
+    roles = ma.List(ma.String())
+    permissions = ma.List(ma.String())
+    direct_reports = ma.List(ma.String())
+
+
+schema_user_sessionstore = Schema_User_SessionStore()
 
 
 def check_login_credentials(user_name: str, password: str):
@@ -141,8 +152,7 @@ def update_password(
     user_name: str, password: str, confirm_password: str
 ) -> Model_AuthUser:
     """
-    This function registers a new user with the given user name and password.
-    It performs all password validation, hashing, and accepts a list of roles too.
+    This function updates a user's password. It performs all password validation and hashing.
     """
     user = Model_AuthUser.find_by_user_name(user_name)
     if user is None:
@@ -180,12 +190,7 @@ def validate_user(user):
         raise ValueError("User must have user_name key")
     if not isinstance(user.get("roles"), list):
         raise ValueError("User must have roles key")
-    return {
-        "auth_user_id": user.get("auth_user_id"),
-        "user_name": user.get("user_name"),
-        "roles": user.get("roles"),
-        "permissions": user.get("permissions"),
-    }
+    return schema_user_sessionstore.load(user)
 
 
 def get_user():

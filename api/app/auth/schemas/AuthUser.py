@@ -10,6 +10,7 @@ class Schema_AuthUser_Output(BaseSchema):
     user_name = ma.String()
     roles = ma.Function(lambda obj: [r.role.auth_role_code for r in obj.roles])
     permissions = ma.Method("get_permissions")
+    direct_reports = ma.Method("get_direct_reports")
 
     def get_permissions(self, obj):
         permissions = []
@@ -18,6 +19,9 @@ class Schema_AuthUser_Output(BaseSchema):
                 [p.permission.auth_permission_code for p in role.role.permissions]
             )
         return permissions
+
+    def get_direct_reports(self, obj):
+        return [dr.user_name for dr in obj.get_direct_reports()]
 
 
 class Schema_AuthUser(BaseSchema):
