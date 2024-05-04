@@ -1,0 +1,30 @@
+.ag-theme-alpine {
+    --ag-odd-row-background-color: theme('colors.gray.75');
+    --ag-font-family: inherit;
+    --ag-borders: none;
+    --ag-row-border-color: transparent; 
+    --ag-header-background-color: transparent;
+    --ag-header-foreground-color: theme('colors.gray.900');
+    --ag-header-column-resize-handle-color: theme('colors.gray.100');
+    --ag-foreground-color: theme('colors.gray.500');
+    --ag-row-hover-color: theme('colors.primary.200');
+    --ag-range-selection-border-color: theme('colors.primary.400');
+    --ag-selected-row-background-color: theme('colors.primary.100');
+}
+
+.ag-theme-alpine .ag-header-row {
+    border-bottom: 1px solid theme('colors.gray.300');
+}
+
+.ag-header-row {
+    font-size: 0.875rem;
+}
+
+.ag-header-cell-resize:hover {
+    --ag-header-column-resize-handle-display: block;
+    --ag-header-column-resize-handle-color: theme('colors.gray.200')
+}
+
+.ag-cell {
+    font-size: 0.875rem;
+}
