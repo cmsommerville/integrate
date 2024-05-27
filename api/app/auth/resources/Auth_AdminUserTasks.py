@@ -8,6 +8,7 @@ from app.auth.auth import (
     update_password,
     generate_password,
 )
+from app.auth.schemas import Schema_NewUser
 
 
 class Resource_AdminCreateNewUser(Resource):
@@ -15,26 +16,16 @@ class Resource_AdminCreateNewUser(Resource):
     This resource is for sys admins to create new users
     """
 
+    schema = Schema_NewUser()
     permissions = {"post": ["admin"]}
-
-    @classmethod
-    def get(cls):
-        try:
-            user = get_user()
-            return user, 200
-        except Exception as e:
-            return {"status": "error", "msg": str(e)}, 400
 
     @classmethod
     @authorization_required
     def post(cls):
         try:
             data = request.get_json()
-            user_name = data.get("user_name")
-            if user_name is None:
-                return {"status": "error", "msg": "Please provide user name"}, 400
-            password = data.get("password")
-            register_user(user_name, password)
+            validated_data = cls.schema.load(data)
+            register_user(validated_data)
         except Exception as e:
             return {"status": "error", "msg": str(e)}, 400
         else:

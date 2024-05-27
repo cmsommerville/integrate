@@ -21,3 +21,4 @@ ns_auth.add_resource(res.Resource_AdminCreateNewUser, *["/admin/user:new"])
 ns_auth.add_resource(
     res.Resource_AdminResetUserPassword, *["/admin/user:reset-password"]
 )
+ns_auth.add_resource(res.Resource_GetCurrentUser, *["/me"])

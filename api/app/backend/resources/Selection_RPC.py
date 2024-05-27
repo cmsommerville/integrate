@@ -69,7 +69,13 @@ class PayloadValidationError(Exception):
 
 class Resource_Selection_RPC_Dispatcher(Resource):
     events = SELECTION_EVENT_MAPPER
-    permissions = {"post": ["write:selection"]}
+    permissions = {
+        "post": [
+            "write:selection:all",
+            "write:selection:hierarchy",
+            "write:selection:self",
+        ]
+    }
     event_log_schema = Schema_EventLog()
 
     @classmethod

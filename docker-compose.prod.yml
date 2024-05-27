@@ -1,0 +1,93 @@
+version: '3.7'
+name: integrate-prod
+services:
+  db:
+    container_name: db
+    image: cmsommerville/integrate-db:latest
+    user: root
+    build: 
+      context: ./db
+      dockerfile: Dockerfile.prod
+    env_file: 
+      - .env
+    volumes:
+      - mssql:/var/opt/mssql/data
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U $UID_APPLICATION -P $PWD_APPLICATION -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+  redis:
+    container_name: redis
+    platform: linux/amd64
+    image: cmsommerville/integrate-redis:latest
+    build: 
+      context: ./redis
+      dockerfile: Dockerfile.prod
+    env_file: 
+      - .env
+  api:
+    container_name: api
+    image: cmsommerville/integrate-api:latest
+    build: 
+      context: ./api
+      dockerfile: Dockerfile.prod
+    ports:
+      - "5001:${API_PORT}"
+    env_file: 
+      - .env
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes: 
+      - ./api:/api
+  celery_worker:
+    container_name: celery_worker
+    image: cmsommerville/integrate-celery_worker:latest
+    build:
+      context: ./api
+    command: celery -A app.make_celery worker --loglevel=info
+    env_file: 
+      - .env
+    volumes:
+      - ./api:/app
+    links:
+      - redis
+    depends_on:
+      db: 
+        condition: service_healthy
+      redis:
+        condition: service_started
+  celery_beat:
+    container_name: celery_beat
+    image: cmsommerville/integrate-celery_beat:latest
+    build: 
+      context: ./api
+    command: celery -A app.make_celery beat --loglevel=info
+    env_file: 
+      - .env
+    volumes:
+      - ./app/:/app/
+    depends_on:
+      redis:
+        condition: service_started
+  celery_dashboard:
+    container_name: celery_dashboard
+    image: cmsommerville/integrate-celery_dashboard:latest
+    build:
+      context: ./api
+    command: celery --app app.make_celery flower --port=5555 --broker=$CELERY_BROKER_URL
+    env_file: 
+      - .env
+    depends_on:
+      api: 
+        condition: service_started
+      celery_worker:
+        condition: service_started
+      redis:
+        condition: service_started
+volumes:
+  mssql:

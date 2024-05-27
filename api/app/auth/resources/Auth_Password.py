@@ -1,6 +1,6 @@
 from flask import request
 from flask_restx import Resource, fields
-from app.extensions import api
+from app.extensions import api, limiter
 from app.auth.auth import (
     login_user,
     update_password,
@@ -41,6 +41,10 @@ class Resource_AuthSetPassword(Resource):
         model=model_post,
         validate=True,
         description="Update the password of a user. The user must provide the old password, the new password, and a confirmation of the new password",
+    )
+    @limiter.limit(
+        "1 per minute;3 per day",
+        error_message="Only 1 password change per hour is allowed",
     )
     def post(cls):
         try:

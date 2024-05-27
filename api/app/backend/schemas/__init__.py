@@ -47,7 +47,10 @@ from .Config_ProductVariation import (
     Schema_ConfigProductVariation,
     Schema_ConfigProductVariation_SetPlanDesignVariationStates,
 )
-from .Config_ProductVariationState import Schema_ConfigProductVariationState
+from .Config_ProductVariationState import (
+    Schema_ConfigProductVariationState,
+    Schema_Getter_ConfigProductVariationState_SelectionPlan,
+)
 from .Config_ProvisionUI import (
     Schema_ConfigProvisionUI,
     Schema_ConfigProvisionUI_Input,

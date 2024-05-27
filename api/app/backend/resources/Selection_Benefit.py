@@ -39,6 +39,14 @@ class CRUD_SelectionBenefit_List(BaseSelectionCRUDResourceList):
     validator = Validator_SelectionBenefitList
 
     @classmethod
+    def list(cls, *args, **kwargs):
+        if kwargs.get("parent_id") is not None:
+            objs = cls.model.find_by_plan(kwargs.get("parent_id"))
+        else:
+            objs = cls.model.find_all(*args, **kwargs)
+        return cls.schema.dump(objs)
+
+    @classmethod
     def bulk_create(cls, *args, **kwargs):
         parent_id = kwargs.get("parent_id")
         if parent_id is None:

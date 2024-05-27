@@ -44,11 +44,13 @@ class BaseConfig:
 class DevConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = connection_url
     DB_USER_NAME = os.getenv("DATABASE_UID")
+    SESSION_COOKIE_SECURE = False
 
 
 class TestConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv("TEST_SQLALCHEMY_DATABASE_URI")
     DB_USER_NAME = os.getenv("DATABASE_UID")
+    SESSION_COOKIE_SECURE = False
 
 
 class ProdConfig(BaseConfig):

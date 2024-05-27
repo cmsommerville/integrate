@@ -23,16 +23,17 @@ class Model_AuthUserPasswordHistory(db.Model):
     )
 
 
-class Model_AuthUser(db.Model):
+class Model_AuthBaseUser(db.Model):
     __tablename__ = AUTH_USER
     __table_args__ = (db.UniqueConstraint("user_name"), {"schema": SCHEMA_NAME})
 
     auth_user_id = db.Column(db.Integer, primary_key=True)
+    user_type_code = db.Column(db.String(30), nullable=False)
     user_name = db.Column(db.String(100), nullable=False)
-    hashed_password = db.Column(db.LargeBinary, nullable=False)
-    password_last_changed_dt = db.Column(
-        db.DateTime, nullable=False, default=db.func.current_timestamp()
-    )
+    first_name = db.Column(db.String(100), nullable=False)
+    last_name = db.Column(db.String(100), nullable=False)
+    email_address = db.Column(db.String(100), nullable=False)
+    avatar = db.Column(db.String(1000), nullable=True)
     manager_id = db.Column(
         db.Integer,
         db.ForeignKey(f"{SCHEMA_NAME}.{AUTH_USER}.auth_user_id"),
@@ -40,14 +41,11 @@ class Model_AuthUser(db.Model):
     )
 
     roles = db.relationship("Model_AuthUserRole")
-    password_history = db.relationship(
-        "Model_AuthUserPasswordHistory",
-        order_by="desc(Model_AuthUserPasswordHistory.created_dts)",
-    )
 
-    @hybrid_property
-    def password_list(self):
-        return [pw.hashed_password for pw in self.password_history][:5]
+    __mapper_args__ = {
+        "polymorphic_on": user_type_code,
+        "polymorphic_identity": "__base__",
+    }
 
     def get_direct_reports(self):
         """
@@ -91,3 +89,20 @@ class Model_AuthUser(db.Model):
         except Exception:
             db.session.rollback()
             raise
+
+
+class Model_AuthUser(Model_AuthBaseUser):
+    __mapper_args__ = {"polymorphic_identity": "app_managed_user"}
+
+    hashed_password = db.Column(db.LargeBinary, nullable=False)
+    password_last_changed_dt = db.Column(
+        db.DateTime, nullable=False, default=db.func.current_timestamp()
+    )
+    password_history = db.relationship(
+        "Model_AuthUserPasswordHistory",
+        order_by="desc(Model_AuthUserPasswordHistory.created_dts)",
+    )
+
+    @hybrid_property
+    def password_list(self):
+        return [pw.hashed_password for pw in self.password_history][:5]
