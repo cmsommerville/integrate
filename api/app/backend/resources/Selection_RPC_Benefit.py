@@ -7,6 +7,7 @@ from app.shared.utils import system_temporal_hint
 from ..models import (
     Model_ConfigBenefit,
     Model_ConfigBenefitAuth,
+    Model_ConfigBenefitAuth_ACL,
     Model_ConfigBenefitDurationSet,
     Model_ConfigBenefitDurationDetail,
     Model_ConfigBenefitVariationState,
@@ -80,6 +81,7 @@ class Selection_RPC_Benefit:
         Get min/max/step values for benefits as of the time `t`
         """
         AUTH = Model_ConfigBenefitAuth
+        ACL = Model_ConfigBenefitAuth_ACL
 
         row_number_column = (
             func.row_number()
@@ -97,7 +99,9 @@ class Selection_RPC_Benefit:
                 AUTH.step_value,
                 row_number_column,
             )
+            .join(ACL, AUTH.config_benefit_auth_id == ACL.config_benefit_auth_id)
             .with_hint(AUTH, system_temporal_hint(self.t))
+            .with_hint(ACL, system_temporal_hint(self.t))
             .subquery()
         )
 

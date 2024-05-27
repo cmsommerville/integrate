@@ -32,4 +32,9 @@ def upgrade():
 
 
 def downgrade():
-    pass
+    op.execute("DELETE FROM auth.auth_role_permission")
+    op.execute("DELETE FROM auth.auth_user_role")
+    op.execute("DELETE FROM auth.auth_user_password_history")
+    op.execute("DELETE FROM auth.auth_role")
+    op.execute("DELETE FROM auth.auth_permission")
+    op.execute("DELETE FROM auth.auth_user")

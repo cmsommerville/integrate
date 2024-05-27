@@ -11,3 +11,4 @@ from .Auth_AdminUserTasks import (
     Resource_AdminAssignUserRole,
     Resource_AdminRemoveUserRole,
 )
+from .Auth_User import Resource_GetCurrentUser

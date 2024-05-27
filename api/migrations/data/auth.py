@@ -1,3 +1,4 @@
+import os
 from app.auth.auth import register_user
 from app.extensions import db
 from app.auth.models import (
@@ -90,4 +91,13 @@ def register_superuser_roles_permissions():
 
 
 def register_sys_admin(pwd):
-    return register_user("sys", pwd, ["superuser"])
+    data = {
+        "user_type_code": "app_managed_user",
+        "user_name": "sys",
+        "first_name": "System",
+        "last_name": "Admin",
+        "email_address": os.getenv("SYS_SUPERUSER_EMAIL_ADDRESS", "sys@dummy.com"),
+        "roles": ["superuser"],
+        "password": pwd,
+    }
+    return register_user(data)

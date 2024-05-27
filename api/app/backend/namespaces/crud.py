@@ -60,6 +60,7 @@ BASE_ROUTES = {
     "/mappers": res.CRUD_ConfigRatingMapperCollection_List,
     "/product/<int:id>": res.CRUD_ConfigProduct,
     "/products": res.CRUD_ConfigProduct_List,
+    "/product:load": res.Resource_ConfigProductLoader,
 }
 
 PRODUCT_ROUTES = {

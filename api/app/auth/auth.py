@@ -33,6 +33,10 @@ UNKNOWN_USER = {
 class Schema_User_SessionStore(ma.Schema):
     auth_user_id = ma.Integer()
     user_name = ma.String()
+    first_name = ma.String()
+    last_name = ma.String()
+    email_address = ma.String()
+    avatar = ma.String(allow_none=True, required=False)
     roles = ma.List(ma.String())
     permissions = ma.List(ma.String())
     direct_reports = ma.List(ma.String())
@@ -110,28 +114,30 @@ def generate_password(password_length=12):
     return new_password
 
 
-def register_user(user_name: str, password: str, roles: list = []):
+def register_user(user_data):
     """
     This function registers a new user with the given user name and password.
     It performs all password validation, hashing, and accepts a list of roles too.
     """
-    check_existing_user = Model_AuthUser.find_by_user_name(user_name)
+    check_existing_user = Model_AuthUser.find_by_user_name(user_data["user_name"])
     if check_existing_user is not None:
         raise ValueError("User name already exists")
 
+    password = user_data.pop("password")
     validate_unhashed_password(password)
     bytes_password = bytes(password, "utf-8")
     hashed_password = bcrypt.hashpw(
         bytes_password, bcrypt.gensalt(constants.BCRYPT_ROUNDS_WORK_FACTOR)
     )
 
+    roles = user_data.pop("roles", [])
     role_objs = Model_AuthRole.find_by_code(roles)
     user_roles = [
         Model_AuthUserRole(auth_role_id=role.auth_role_id) for role in role_objs
     ]
 
     user = Model_AuthUser(
-        user_name=user_name, hashed_password=hashed_password, roles=user_roles
+        **user_data, hashed_password=hashed_password, roles=user_roles
     )
     user.password_history.append(
         Model_AuthUserPasswordHistory(

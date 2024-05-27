@@ -1,6 +1,7 @@
 import bcrypt
 from flask import request
 from flask_restx import Resource
+from app.extensions import limiter
 from ..models import Model_AuthUser
 from ..schemas import Schema_AuthUser_Output
 from ..auth import login_user, logout
@@ -11,6 +12,10 @@ _schema = Schema_AuthUser_Output()
 
 class Resource_AuthLogin(Resource):
     @classmethod
+    @limiter.limit(
+        "20 per minute",
+        error_message="Rate limit exceeded. Please try again in a few seconds",
+    )
     def post(cls):
         try:
             data = request.get_json()
@@ -23,7 +28,11 @@ class Resource_AuthLogin(Resource):
             if is_valid_password:
                 user_data = _schema.dump(user)
                 login_user(user_data)
-                return {"status": "success", "msg": "Successfully logged in"}, 200
+                return {
+                    "status": "success",
+                    "msg": "Successfully logged in",
+                    "data": user_data,
+                }, 200
             logout()
             return {"status": "error", "msg": "Password incorrect"}, 401
 

@@ -1,3 +1,4 @@
+import os
 import redis
 from flask import Flask
 from sqlalchemy import MetaData
@@ -7,10 +8,18 @@ from flask_marshmallow import Marshmallow
 from flask_restx import Api
 from flask_session import Session
 from flask_migrate import Migrate
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from celery import Celery, Task
 
 
-cors = CORS(supports_credentials=True)
+cors = CORS(
+    resources={
+        r"/api/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]},
+        r"/rpc/*": {"origins": ["http://localhost:5173", "http://127.0.0.1:5173"]},
+    },
+    supports_credentials=True,
+)
 metadata = MetaData(schema="dbo")
 db = SQLAlchemy(metadata=metadata, engine_options={"fast_executemany": True})
 migrate = Migrate()
@@ -18,6 +27,12 @@ ma = Marshmallow()
 api = Api(doc="/api/doc/")
 sess = Session()
 cache = redis.Redis(db=1)
+limiter = Limiter(
+    get_remote_address,
+    default_limits=["1000 per day", "50 per hour"],
+    storage_uri=os.getenv("RATE_LIMITER_DB_URI", "memory://"),
+    strategy="fixed-window",
+)
 
 
 def init_extensions(app: Flask):
@@ -30,6 +45,7 @@ def init_extensions(app: Flask):
     api.init_app(app)
     sess.init_app(app)
     migrate.init_app(app, db)
+    limiter.init_app(app)
 
     return app, db, ma, api, sess
 

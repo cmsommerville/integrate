@@ -17,6 +17,11 @@ services:
       timeout: 3s
       retries: 10
       start_period: 10s
+    deploy:
+      resources:
+        reservations:
+          cpus: '1'
+          memory: 4gb
   redis:
     container_name: redis
     build: ./redis
